@@ -16,5 +16,8 @@ void DirectionalWave::setUniforms(Shader * shader) {
 PointWave::PointWave(const glm::vec2 position) : position(position){}
 
 void PointWave::setUniforms(Shader * shader) {
-
+    shader->setFloat("pWave.waveLength", waveLength);
+    shader->setFloat("pWave.magnitude", magnitude);
+    shader->setFloat("pWave.speed", speed);
+    shader->setVec2("pWave.position", position);
 }

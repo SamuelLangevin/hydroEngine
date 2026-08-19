@@ -32,11 +32,16 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera.getViewMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     Shader * screenWaterShader = ResourceManager::getShader("screenWaterShader");
+    screenWaterShader->use();
+    screenWaterShader->setFloat("time", static_cast<float>(glfwGetTime()));
 
     DirectionalWave dWave(glm::vec2(0.2f, 0.7f));
-    screenWaterShader->use();
     dWave.setUniforms(screenWaterShader);
-    screenWaterShader->setFloat("time", static_cast<float>(glfwGetTime()));
+
+    PointWave pWave(glm::vec2(0.2f, 0.2f));
+    pWave.waveLength = 0.05f;
+    pWave.setUniforms(screenWaterShader);
+
     Rectangle::draw2DQuad();
 }
 
