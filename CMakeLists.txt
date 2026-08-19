@@ -20,6 +20,8 @@ add_executable(hydroEngine
     src/draw/Cone.cpp
     src/draw/Sphere.cpp
     src/draw/Mesh.cpp
+    src/draw/Rectangle.cpp
+    src/utility/Waves.cpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/freetype2)

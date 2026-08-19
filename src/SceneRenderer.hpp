@@ -5,6 +5,7 @@
 
 class SceneRenderer {
     public:
+
         SceneRenderer() = default;
         ~SceneRenderer();
 

@@ -1,11 +1,9 @@
 # HydroEngine
 
 ## About
-***
 This project aims to create simple yet realistic water physics, showcased in an interactive application.
 
 ## Setup (linux)
-***
 
 ### Install
 1.
@@ -28,11 +26,9 @@ Renderdoc is an optional debugging tool.
 2. run renderdoc as admin with command ```$sudo ./qrenderdoc```
 
 ## Attributions
-***
-This project was partially based on the work of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction).
+This project is partially based on the work of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction).
 
 ## Contributing
-***
 This is a personal project. You may suggest modifications, report bugs through issues but pull requests will not be merged.
 
 
