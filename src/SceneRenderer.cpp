@@ -14,10 +14,13 @@ void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
     Rectangle::free();
     ResourceManager::clear();
+    delete water;
 }
 
 void SceneRenderer::init(glm::ivec2 windowSize) {
     ResourceManager::loadShader("screenWaterShader", "screen.vert", "screenWater.frag");
+    ResourceManager::loadShader("waterSurfaceShader", "waterSurface.vert", "waterSurface.frag",
+                                    nullptr, "waterSurface.tesc", "waterSurface.tese");
 
     glGenBuffers(1, &matricesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
@@ -26,11 +29,16 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUBO, 0, 2*sizeof(glm::mat4));
 
-    Shader * screenWaterShader = ResourceManager::getShader("screenWaterShader");
-    screenWaterShader->use();
+    Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
+    waterSurfaceShader->use();
+    waterSurfaceShader->setUniformBlock("Matrices", 0);
 
     DirectionalWave dWave(glm::vec2(0.2f, 0.7f));
-    dWave.setUniforms(screenWaterShader, 0);
+    dWave.setUniforms(waterSurfaceShader, 0);
+
+    water = new Surface(glm::ivec2(1000));
+    water->scale = glm::vec3(0.1f);
+    water->position = glm::vec3(0.0f, -10.0f, 0.0f);
 }
 
 void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) const {
@@ -40,17 +48,23 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(camera.getViewMatrix()));
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-    Shader * screenWaterShader = ResourceManager::getShader("screenWaterShader");
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.7, 0.8, 1.0, 1.0);
+    glPatchParameteri(GL_PATCH_VERTICES, 4);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
 
-    screenWaterShader->use();
-    screenWaterShader->setFloat("time", static_cast<float>(glfwGetTime()));
+    Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
 
+    waterSurfaceShader->use();
+    waterSurfaceShader->setFloat("time", static_cast<float>(glfwGetTime()));
 
-    screenWaterShader->setInt("nbOfPointWaves", waves.size());
+    waterSurfaceShader->setInt("nbOfPointWaves", waves.size());
     for (int i = 0; i < std::min(static_cast<int>(waves.size()), 50); ++i) {
-        waves.at(i).setUniforms(screenWaterShader, i);
+        waves.at(i).setUniforms(waterSurfaceShader, i);
     }
     
-    Rectangle::draw2DQuad();
+    water->draw(waterSurfaceShader);
 }
 

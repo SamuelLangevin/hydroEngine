@@ -21,7 +21,7 @@ class DirectionalWave : public Wave {
 public:
     glm::vec2 direction;
 
-    explicit DirectionalWave(glm::vec2 direction, float waveLength = 0.1f, float magnitude = 0.5f, float speed = 3.0f);
+    explicit DirectionalWave(glm::vec2 direction, float waveLength = 1.0f, float magnitude = 0.5f, float speed = 3.0f);
     void setUniforms(Shader * shader, int index) const override;
 };
 
@@ -31,7 +31,7 @@ public:
     glm::vec2 origin;
     float dropTime;
 
-    explicit PointWave(glm::vec2 position, float dropTime, float waveLength = 0.05f, float magnitude = 0.5f, float speed = 10.0f);
+    explicit PointWave(glm::vec2 position, float dropTime, float waveLength = 1.0f, float magnitude = 0.5f, float speed = 10.0f);
     void setUniforms(Shader * shader, int index) const override;
 };
 

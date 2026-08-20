@@ -42,6 +42,15 @@ class Shape {
         glm::vec3 scale = glm::vec3(1.0f);
 
         virtual ~Shape() = default;
+
+        void setMatricesUniforms(Shader * shader) const {
+            glm::mat4 model(1.0f);
+            model = glm::translate(model, position);
+            model = glm::rotate(model, orientation.w, glm::vec3(orientation.x, orientation.y, orientation.z));
+            model = glm::scale(model, scale);
+            shader->setMat4("model", model);
+        }
+
         virtual void draw(Shader * shader) const = 0;
 };
 

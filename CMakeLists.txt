@@ -21,6 +21,7 @@ add_executable(hydroEngine
     src/draw/Mesh.cpp
     src/draw/Rectangle.cpp
     src/utility/Waves.cpp
+    src/draw/Surface.cpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/glm)
