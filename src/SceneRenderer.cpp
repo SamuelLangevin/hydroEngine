@@ -30,12 +30,7 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
     screenWaterShader->use();
 
     DirectionalWave dWave(glm::vec2(0.2f, 0.7f));
-    dWave.setUniforms(screenWaterShader);
-
-    PointWave pWave(glm::vec2(0.2f, 0.2f));
-    pWave.waveLength = 0.05f;
-    pWave.speed = 10.0f;
-    pWave.setUniforms(screenWaterShader);
+    dWave.setUniforms(screenWaterShader, 0);
 }
 
 void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) const {
@@ -46,18 +41,16 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     Shader * screenWaterShader = ResourceManager::getShader("screenWaterShader");
-    screenWaterShader->use();
-    float time = static_cast<float>(glfwGetTime());
-    screenWaterShader->setFloat("time", time);
-    static bool firstloop = true;
-    static float dropTime;
-    if (firstloop) {
-        firstloop = false;
-        dropTime = static_cast<float>(glfwGetTime());
-        screenWaterShader->setFloat("pWave.dropTime", dropTime);
-    }
-    std::cout << time - dropTime << "\n";
 
+    screenWaterShader->use();
+    screenWaterShader->setFloat("time", static_cast<float>(glfwGetTime()));
+
+
+    screenWaterShader->setInt("nbOfPointWaves", waves.size());
+    for (int i = 0; i < std::min(static_cast<int>(waves.size()), 50); ++i) {
+        waves.at(i).setUniforms(screenWaterShader, i);
+    }
+    
     Rectangle::draw2DQuad();
 }
 

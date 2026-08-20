@@ -11,26 +11,28 @@ public:
     float magnitude;
     float speed;
 
-    explicit Wave(const float waveLength = 0.1f, const float magnitude = 0.5f, const float speed = 3.0f)
+    explicit Wave(const float waveLength, const float magnitude, const float speed)
         : waveLength(waveLength), magnitude(magnitude), speed(speed){}
     virtual ~Wave() = default;
-    virtual void setUniforms(Shader * shader) = 0;
+    virtual void setUniforms(Shader * shader, int index) const = 0;
 };
 
 class DirectionalWave : public Wave {
 public:
     glm::vec2 direction;
 
-    explicit DirectionalWave(glm::vec2 direction = glm::vec2(1.0f, 0.0f));
-    void setUniforms(Shader * shader) override;
+    explicit DirectionalWave(glm::vec2 direction, float waveLength = 0.1f, float magnitude = 0.5f, float speed = 3.0f);
+    void setUniforms(Shader * shader, int index) const override;
 };
 
 class PointWave : public Wave {
 public:
-    glm::vec2 position;
+    static constexpr float lifeTime = 5.0f;
+    glm::vec2 origin;
+    float dropTime;
 
-    explicit PointWave(glm::vec2 position = glm::vec2(0.5f, 0.5f));
-    void setUniforms(Shader * shader) override;
+    explicit PointWave(glm::vec2 position, float dropTime, float waveLength = 0.05f, float magnitude = 0.5f, float speed = 10.0f);
+    void setUniforms(Shader * shader, int index) const override;
 };
 
 
