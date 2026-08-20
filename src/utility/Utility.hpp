@@ -2,8 +2,6 @@
 #define UTILITY_HPP
 
 #include "../../includes/glad.h"
-#include <map>
-#include <freetype/freetype.h>
 #include <glm/glm.hpp>
 
 class Utility{
@@ -32,14 +30,6 @@ class Utility{
             uint renderBuffer{};
         };
 
-        struct Character {
-            uint textureID;
-            glm::ivec2 size;
-            glm::ivec2 bearing;
-            uint advance;
-        };
-        typedef std::map<char, Character> Font;
-
         Utility() = delete;
 
         static void createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool attachRenderBuffer, int colorAttachments);
@@ -52,8 +42,6 @@ class Utility{
 
         static GLenum glCheckError_(const char *file, int line);
         #define glCheckError() glCheckError_(__FILE__, __LINE__)
-
-        static void loadFont(FT_Library & ft, Font & characters, const char * fontPath);
 
 };
 

@@ -13,7 +13,6 @@ sudo apt-get install libglfw-dev
 ```
 2. Download glm from its [repository](https://github.com/g-truc/glm), then build and install.
 3. Download assimp from its [repository](https://github.com/assimp/assimp). Build and install instructions in Build.md.
-4. Download freetype from the [website](https://freetype.org/). Build and install instructions in docs/INSTALL.
 
 ### glfw, glad/openGL setup
 https://youtu.be/LxEFn-cGdE0?si=VZp4Sloh_Ba7o2I9
