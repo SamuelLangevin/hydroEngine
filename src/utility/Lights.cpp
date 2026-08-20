@@ -3,7 +3,7 @@
 #include "../draw/Cone.hpp"
 
 
-AmbientLight::AmbientLight(glm::vec3 color): Light(color, AMBIENT) {}
+AmbientLight::AmbientLight(glm::vec3 color): Light(color) {}
 
 void AmbientLight::draw(Shader * shader) {}
 
@@ -11,9 +11,9 @@ void AmbientLight::setUniforms(Shader * shader, int lightIndex) {}
 
 
 
-DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f), DIRECTIONAL), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
 
-DirectionalLight::DirectionalLight(glm::vec3 color, glm::vec3 direction): Light(color, DIRECTIONAL), direction(direction) {}
+DirectionalLight::DirectionalLight(glm::vec3 color, glm::vec3 direction): Light(color), direction(direction) {}
 
 void DirectionalLight::draw(Shader * shader) {}
 
@@ -25,9 +25,9 @@ void DirectionalLight::setUniforms(Shader * shader, int lightIndex) {
 
 
 
-PointLight::PointLight() : Light(glm::vec3(1.0f), POINT) {}
+PointLight::PointLight() : Light(glm::vec3(1.0f)) {}
 
-PointLight::PointLight(glm::vec3 color, glm::vec3 position): Light(color, POINT), position(position) {}
+PointLight::PointLight(glm::vec3 color, glm::vec3 position): Light(color), position(position) {}
 
 void PointLight::draw(Shader * shader) {
     shader->use();
@@ -47,10 +47,10 @@ void PointLight::setUniforms(Shader * shader, int lightIndex) {
 
 
 
-SpotLight::SpotLight() : Light(glm::vec3(1.0f), SPOT), position(glm::vec3(0.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+SpotLight::SpotLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
 
 SpotLight::SpotLight(glm::vec3 color, glm::vec3 position, glm::vec3 direction)
-    : Light(color, SPOT), position(position), direction(direction) {}
+    : Light(color), position(position), direction(direction) {}
 
 void SpotLight::draw(Shader * shader) {
     shader->use();

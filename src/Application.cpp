@@ -16,6 +16,7 @@ float Application::sensitivity = 0.002f;
 bool Application::firsttime = true;
 uint Application::keys[1024];
 uint Application::keysProcessed[1024];
+bool Application::leftMouseButtonProcessed = false;
 
 Application::Application() {
     initializeWindow();
@@ -23,7 +24,7 @@ Application::Application() {
 }
 
 Application::~Application(){
-    ResourceManager::clear();
+    sceneRenderer.free();
     glfwTerminate();
 }
 
@@ -48,7 +49,7 @@ void Application::initializeWindow(){
     glViewport(0,0, windowSize.x, windowSize.y);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     glfwSetKeyCallback(window, key_callback);
 }
 
@@ -100,7 +101,16 @@ void Application::processInput(float deltaTime){
         if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
         if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
     }
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
+        if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        leftMouseButtonProcessed = true;
+
+        sceneRenderer.waves.emplace_back(glm::vec2(x/windowSize.x, (windowSize.y - y)/windowSize.y), glfwGetTime());
+    }
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 }
 
 bool Application::shouldWindowClose(){
@@ -114,6 +124,7 @@ void Application::draw(){
 
     if (state == ACTIVE) {
         sceneRenderer.draw(camera, windowSize);
+        updateWaves();
         
     } else if (state == MENU) {
         
@@ -124,6 +135,12 @@ void Application::draw(){
     glfwPollEvents();
     Utility::glCheckError();
     //checkFPS(deltatime);
+}
+
+void Application::updateWaves() {
+    if (!sceneRenderer.waves.empty())
+    if (glfwGetTime() - sceneRenderer.waves.at(0).dropTime > PointWave::lifeTime)
+        sceneRenderer.waves.erase(sceneRenderer.waves.begin());
 }
 
 void Application::checkFPS(float dt) {

@@ -7,12 +7,9 @@
 class Light {
     public:
 
-        enum LightType {AMBIENT, DIRECTIONAL, POINT, SPOT};
-
         glm::vec3 color;
-        const LightType type;
 
-        Light(const glm::vec3 color, LightType type) : color(color), type(type) {};
+        Light(const glm::vec3 color) : color(color) {};
         virtual ~Light() = default;
         virtual void draw(Shader * shader) = 0;
         virtual void setUniforms(Shader * shader, int lightIndex) = 0;

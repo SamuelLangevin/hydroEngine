@@ -8,9 +8,6 @@ class BasicShape : public Shape {
 public:
 
     Utility::Material material;
-    uint normalMap = 0;
-    uint displacementMap = 0;
-    bool enableNormalMapping = false;
 
 protected:
 
@@ -27,15 +24,6 @@ protected:
         shader->setFloat("material.ao", material.ao);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, material.texture_diffuse0);
-
-        if (enableNormalMapping) {
-            shader->setInt("normalMap", 1);
-            shader->setInt("displacementMap", 2);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, normalMap);
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, displacementMap);
-        }
     }
 };
 

@@ -4,13 +4,15 @@
 
 class Cone : public BasicShape{
 public:
-    static uint VAO;
 
     Cone();
+    static void free();
     static void load();
     void draw(Shader * shader) const override;
 
     static int lonResolution;
+private:
+    static uint VAO, VBO, EBO;
 };
 
 
