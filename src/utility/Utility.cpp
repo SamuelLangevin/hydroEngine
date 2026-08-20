@@ -1,6 +1,5 @@
 #include "Utility.hpp"
 #include <iostream>
-#include <map>
 #include "Texture.hpp"
 
 void Utility::createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
@@ -167,33 +166,4 @@ GLenum Utility::glCheckError_(const char *file, int line) {
     return errorCode;
 }
 
-void Utility::loadFont(FT_Library & ft, Font & characters, const char * fontPath) {
-
-    FT_Face face;
-    if (FT_New_Face(ft, fontPath, 0, &face))
-        std::cout << "ERROR::FREETYPE: Could not load font\n";
-    FT_Set_Pixel_Sizes(face, 0, 48);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    for (unsigned char c = 0; c < 128; c++) {
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-            std::cout << "ERROR::FREETYPE: Could not load Glyph\n";
-            continue;
-        }
-
-        uint texture = Texture::createTexture(glm::ivec2(face->glyph->bitmap.width,face->glyph->bitmap.rows),
-            GL_RED, GL_RED, GL_UNSIGNED_BYTE,GL_CLAMP_TO_EDGE,GL_LINEAR, face->glyph->bitmap.buffer);
-        glBindTexture(GL_TEXTURE_2D,texture);
-        Character character = {
-            texture,
-            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-            static_cast<uint>(face->glyph->advance.x)
-        };
-
-        characters.insert(std::pair<char, Character>(c, character));
-    }
-
-    FT_Done_Face(face);
-}
 

@@ -4,7 +4,7 @@
 
 #define PI 3.14159265359
 
-uint Sphere::VAO;
+uint Sphere::VAO, Sphere::VBO, Sphere::EBO;
 int Sphere::latResolution = 20, Sphere::lonResolution = 20;
 
 Sphere::Sphere()= default;
@@ -53,8 +53,16 @@ void Sphere::load(){
         std::vector<Mesh::Texture> textures;
         Mesh mesh(vertices, indices, textures);
         VAO = mesh.VAO;
+        VBO = mesh.VBO;
+        EBO = mesh.EBO;
     }
     glBindVertexArray(VAO);
+}
+
+void Sphere::free() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, & VAO);
 }
 
 void Sphere::draw(Shader * shader) const {

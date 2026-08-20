@@ -33,6 +33,12 @@ void Mesh::setupMesh(){
     glBindVertexArray(0);
 }
 
+void Mesh::free() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, & VAO);
+}
+
 void Mesh::draw(Shader &shader) const {
     uint diffuseNr = 1;
     uint specularNr = 1;

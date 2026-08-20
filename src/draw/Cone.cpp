@@ -5,10 +5,16 @@
 
 #define PI 3.14159265359
 
-uint Cone::VAO;
+uint Cone::VAO, Cone::VBO, Cone::EBO;
 int Cone::lonResolution = 40;
 
 Cone::Cone()= default;
+
+void Cone::free() {
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, & VAO);
+}
 
 void Cone::load(){
     if (VAO == 0) {
@@ -66,6 +72,8 @@ void Cone::load(){
         std::vector<Mesh::Texture> textures;
         Mesh mesh(vertices, indices, textures);
         VAO = mesh.VAO;
+        VBO = mesh.VBO;
+        EBO = mesh.EBO;
     }
     glBindVertexArray(VAO);
 }

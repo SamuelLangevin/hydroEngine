@@ -6,8 +6,9 @@
 class Rectangle : public BasicShape {
 public:
     static void draw2DQuad();
+    static void free();
 private:
-    static uint screenQuadVAO;
+    static uint screenQuadVAO, screenQuadVBO;
 };
 
 

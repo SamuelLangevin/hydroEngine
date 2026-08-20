@@ -27,6 +27,7 @@ class Mesh {
         Mesh(std::vector<Vertex> vertices, std::vector<uint> indices,
             std::vector<Texture> textures);
 
+        void free();
         void draw(Shader &shader) const;
 
         uint VAO, VBO, EBO;

@@ -1,10 +1,11 @@
 #include "Application.hpp"
 
 int main(){
-    Application application;
+	Application application;
 
-    while(application.shouldWindowClose()){
-        application.draw();
+	while(application.shouldWindowClose()){
+    	application.draw();
     }
+
 	return 0;
 }

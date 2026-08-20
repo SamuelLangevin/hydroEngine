@@ -2,16 +2,17 @@
 #include "SceneRenderer.hpp"
 
 #include <glm/gtc/type_ptr.hpp>
-
 #include "draw/Rectangle.hpp"
 #include "draw/Sphere.hpp"
 #include "utility/ResourceManager.hpp"
 #include <GLFW/glfw3.h>
-
 #include "utility/Waves.hpp"
 
-SceneRenderer::~SceneRenderer() {
+
+void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
+    Rectangle::free();
+    ResourceManager::clear();
 }
 
 void SceneRenderer::init(glm::ivec2 windowSize) {

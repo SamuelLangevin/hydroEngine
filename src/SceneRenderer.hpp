@@ -7,9 +7,10 @@ class SceneRenderer {
     public:
 
         SceneRenderer() = default;
-        ~SceneRenderer();
+        ~SceneRenderer() = default;
 
         void init(glm::ivec2 windowSize);
+        void free();
         void draw(const Camera & camera, glm::ivec2 windowSize) const;
 
     private:

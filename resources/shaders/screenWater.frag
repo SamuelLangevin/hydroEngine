@@ -25,9 +25,9 @@ out vec4 fragColor;
 
 void main() {
 
-    float directWaveHeight = dWave.magnitude * sin((dot(dWave.direction, texCoords))/dWave.waveLength + time * dWave.speed) + 0.5;
+    float directWaveHeight = dWave.magnitude * sin(-dot(dWave.direction, texCoords)/dWave.waveLength + time * dWave.speed) + 0.5;
     vec2 posToFrag = pWave.position - texCoords;
-    float pointWaveHeight = pWave.magnitude * sin(dot(-posToFrag, normalize(posToFrag))/pWave.waveLength + time * pWave.speed) + 0.5;
+    float pointWaveHeight = pWave.magnitude * sin(-dot(posToFrag, normalize(posToFrag))/pWave.waveLength + time * pWave.speed) + 0.5;
 
     fragColor = vec4(0.0, pointWaveHeight, directWaveHeight, 1.0);
 }

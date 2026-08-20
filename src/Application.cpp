@@ -23,7 +23,7 @@ Application::Application() {
 }
 
 Application::~Application(){
-    ResourceManager::clear();
+    sceneRenderer.free();
     glfwTerminate();
 }
 
@@ -100,7 +100,8 @@ void Application::processInput(float deltaTime){
         if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
         if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
     }
-        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, true);
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
 }
 
 bool Application::shouldWindowClose(){

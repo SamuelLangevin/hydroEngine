@@ -26,15 +26,10 @@ public:
     static void addTexture(const std::string & name, uint textureID, GLenum type);
     [[nodiscard]] static Texture * getTexture(const std::string & name);
 
-    static void addFont(const std::string & name, const char * fontPath);
-    [[nodiscard]] static Utility::Font * getFont(const std::string & name);
-
     static void clear();
 private:
-    static std::map<std::string, Shader*>    shaders;
+    static std::map<std::string, Shader*> shaders;
     static std::map<std::string, Texture*> textures;
-    static std::map<std::string, Utility::Font*> fonts;
-    static FT_Library ft;
 
 };
 

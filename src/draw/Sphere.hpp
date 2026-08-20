@@ -7,13 +7,16 @@
 
 class Sphere : public BasicShape {
 public:
-    static uint VAO;
 
     Sphere();
     static void load();
+
+    static void free();
     void draw(Shader * shader) const override;
 
     static int latResolution, lonResolution;
+private:
+    static uint VAO, VBO, EBO;
 };
 
 #endif
