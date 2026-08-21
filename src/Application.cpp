@@ -70,9 +70,6 @@ void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
     glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
     camera.front = glm::normalize(qYaw * qPitch * camera.front);
 
-    glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
-    worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position, glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
-
 }
 
 
@@ -104,20 +101,26 @@ void Application::processInput(float deltaTime){
         if(keys[GLFW_KEY_S]) camera.position -= cameraSpeed * camera.front;
         if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
         if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+
+        glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
+        worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
+                                                    glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
     }
-        if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
+
+    if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
         double x, y;
         glfwGetCursorPos(window, &x, &y);
         leftMouseButtonProcessed = true;
 
-        sceneRenderer.waves.emplace_back(glm::vec2(worldCursorPos.x, worldCursorPos.y), glfwGetTime());
+        PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(), 3.0,3, 20.0);
+        sceneRenderer.pointWaves.push_back(wave);
     }
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 }
 
-bool Application::shouldWindowClose(){
+bool Application::shouldWindowClose() const {
     return !glfwWindowShouldClose(window);
 }
 
@@ -126,14 +129,9 @@ void Application::draw(){
     deltatime = currentframe - lastFrame;
     lastFrame = currentframe;
 
-    if (state == ACTIVE) {
-        sceneRenderer.draw(camera, windowSize);
-        sceneRenderer.drawWorldCursor(worldCursorPos);
-        updateWaves();
-        
-    } else if (state == MENU) {
-        
-    } else glfwSetWindowShouldClose(window, true);
+    sceneRenderer.draw(camera, windowSize);
+    sceneRenderer.drawWorldCursor(worldCursorPos);
+    updateWaves();
 
     glfwSwapBuffers(window);
     processInput(deltatime);
@@ -143,9 +141,9 @@ void Application::draw(){
 }
 
 void Application::updateWaves() {
-    for (uint i = 0; i < sceneRenderer.waves.size(); ++i){
-        if (glfwGetTime() - sceneRenderer.waves.at(i).dropTime > PointWave::lifeTime)
-            sceneRenderer.waves.erase(sceneRenderer.waves.begin() + i);
+    for (uint i = 0; i < sceneRenderer.pointWaves.size(); ++i){
+        if (glfwGetTime() - sceneRenderer.pointWaves.at(i).dropTime > PointWave::lifeTime)
+            sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
         else break; // expired waves will always be at the beginning of the vector;
     }
 }

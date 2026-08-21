@@ -11,14 +11,14 @@ class Application{
     public:
         Application();
         ~Application();
-        bool shouldWindowClose();
+        [[nodiscard]] bool shouldWindowClose() const;
         void draw();
 
     private:
 
         enum AppState {ACTIVE, MENU};
 
-        GLFWwindow* window;
+        GLFWwindow* window = nullptr;
         static SceneRenderer sceneRenderer;
         static Camera camera;
         static AppState state;

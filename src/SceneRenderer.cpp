@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
-#include "draw/Rectangle.hpp"
 #include "draw/Sphere.hpp"
 #include "utility/ResourceManager.hpp"
 #include <GLFW/glfw3.h>
@@ -12,9 +11,10 @@
 
 void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
-    Rectangle::free();
+    Sphere::free();
     ResourceManager::clear();
     delete water;
+    delete directionalWave;
 }
 
 void SceneRenderer::init(glm::ivec2 windowSize) {
@@ -46,8 +46,8 @@ void SceneRenderer::initializeScene() {
     Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
     waterSurfaceShader->use();
 
-    DirectionalWave dWave(glm::vec2(0.2f, 0.7f));
-    dWave.setUniforms(waterSurfaceShader, 0);
+    directionalWave = new DirectionalWave(glm::vec2(0.2f, 0.7f));
+    directionalWave->setUniforms(waterSurfaceShader, 0);
 
     water = new Surface(glm::ivec2(1000));
     water->scale = glm::vec3(0.1f);
@@ -73,22 +73,20 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     waterSurfaceShader->use();
     waterSurfaceShader->setFloat("time", static_cast<float>(glfwGetTime()));
 
-    waterSurfaceShader->setInt("nbOfPointWaves", waves.size());
-    for (int i = 0; i < std::min(static_cast<int>(waves.size()), 50); ++i) {
-        waves.at(i).setUniforms(waterSurfaceShader, i);
+    waterSurfaceShader->setInt("nbOfPointWaves", pointWaves.size());
+    for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
+        pointWaves.at(i).setUniforms(waterSurfaceShader, i);
     }
     water->draw(waterSurfaceShader);
 }
 
 void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
     Shader * monoColorShader = ResourceManager::getShader("monoColorShader");
     monoColorShader->use();
     monoColorShader->setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
+
     Sphere worldCursor;
-    worldCursor.position = worldCursorPos;
+    worldCursor.position = worldCursorPos + glm::vec3(0.0, directionalWave->magnitude, 0.0);
     worldCursor.draw(monoColorShader);
 }
 

@@ -27,7 +27,7 @@ public:
 
 class PointWave : public Wave {
 public:
-    static constexpr float lifeTime = 5.0f;
+    static constexpr float lifeTime = 10.0f;
     glm::vec2 origin;
     float dropTime;
 

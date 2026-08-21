@@ -17,13 +17,14 @@ struct PointWave {
 };
 
 float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos){
-    vec2 posToFrag = pWave.origin - vertexPos;
+    vec2 originToVert = pWave.origin - vertexPos;
     float relativeTime = absoluteTime - pWave.dropTime;
+    float advance = pWave.speed * relativeTime;
 
-    //todo replace magic 20, there could be better measures of speed and attenuation based on studies...
-    float attenuation = pow(e, -pWave.speed * relativeTime/(pWave.magnitude * 20.0));
-    float reached = ceil(clamp(relativeTime/20.0 * pWave.speed - length(posToFrag), 0.0, 1.0));
-    float pointWaveHeight = pWave.magnitude * sin( -dot(posToFrag, normalize(posToFrag))/ pWave.waveLength + relativeTime * pWave.speed) * attenuation * reached;
+    //todo replace magic 10, there could be better measures of speed and attenuation based on studies...
+    float attenuation = pow(e, -advance/(pWave.magnitude * 10.0));
+    float reachedVertex = ceil(clamp(advance - length(originToVert), 0.0, 1.0));
+    float pointWaveHeight = pWave.magnitude * sin( -length(originToVert)/ pWave.waveLength + advance ) * attenuation * reachedVertex;
     return pointWaveHeight;
 }
 

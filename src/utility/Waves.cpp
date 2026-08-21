@@ -2,8 +2,6 @@
 
 #include "Shader.hpp"
 
-
-
 DirectionalWave::DirectionalWave(const glm::vec2 direction, const float waveLength, const float magnitude, const float speed)
     : Wave(waveLength, magnitude, speed),direction(normalize(direction)){}
 

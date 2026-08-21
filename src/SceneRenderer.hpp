@@ -20,7 +20,8 @@ class SceneRenderer {
         void drawWorldCursor(glm::vec3 worldCursorPos) const;
 
         Surface * water = nullptr;
-        std::vector<PointWave> waves;
+        DirectionalWave * directionalWave = nullptr;
+        std::vector<PointWave> pointWaves;
 
     private:
         uint matricesUBO = 0;

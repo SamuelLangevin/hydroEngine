@@ -37,14 +37,15 @@ void main() {
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
 
-    float directWaveHeight = computeDirectionalWaveHeight(dWave, time, vec2(p.x, p.z));
+    vec4 modelSpacePoint = model * p;
+    float directWaveHeight = computeDirectionalWaveHeight(dWave, time, modelSpacePoint.xz);
 
     float pointWaveHeightResult = 0.0;
     for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
-        pointWaveHeightResult += computePointWaveHeight(pWaves[i], time, vec2(p.x, p.z));
+        pointWaveHeightResult += computePointWaveHeight(pWaves[i], time, modelSpacePoint.xz);
     }
 
-    height = (directWaveHeight +pointWaveHeightResult) * 5.0;
+    height = (directWaveHeight + pointWaveHeightResult) * 5.0;
 
     p += normal * height;
 
