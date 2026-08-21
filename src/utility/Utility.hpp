@@ -4,6 +4,8 @@
 #include "../../includes/glad.h"
 #include <glm/glm.hpp>
 
+#include "Camera.hpp"
+
 class Utility{
     public:
 
@@ -37,11 +39,15 @@ class Utility{
         static void createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
         static void createDepthFrameBuffer(FrameBuffer & FBO, int shadowsResolution);
         static void createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolution);
-        static void createSSAOFRameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
+        static void createSSAOFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
         static void createHDRCubemapFramebuffer(FrameBuffer & FBO, glm::ivec2 resolution);
 
         static GLenum glCheckError_(const char *file, int line);
         #define glCheckError() glCheckError_(__FILE__, __LINE__)
+
+        static glm::vec3 getIntersectionOfLinePlane(glm::vec3 lineP0, glm::vec3 p1, glm::vec3 planePosition, glm::vec3 planeNormal);
+        static glm::vec3 getClickPositionOnPlane(glm::ivec2 clickPos, const Camera & camera, glm::vec3 planePosition, glm::vec3 planeNormal, glm::ivec2 windowSize);
+
 
 };
 

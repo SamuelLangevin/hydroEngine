@@ -14,8 +14,8 @@ void DirectionalWave::setUniforms(Shader * shader, int index) const {
     shader->setVec2("dWave.direction", direction);
 }
 
-PointWave::PointWave(const glm::vec2 position, const float dropTime, const float waveLength, const float magnitude, const float speed)
-    : Wave(waveLength, magnitude, speed), origin(position), dropTime(dropTime){}
+PointWave::PointWave(const glm::vec2 origin, const float dropTime, const float waveLength, const float magnitude, const float speed)
+    : Wave(waveLength, magnitude, speed), origin(origin), dropTime(dropTime){}
 
 void PointWave::setUniforms(Shader * shader, int index) const{
     shader->setFloat("pWaves[" + std::to_string(index) + "].waveLength", waveLength);

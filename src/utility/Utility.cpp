@@ -106,7 +106,7 @@ void Utility::createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolu
     glBindTexture(GL_TEXTURE_CUBE_MAP, FBO.textureBuffer0);
     for (int i = 0; i < 6; ++i) {
        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, shadowsResolution,
-            shadowsResolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+            shadowsResolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -123,14 +123,14 @@ void Utility::createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolu
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Utility::createSSAOFRameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
+void Utility::createSSAOFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
     glGenTextures(1, &FBO.textureBuffer0);
     glBindTexture(GL_TEXTURE_2D, FBO.textureBuffer0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, windowSize.x, windowSize.y,
-                0, GL_RED, GL_FLOAT, NULL);
+                0, GL_RED, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -164,6 +164,27 @@ GLenum Utility::glCheckError_(const char *file, int line) {
         std::cout << error << " | " << file << " (" << line << ")" << "\n";
     }
     return errorCode;
+}
+
+glm::vec3 Utility::getIntersectionOfLinePlane(const glm::vec3 lineP0, const glm::vec3 lineP1,
+                                    const glm::vec3 planePosition, const glm::vec3 planeNormal) {
+    constexpr float eps = 0.00001;
+    glm::vec3 line = lineP1 - lineP0;
+    float dot = glm::dot(planeNormal, line);
+
+    if (std::abs(dot) > eps) {
+        const glm::vec3 w = lineP0 - planePosition;
+        float travelFactor = -(glm::dot(planeNormal, w)) / dot;
+        return travelFactor * line + lineP0;
+    }
+
+    return glm::vec3(0.0f); // No intersection
+}
+
+glm::vec3 Utility::getClickPositionOnPlane(const glm::ivec2 clickPos, const Camera & camera,
+                const glm::vec3 planePosition, const glm::vec3 planeNormal, const glm::ivec2 windowSize) {
+    const glm::vec3 p1 = camera.screenClickToNearClip(clickPos, windowSize);
+    return getIntersectionOfLinePlane(camera.position, p1, planePosition, planeNormal);
 }
 
 

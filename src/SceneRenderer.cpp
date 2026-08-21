@@ -18,10 +18,19 @@ void SceneRenderer::free() {
 }
 
 void SceneRenderer::init(glm::ivec2 windowSize) {
+    loadShaders();
+    setMatrixBlocks();
+    initializeScene();
+}
+
+void SceneRenderer::loadShaders() {
     ResourceManager::loadShader("screenWaterShader", "screen.vert", "screenWater.frag");
     ResourceManager::loadShader("waterSurfaceShader", "waterSurface.vert", "waterSurface.frag",
                                     nullptr, "waterSurface.tesc", "waterSurface.tese");
+    ResourceManager::loadShader("monoColorShader", "object.vert", "monoColor.frag");
+}
 
+void SceneRenderer::setMatrixBlocks() {
     glGenBuffers(1, &matricesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
     glBufferData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
@@ -29,9 +38,13 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUBO, 0, 2*sizeof(glm::mat4));
 
+    ResourceManager::getShader("monoColorShader")->setUniformBlock("Matrices", 0);
+    ResourceManager::getShader("waterSurfaceShader")->setUniformBlock("Matrices", 0);
+}
+
+void SceneRenderer::initializeScene() {
     Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
     waterSurfaceShader->use();
-    waterSurfaceShader->setUniformBlock("Matrices", 0);
 
     DirectionalWave dWave(glm::vec2(0.2f, 0.7f));
     dWave.setUniforms(waterSurfaceShader, 0);
@@ -64,7 +77,18 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     for (int i = 0; i < std::min(static_cast<int>(waves.size()), 50); ++i) {
         waves.at(i).setUniforms(waterSurfaceShader, i);
     }
-    
     water->draw(waterSurfaceShader);
+}
+
+void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    Shader * monoColorShader = ResourceManager::getShader("monoColorShader");
+    monoColorShader->use();
+    monoColorShader->setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
+    Sphere worldCursor;
+    worldCursor.position = worldCursorPos;
+    worldCursor.draw(monoColorShader);
 }
 

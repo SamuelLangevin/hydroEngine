@@ -17,6 +17,7 @@ bool Application::firsttime = true;
 uint Application::keys[1024];
 uint Application::keysProcessed[1024];
 bool Application::leftMouseButtonProcessed = false;
+glm::vec3 Application::worldCursorPos;
 
 Application::Application() {
     initializeWindow();
@@ -69,6 +70,9 @@ void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
     glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
     camera.front = glm::normalize(qYaw * qPitch * camera.front);
 
+    glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
+    worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position, glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
+
 }
 
 
@@ -108,7 +112,7 @@ void Application::processInput(float deltaTime){
         glfwGetCursorPos(window, &x, &y);
         leftMouseButtonProcessed = true;
 
-        sceneRenderer.waves.emplace_back(glm::vec2(x/windowSize.x, (windowSize.y - y)/windowSize.y), glfwGetTime());
+        sceneRenderer.waves.emplace_back(glm::vec2(worldCursorPos.x, worldCursorPos.y), glfwGetTime());
     }
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 }
@@ -124,6 +128,7 @@ void Application::draw(){
 
     if (state == ACTIVE) {
         sceneRenderer.draw(camera, windowSize);
+        sceneRenderer.drawWorldCursor(worldCursorPos);
         updateWaves();
         
     } else if (state == MENU) {
@@ -138,9 +143,11 @@ void Application::draw(){
 }
 
 void Application::updateWaves() {
-    if (!sceneRenderer.waves.empty())
-    if (glfwGetTime() - sceneRenderer.waves.at(0).dropTime > PointWave::lifeTime)
-        sceneRenderer.waves.erase(sceneRenderer.waves.begin());
+    for (uint i = 0; i < sceneRenderer.waves.size(); ++i){
+        if (glfwGetTime() - sceneRenderer.waves.at(i).dropTime > PointWave::lifeTime)
+            sceneRenderer.waves.erase(sceneRenderer.waves.begin() + i);
+        else break; // expired waves will always be at the beginning of the vector;
+    }
 }
 
 void Application::checkFPS(float dt) {

@@ -15,13 +15,19 @@ class SceneRenderer {
 
         void init(glm::ivec2 windowSize);
         void free();
-        void draw(const Camera & camera, glm::ivec2 windowSize) const;
 
-        Surface * water;
+        void draw(const Camera & camera, glm::ivec2 windowSize) const;
+        void drawWorldCursor(glm::vec3 worldCursorPos) const;
+
+        Surface * water = nullptr;
         std::vector<PointWave> waves;
 
     private:
         uint matricesUBO = 0;
+
+        static void loadShaders();
+        void setMatrixBlocks();
+        void initializeScene();
 
 };
 

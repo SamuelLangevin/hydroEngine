@@ -40,6 +40,7 @@ class Camera {
         [[nodiscard]] glm::mat4 getProjectionMatrix(glm::ivec2 windowSize) const;
 
         [[nodiscard]] Frustum createFrustumFromCamera(glm::ivec2 windowSize) const;
+        [[nodiscard]] glm::vec3 screenClickToNearClip(glm::ivec2 clickPos, glm::ivec2 windowSize) const;
 
     private:;
 

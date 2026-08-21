@@ -31,7 +31,7 @@ public:
     glm::vec2 origin;
     float dropTime;
 
-    explicit PointWave(glm::vec2 position, float dropTime, float waveLength = 1.0f, float magnitude = 0.5f, float speed = 10.0f);
+    explicit PointWave(glm::vec2 origin, float dropTime, float waveLength = 5.0f, float magnitude = 4.0f, float speed = 10.0f);
     void setUniforms(Shader * shader, int index) const override;
 };
 

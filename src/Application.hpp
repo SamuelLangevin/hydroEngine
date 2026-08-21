@@ -30,6 +30,7 @@ class Application{
         static uint keys[1024];
         static uint keysProcessed[1024];
         static bool leftMouseButtonProcessed;
+        static glm::vec3 worldCursorPos;
 
         float deltatime = 0.0f;
         float lastFrame = 0.0f;

@@ -29,3 +29,12 @@ Camera::Frustum Camera::createFrustumFromCamera(glm::ivec2 windowSize) const {
 
     return frustum;
 }
+
+glm::vec3 Camera::screenClickToNearClip(const glm::ivec2 clickPos, const glm::ivec2 windowSize) const {
+    const float halfHSide = nearClip * tanf(zoom * 0.5f);
+    const float nearClipViewportRatio = halfHSide/(0.5f * windowSize.x);
+    const glm::mat3 cameraSpace = glm::mat3(glm::cross(up, front), up, front);
+
+    glm::vec3 screenCenterToClick = glm::vec3(windowSize.x/2.0f, windowSize.y/2.0f, 0.0f) - glm::vec3(clickPos, 0.0f);
+    return position + front * nearClip + cameraSpace * screenCenterToClick *  nearClipViewportRatio;
+}
