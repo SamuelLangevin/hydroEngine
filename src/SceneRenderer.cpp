@@ -19,7 +19,7 @@ void SceneRenderer::free() {
 
 void SceneRenderer::init(glm::ivec2 windowSize) {
     loadShaders();
-    setMatrixBlocks();
+    setUniformBlocks();
     initializeScene();
 }
 
@@ -30,7 +30,7 @@ void SceneRenderer::loadShaders() {
     ResourceManager::loadShader("monoColorShader", "object.vert", "monoColor.frag");
 }
 
-void SceneRenderer::setMatrixBlocks() {
+void SceneRenderer::setUniformBlocks() {
     glGenBuffers(1, &matricesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
     glBufferData(GL_UNIFORM_BUFFER, 2*sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
@@ -62,6 +62,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, windowSize.x, windowSize.y);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.7, 0.8, 1.0, 1.0);
     glPatchParameteri(GL_PATCH_VERTICES, 4);

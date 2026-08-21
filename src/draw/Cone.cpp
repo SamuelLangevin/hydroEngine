@@ -18,17 +18,18 @@ void Cone::free() {
 
 void Cone::load(){
     if (VAO == 0) {
+        //todo texture coordinates are not calculated
+        //fixme Normals are approximated
+
         std::vector<Mesh::Vertex> vertices;
-        Mesh::Vertex topVertex; // Normals will be approximated
+        Mesh::Vertex topVertex;
         topVertex.normal = glm::vec3(0.0f, 1.0f, 0.0f);
         topVertex.position = 0.5f * topVertex.normal;
-        topVertex.texCoords = glm::vec2(0.0f, 0.0f);
         vertices.push_back(topVertex);
 
         Mesh::Vertex bottomVertex;
         bottomVertex.normal = glm::vec3(0.0f, -1.0f, 0.0f);
         bottomVertex.position = 0.5f * bottomVertex.normal;
-        bottomVertex.texCoords = glm::vec2(0.0f, 0.0f);
         vertices.push_back(bottomVertex);
 
         for (int i = 0; i <= lonResolution; ++i) {
@@ -42,13 +43,11 @@ void Cone::load(){
             Mesh::Vertex sideVertex;
             sideVertex.position = pos;
             sideVertex.normal = normalize(glm::vec3(coordX, 1.5f, coordZ));
-            sideVertex.texCoords = glm::vec2(0.0f, 0.0f);
             vertices.push_back(sideVertex);
 
             Mesh::Vertex baseVertex;
             baseVertex.position = pos;
             baseVertex.normal = glm::vec3(0.0f, -1.0f, 0.0f);
-            baseVertex.texCoords = glm::vec2(0.0f, 0.0f);
             vertices.push_back(baseVertex);
         }
 

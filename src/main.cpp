@@ -4,7 +4,7 @@ int main(){
 	Application application;
 
 	while(application.shouldWindowClose()){
-    	application.draw();
+    	application.processFrame();
     }
 
 	return 0;
