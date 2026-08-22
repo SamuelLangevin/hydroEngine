@@ -6,7 +6,9 @@
 #include <fstream>
 #include "../../includes/glad.h"
 
-Shader::Shader(const char* vertexName, const char* fragmentName, const char* geometryName,
+Shader::Shader(const uint programID) : ID(programID){}
+
+uint Shader::createShader(const char* vertexName, const char* fragmentName, const char* geometryName,
     const char* tesselControlName, const char* tesselEvalName) {
 
     uint vertexShader = prepareShader(vertexName, GL_VERTEX_SHADER);
@@ -14,19 +16,20 @@ Shader::Shader(const char* vertexName, const char* fragmentName, const char* geo
     uint geometryShader = prepareShader(geometryName, GL_GEOMETRY_SHADER);
     uint tesselControlShader = prepareShader(tesselControlName, GL_TESS_CONTROL_SHADER);
     uint tesselEvalShader = prepareShader(tesselEvalName, GL_TESS_EVALUATION_SHADER);
-    ID = prepareProgram(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
+    return prepareProgram(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
 }
 
-Shader::Shader(const char* computeName) {
-    uint computeShader = prepareShader(computeName, GL_COMPUTE_SHADER);
-    ID = glCreateProgram();
+uint Shader::createComputeShader(const char* computeName) {
+    const uint computeShader = prepareShader(computeName, GL_COMPUTE_SHADER);
+    const uint ID = glCreateProgram();
     glAttachShader(ID, computeShader);
     glLinkProgram(ID);
     printLinkStatus(ID);
     glDeleteShader(computeShader);
+    return ID;
 }
 
-Shader::~Shader() {
+void Shader::free() {
     glDeleteProgram(ID);
 }
 
@@ -120,9 +123,8 @@ std::string Shader::findIncludeFile(const std::string& fileName, const std::vect
     throw std::runtime_error("File not found: " + fileName);
 }
 
-//from https://stackoverflow.com/questions/78885511/how-can-i-use-include-in-a-glsl-file-using-c
 std::string Shader::processIncludes(const std::string& input, const std::vector<std::string>& includeDirs) {
-    std::regex includeRegex(R"(#include\s*["<](.*?)[">])");
+    const std::regex includeRegex(R"(#include\s*["<](.*?)[">])");
     std::smatch match;
     std::string output = input;
     std::string::const_iterator searchStart(output.cbegin());
@@ -139,7 +141,7 @@ std::string Shader::processIncludes(const std::string& input, const std::vector<
             fileContent = "";
         }
 
-        auto matchPos = match.position(0) + (searchStart - output.cbegin());
+        const long matchPos = match.position(0) + (searchStart - output.cbegin());
         output.replace(matchPos, match.length(0), fileContent);
         searchStart = output.cbegin() + matchPos;
     }
@@ -149,7 +151,7 @@ std::string Shader::processIncludes(const std::string& input, const std::vector<
 
 void Shader::use() const{ glUseProgram(ID);}
 
-void Shader::setBool(const std::string &name, bool value) const{
+void Shader::setBool(const std::string &name, const bool value) const{
     glUniform1i(glGetUniformLocation(ID, name.c_str()), static_cast<int>(value));
 }
 
@@ -176,7 +178,7 @@ void Shader::setVec2(const std::string &name, glm::vec2 values) const{
 }
 
 void Shader::setMat4(const std::string &name, glm::mat4 matrix) const{
-    int location = glGetUniformLocation(ID, name.c_str());
+     int location = glGetUniformLocation(ID, name.c_str());
     glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(matrix));
 }
 

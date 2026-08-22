@@ -38,11 +38,11 @@ void Utility::createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool a
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
-    FBO.textureBuffer0 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.textureBuffer0 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.textureBuffer0, 0);
 
     if (colorAttachments == 2 ) {
-        FBO.textureBuffer1 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+        FBO.textureBuffer1 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, FBO.textureBuffer1, 0);
     }
 
@@ -63,11 +63,11 @@ void Utility::createGBuffer(GeometryFrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
-    FBO.positionTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.positionTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.positionTexture, 0);
-    FBO.normalTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.normalTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, FBO.normalTexture, 0);
-    FBO.albedoSpecTex = Texture::createTexture(windowSize, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.albedoSpecTex = Texture::createTexture(windowSize, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, FBO.albedoSpecTex, 0);
 
     uint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -88,7 +88,7 @@ void Utility::createGBuffer(GeometryFrameBuffer & FBO, glm::ivec2 windowSize) {
 void Utility::createDepthFrameBuffer(FrameBuffer & FBO, int shadowsResolution) {
     glGenFramebuffers(1, &FBO.ID);
     FBO.textureBuffer0 = Texture::createTexture(glm::ivec2(shadowsResolution),
-        GL_DEPTH_COMPONENT,GL_DEPTH_COMPONENT,GL_FLOAT,GL_CLAMP_TO_BORDER, GL_NEAREST);
+        GL_DEPTH_COMPONENT,GL_DEPTH_COMPONENT,GL_FLOAT, nullptr, GL_CLAMP_TO_BORDER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, FBO.textureBuffer0);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);

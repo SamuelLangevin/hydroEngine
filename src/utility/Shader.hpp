@@ -7,33 +7,45 @@
 
 
 /** \class Shader
- * Encapsulates OpenGL's programs.
+ * Represents an OpenGL program.
  */
 class Shader{
     public :
         /** Shaders directory path. */
         static constexpr const char * directory = "../resources/shaders/";
 
+        const uint ID; /**< The OpenGL program ID. */
+
         /**
-         * Creates a render pipeline shader.
+         * Creates a shader object from an OpenGL program.
+         * @param programID
+         */
+        explicit Shader(uint programID);
+
+        Shader() = delete;
+        ~Shader() = default;
+
+        /**
+         * Creates an OpenGL render shader (program).
          * @param vertexName vertex shader file name
          * @param fragmentName fragment shader file name
          * @param geometryName (optional) geometry shader file name
          * @param tesselControlName (optional) Tessellation control shader file name
          * @param tesselEvalName (optional) Tessellation evaluation shader file name
+         * @returns the associated programID
          */
-        Shader(const char* vertexName, const char* fragmentName, const char* geometryName = nullptr,
+        static uint createShader(const char* vertexName, const char* fragmentName, const char* geometryName = nullptr,
                const char* tesselControlName = nullptr, const char* tesselEvalName = nullptr);
 
         /**
-         * Creates a compute shader.
+         * Creates an OpenGL compute shader (program).
          * @param computeName compute shader file name
+         * @return the associated programID
          */
-        explicit Shader(const char* computeName);
-        Shader(Shader & shader) = delete;
+        static uint createComputeShader(const char* computeName);
 
         /** Deletes the associated OpenGL program. */
-        ~Shader();
+        void free();
 
         /** Binds the associated OpenGL program. */
         void use() const;
@@ -95,7 +107,6 @@ class Shader{
         void setUniformBlock(const std::string & name, int index) const;
 
     private:
-        uint ID = 0; /**< The OpenGL program ID. */
 
         /**
          * Generates an OpenGL shader from compiled code.
@@ -145,8 +156,23 @@ class Shader{
          */
         static uint prepareProgram(uint vertexShaderID, uint fragmentShaderID, uint geometryShaderID, uint tesselControlShaderID, uint tesselEvalShaderID);
 
-        //from https://stackoverflow.com/questions/78885511/how-can-i-use-include-in-a-glsl-file-using-c
+
+        /**
+         * Finds the file path of the searched for shader file.
+         * @param fileName
+         * @param includeDirs directories to search shaders files in
+         * @returns the full path of the file
+         */
         static std::string findIncludeFile(const std::string& fileName, const std::vector<std::string>& includeDirs);
+
+        /**
+         * from https://stackoverflow.com/questions/78885511/how-can-i-use-include-in-a-glsl-file-using-c
+         *
+         * Replaces #include "fileName" in shaders by the specified file's content
+         * @param input initial shader code
+         * @param includeDirs directories to search shaders files in
+         * @return code with the included file's content added
+         */
         static std::string processIncludes(const std::string& input, const std::vector<std::string>& includeDirs);
 };
 

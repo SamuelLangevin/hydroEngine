@@ -24,10 +24,10 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 }
 
 void SceneRenderer::loadShaders() {
-    ResourceManager::loadShader("screenWaterShader", "screen.vert", "screenWater.frag");
-    ResourceManager::loadShader("waterSurfaceShader", "waterSurface.vert", "waterSurface.frag",
-                                    nullptr, "waterSurface.tesc", "waterSurface.tese");
-    ResourceManager::loadShader("monoColorShader", "object.vert", "monoColor.frag");
+    ResourceManager::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
+    ResourceManager::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert", "waterSurface.frag",
+                                    nullptr, "waterSurface.tesc", "waterSurface.tese"));
+    ResourceManager::addShader("monoColorShader", Shader::createShader("object.vert", "monoColor.frag"));
 }
 
 void SceneRenderer::setUniformBlocks() {
@@ -38,16 +38,16 @@ void SceneRenderer::setUniformBlocks() {
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUBO, 0, 2*sizeof(glm::mat4));
 
-    ResourceManager::getShader("monoColorShader")->setUniformBlock("Matrices", 0);
-    ResourceManager::getShader("waterSurfaceShader")->setUniformBlock("Matrices", 0);
+    ResourceManager::getShader("monoColorShader").setUniformBlock("Matrices", 0);
+    ResourceManager::getShader("waterSurfaceShader").setUniformBlock("Matrices", 0);
 }
 
 void SceneRenderer::initializeScene() {
-    Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
-    waterSurfaceShader->use();
+    Shader waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
+    waterSurfaceShader.use();
 
     directionalWave = new DirectionalWave(glm::vec2(0.2f, 0.7f));
-    directionalWave->setUniforms(waterSurfaceShader, 0);
+    directionalWave->setUniforms(&waterSurfaceShader, 0);
 
     water = new Surface(glm::ivec2(1000));
     water->scale = glm::vec3(0.1f);
@@ -69,25 +69,25 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glDisable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
 
-    Shader * waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
+    Shader waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
 
-    waterSurfaceShader->use();
-    waterSurfaceShader->setFloat("time", static_cast<float>(glfwGetTime()));
+    waterSurfaceShader.use();
+    waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
 
-    waterSurfaceShader->setInt("nbOfPointWaves", pointWaves.size());
+    waterSurfaceShader.setInt("nbOfPointWaves", pointWaves.size());
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
-        pointWaves.at(i).setUniforms(waterSurfaceShader, i);
+        pointWaves.at(i).setUniforms(&waterSurfaceShader, i);
     }
-    water->draw(waterSurfaceShader);
+    water->draw(&waterSurfaceShader);
 }
 
 void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {
-    Shader * monoColorShader = ResourceManager::getShader("monoColorShader");
-    monoColorShader->use();
-    monoColorShader->setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
+    Shader monoColorShader = ResourceManager::getShader("monoColorShader");
+    monoColorShader.use();
+    monoColorShader.setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
 
     Sphere worldCursor;
     worldCursor.position = worldCursorPos + glm::vec3(0.0, directionalWave->magnitude, 0.0);
-    worldCursor.draw(monoColorShader);
+    worldCursor.draw(&monoColorShader);
 }
 
