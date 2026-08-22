@@ -2,18 +2,18 @@
 #include <iostream>
 #include "Texture.hpp"
 
+//todo refactor duplicated code : texture and renderbuffer creation
+
 void Utility::createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
+    //todo move in texture class
     auto generateTextureBuffer = [&](uint & textureBufferId, const GLuint number) {
         glGenTextures(1, &textureBufferId);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureBufferId);
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, windowSize.x, windowSize.y, GL_TRUE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        Texture::setParameters(GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, number, GL_TEXTURE_2D_MULTISAMPLE, textureBufferId, 0);
     };
@@ -108,11 +108,7 @@ void Utility::createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolu
        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, shadowsResolution,
             shadowsResolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    Texture::setParameters(GL_TEXTURE_CUBE_MAP, GL_CLAMP_TO_BORDER, GL_NEAREST);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor);
 
@@ -131,8 +127,7 @@ void Utility::createSSAOFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
     glBindTexture(GL_TEXTURE_2D, FBO.textureBuffer0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, windowSize.x, windowSize.y,
                 0, GL_RED, GL_FLOAT, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    Texture::setParameters(GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_NEAREST);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.textureBuffer0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -166,16 +161,16 @@ GLenum Utility::glCheckError_(const char *file, int line) {
     return errorCode;
 }
 
-glm::vec3 Utility::getIntersectionOfLinePlane(const glm::vec3 lineP0, const glm::vec3 lineP1,
+glm::vec3 Utility::getIntersectionOfLinePlane(const glm::vec3 lineP1, const glm::vec3 lineP2,
                                     const glm::vec3 planePosition, const glm::vec3 planeNormal) {
     constexpr float eps = 0.00001;
-    glm::vec3 line = lineP1 - lineP0;
+    glm::vec3 line = lineP2 - lineP1;
     float dot = glm::dot(planeNormal, line);
 
     if (std::abs(dot) > eps) {
-        const glm::vec3 w = lineP0 - planePosition;
+        const glm::vec3 w = lineP1 - planePosition;
         float travelFactor = -(glm::dot(planeNormal, w)) / dot;
-        return travelFactor * line + lineP0;
+        return travelFactor * line + lineP1;
     }
 
     return glm::vec3(0.0f); // No intersection

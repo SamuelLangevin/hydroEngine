@@ -1,7 +1,7 @@
 # HydroEngine
 
 ## About
-This project aims to create simple yet realistic water physics, showcased in an interactive application.
+This project aims to create simple yet realistic wave physics for larges bodies of water, showcased in an interactive application.
 
 ## Setup (linux)
 

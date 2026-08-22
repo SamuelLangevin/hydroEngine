@@ -61,13 +61,23 @@ class Camera {
         /** @returns a matrix transforming to the camera's view space.*/
         [[nodiscard]] glm::mat4 getViewMatrix() const;
 
-        /** @returns a matrix transforming to the screen's space. */
+        /**
+         * @param windowSize AKA viewport
+         * @returns a matrix transforming to the screen's space.
+         */
         [[nodiscard]] glm::mat4 getProjectionMatrix(glm::ivec2 windowSize) const;
 
-        /** @returns the camera's frustum. */
+        /**
+         * @param windowSize AKA viewport
+         * @returns the camera's frustum
+         */
         [[nodiscard]] Frustum createFrustumFromCamera(glm::ivec2 windowSize) const;
 
-        /** @returns the world position on the nearClip of the camera corresponding to a screen click. */
+        /**
+         * @param clickPos on the screen
+         * @param windowSize AKA viewport
+         * @returns the world position on the nearClip of the camera corresponding to a screen click.
+         */
         [[nodiscard]] glm::vec3 screenClickToNearClip(glm::ivec2 clickPos, glm::ivec2 windowSize) const;
 
     private:;

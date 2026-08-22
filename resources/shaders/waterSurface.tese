@@ -12,10 +12,10 @@ layout (std140) uniform Matrices{
 
 uniform mat4 model;
 uniform float time;
-uniform DirectionalWave dWave;
+uniform DirectionalWave dirWave;
 
 #define MAX_NUMBER_POINT_WAVES 50
-uniform PointWave pWaves[MAX_NUMBER_POINT_WAVES];
+uniform PointWave pointWaves[MAX_NUMBER_POINT_WAVES];
 uniform int nbOfPointWaves;
 
 out float height;
@@ -38,11 +38,11 @@ void main() {
     vec4 p = (p1 - p0) * v + p0;
 
     vec4 modelSpacePoint = model * p;
-    float directWaveHeight = computeDirectionalWaveHeight(dWave, time, modelSpacePoint.xz);
+    float directWaveHeight = computeDirectionalWaveHeight(dirWave, time, modelSpacePoint.xz);
 
     float pointWaveHeightResult = 0.0;
     for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
-        pointWaveHeightResult += computePointWaveHeight(pWaves[i], time, modelSpacePoint.xz);
+        pointWaveHeightResult += computePointWaveHeight(pointWaves[i], time, modelSpacePoint.xz);
     }
 
     height = (directWaveHeight + pointWaveHeightResult) * 5.0;

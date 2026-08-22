@@ -26,9 +26,9 @@ class Light {
 
         /** Every light needs to be sent to the shaders to calculate illumination.
          * @param shader to send the data to
-         * @param lightIndex
+         * @param name of the light struct instance
          */
-        virtual void setUniforms(Shader * shader, int lightIndex) = 0;
+        virtual void setUniforms(Shader * shader, const std::string &name) = 0;
 };
 
 /** \class AmbientLight
@@ -47,9 +47,9 @@ class AmbientLight : public Light{
 
         /** Sends the light's color to the shader for lighting calculations.
         * @param shader to send the data for computing
-        * @param lightIndex index of the light in its designated array
+        * @param name of the light struct instance
         */
-        void setUniforms(Shader * shader, int lightIndex) override;
+        void setUniforms(Shader * shader, const std::string &name) override;
 };
 
 /** \class DirectionalLight
@@ -76,13 +76,10 @@ class DirectionalLight : public Light{
 
         /**
          * Sends the light's attributes to the shader.
-         *
-         * Assumes the DirectionalLight array uniform is named dirLights
-         * and that their attributes are named identical.
          * @param shader to send the data for computing
-         * @param lightIndex index of the light in its designated array
+         * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, int lightIndex) override;
+        void setUniforms(Shader * shader, const std::string &name) override;
 
 };
 
@@ -116,13 +113,10 @@ class PointLight : public Light{
 
         /**
          * Sends the light's attributes to the shader.
-         *
-         * Assumes the SpotLight array uniform is named spotLights
-         * and that their attributes are named identical.
          * @param shader to send the data for computing
-         * @param lightIndex index of the light in its designated array
+         * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, int lightIndex) override;
+        void setUniforms(Shader * shader, const std::string &name) override;
 };
 
 
@@ -156,9 +150,9 @@ class SpotLight : public Light{
         /**
          * Sends the light's color, position, to the shader.
          * @param shader to send the data for computing
-         * @param lightIndex index of the light in its designated array
+         * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, int lightIndex) override;
+        void setUniforms(Shader * shader, const std::string &name) override;
 
         /**
          * Used to orientate the cone's base towards the direction it illuminates.

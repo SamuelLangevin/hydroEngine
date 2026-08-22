@@ -47,7 +47,7 @@ void SceneRenderer::initializeScene() {
     waterSurfaceShader.use();
 
     directionalWave = new DirectionalWave(glm::vec2(0.2f, 0.7f));
-    directionalWave->setUniforms(&waterSurfaceShader, 0);
+    directionalWave->setUniforms(&waterSurfaceShader, "dirWave");
 
     water = new Surface(glm::ivec2(1000));
     water->scale = glm::vec3(0.1f);
@@ -76,7 +76,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
 
     waterSurfaceShader.setInt("nbOfPointWaves", pointWaves.size());
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
-        pointWaves.at(i).setUniforms(&waterSurfaceShader, i);
+        pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
     }
     water->draw(&waterSurfaceShader);
 }
