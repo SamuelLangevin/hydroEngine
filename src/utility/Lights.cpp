@@ -7,30 +7,30 @@ AmbientLight::AmbientLight(glm::vec3 color): Light(color) {}
 
 void AmbientLight::draw(Shader * shader) {}
 
-void AmbientLight::setUniforms(Shader * shader, int lightIndex) {}
+void AmbientLight::setUniforms(Shader * shader, const std::string &name) {
+    shader->setVec3(name + ".color", color);
+}
 
 
 
-DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f)), direction(glm::vec3(0.0f, -1.0f, 0.0f)) {}
 
 DirectionalLight::DirectionalLight(glm::vec3 color, glm::vec3 direction): Light(color), direction(direction) {}
 
 void DirectionalLight::draw(Shader * shader) {}
 
-void DirectionalLight::setUniforms(Shader * shader, int lightIndex) {
-    shader->use();
-    shader->setVec3("dirLights[" + std::to_string(lightIndex) + "].direction",direction);
-    shader->setVec3("dirLights[" + std::to_string(lightIndex) + "].color",color);
+void DirectionalLight::setUniforms(Shader * shader, const std::string &name) {
+    shader->setVec3(name + ".direction", direction);
+    shader->setVec3(name + ".color", color);
 }
 
 
 
-PointLight::PointLight() : Light(glm::vec3(1.0f)) {}
+PointLight::PointLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)) {}
 
 PointLight::PointLight(glm::vec3 color, glm::vec3 position): Light(color), position(position) {}
 
 void PointLight::draw(Shader * shader) {
-    shader->use();
     Sphere lightModel;
     lightModel.position = position;
     lightModel.scale = glm::vec3(0.5f);
@@ -38,22 +38,20 @@ void PointLight::draw(Shader * shader) {
     lightModel.draw(shader);
 }
 
-void PointLight::setUniforms(Shader * shader, int lightIndex) {
-    shader->use();
-    shader->setVec3("pointLights[" + std::to_string(lightIndex) + "].position",position);
-    shader->setVec3("pointLights[" + std::to_string(lightIndex) + "].color", color);
-    shader->setFloat("pointLights[" + std::to_string(lightIndex) + "].strength",strength);
+void PointLight::setUniforms(Shader * shader, const std::string &name) {
+    shader->setVec3(name + ".position",position);
+    shader->setVec3(name + ".color", color);
+    shader->setFloat(name + ".strength",strength);
 }
 
 
 
-SpotLight::SpotLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+SpotLight::SpotLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)), direction(glm::vec3(0.0f, -1.0f, 0.0f)) {}
 
 SpotLight::SpotLight(glm::vec3 color, glm::vec3 position, glm::vec3 direction)
     : Light(color), position(position), direction(direction) {}
 
 void SpotLight::draw(Shader * shader) {
-    shader->use();
     Cone lightModel;
     lightModel.position = position;
     lightModel.scale = glm::vec3(0.5f);
@@ -62,17 +60,16 @@ void SpotLight::draw(Shader * shader) {
     lightModel.draw(shader);
 }
 
-void SpotLight::setUniforms(Shader * shader, int lightIndex) {
-    shader->use();
-    shader->setVec3("spotLights[" + std::to_string(lightIndex) + "].position", position);
-    shader->setVec3("spotLights[" + std::to_string(lightIndex) + "].direction", direction);
-    shader->setVec3("spotLights[" + std::to_string(lightIndex) + "].color", color);
-    shader->setFloat("spotLights[" + std::to_string(lightIndex) + "].strength", strength);
-    shader->setFloat("spotLights[" + std::to_string(lightIndex) + "].angularAttenuation", angularAttenuation);
+void SpotLight::setUniforms(Shader * shader, const std::string &name) {
+    shader->setVec3(name + ".position", position);
+    shader->setVec3(name + ".direction", direction);
+    shader->setVec3(name + ".color", color);
+    shader->setFloat(name + ".strength", strength);
+    shader->setFloat(name + ".angularAttenuation", angularAttenuation);
 }
 
-glm::quat SpotLight::getLookAtQuat(){
+glm::quat SpotLight::getLookAtQuat() const{
     const glm::vec3 down = glm::vec3(0.0f, -1.0f, 0.0f);
-    const float angle = acos(glm::dot(glm::normalize(direction), down));
+    const float angle = static_cast<float>(acos(glm::dot(glm::normalize(direction), down)));
     return glm::quat(-angle, normalize(glm::cross(direction, down)));
 }

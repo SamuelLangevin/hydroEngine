@@ -7,29 +7,55 @@
 #include "Texture.hpp"
 #include "../../includes/glad.h"
 #include "Shader.hpp"
-#include "Utility.hpp"
 
-
+//todo allow to store framebuffers
+/** \class ResourceManager
+ * Singleton managing the shaders and textures creation, usage and destruction.
+ */
 class ResourceManager{
-public:
+    public:
 
-    ResourceManager() = delete;
+        ResourceManager() = delete;
 
-    static void loadShader(const std::string & name, const char * vsPath, const char * fsPath,
-        const char * gsPath = nullptr, const char * tcsPath = nullptr, const char * tesPath = nullptr);
-    static void loadComputeShader(const std::string & name, const char * csPath);
-    [[nodiscard]] static Shader * getShader(const std::string & name);
+        /**
+         * Creates and stores a shader object by name from an existing OpenGL program.
+         * @param name given to the shader
+         * @param programID
+         */
+        static void addShader(const std::string & name, uint programID);
 
-    static void loadTexture(const std::string & name, const char * filenameChar, const std::string &directory, GLint wrap = GL_REPEAT, GLint filters = GL_LINEAR);
-    static void loadHDRTexture(const std::string & name, const char * filenameChar, const std::string &directory);
-    static void loadCubemap(const std::string & name, const std::string &directory);
-    static void addTexture(const std::string & name, uint textureID, GLenum type);
-    [[nodiscard]] static Texture * getTexture(const std::string & name);
+        /**
+         * @param name of the shader
+         * @returns pointer to the named shader
+         * @throws std::invalid_argument if there is no shader linked to the given name
+         */
+        [[nodiscard]] static Shader getShader(const std::string & name);
 
-    static void clear();
-private:
-    static std::map<std::string, Shader*> shaders;
-    static std::map<std::string, Texture*> textures;
+        /**
+         * Creates and stores a texture object by name from an existing OpenGL texture.
+         * @param name given to the texture
+         * @param textureID
+         * @param size the image's height and width.
+         * @param type 2D ? Cubemap ?
+         */
+        static void addTexture(const std::string & name, uint textureID, glm::ivec2 size, GLenum type);
+
+        /**
+        * @param name of the texture
+        * @returns pointer to the named texture
+        * @throws std::invalid_argument if there is no texture linked to the given name
+        */
+        [[nodiscard]] static Texture getTexture(const std::string & name);
+
+        /**
+         * clear stored shaders and textures and deletes their OpenGL resources.
+         */
+        static void clear();
+
+    private:
+
+        static std::map<std::string, Shader> shaders; /**< Shaders stored by name*/
+        static std::map<std::string, Texture> textures; /**< Textures stored by name*/
 
 };
 

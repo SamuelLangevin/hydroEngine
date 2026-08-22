@@ -6,18 +6,19 @@
 #include <string>
 #include <vector>
 
-Texture::Texture(uint textureID, GLenum type)
-    :  ID(textureID), type(type){}
+glm::ivec2 Texture::lastCreatedImageSize = glm::ivec2(0);
 
-uint Texture::textureFromFile(const char * filenameChar, const std::string &directory, GLint wrap, GLint filters) {
+Texture::Texture(const uint textureID, const glm::ivec2 size, const GLenum type)
+    :  ID(textureID), size (size), type(type){}
+
+uint Texture::textureFromFile(const char * filenameChar, const std::string &directory, GLint wrap, GLint filter) {
     std::string filename = std::string(filenameChar);
     filename = directory + '/' + filename;
 
     uint textureID = 0;
     int width, height, nrComponents;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
-    if (data)
-    {
+    if (data){
         GLenum format;
         if (nrComponents == 1)format = GL_RED;
         else if (nrComponents == 4)format = GL_RGBA;
@@ -27,10 +28,9 @@ uint Texture::textureFromFile(const char * filenameChar, const std::string &dire
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filters);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filters);
+        setParameters(GL_TEXTURE_2D, wrap, filter);
+
+        lastCreatedImageSize = glm::ivec2(width, height);
 
         stbi_image_free(data);
     }
@@ -40,23 +40,22 @@ uint Texture::textureFromFile(const char * filenameChar, const std::string &dire
     return textureID;
 }
 
-uint Texture::hdrTextureFromFile(const char * filenameChar, const std::string &directory) {
+uint Texture::hdrTextureFromFile(const char * filenameChar, const std::string &directory, GLint wrap, GLint filter) {
     std::string filename = std::string(filenameChar);
     filename = directory + '/' + filename;
 
     uint textureID = 0;
     int width, height, nrComponents;
-    float *data = stbi_loadf(filename.c_str(), &width, &height, &nrComponents, 0);
+    float * data = stbi_loadf(filename.c_str(), &width, &height, &nrComponents, 0);
     if (data)
     {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
+        setParameters(GL_TEXTURE_2D, wrap, filter);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        lastCreatedImageSize = glm::ivec2(width, height);
+
         stbi_image_free(data);
     }
 
@@ -65,49 +64,47 @@ uint Texture::hdrTextureFromFile(const char * filenameChar, const std::string &d
     return textureID;
 }
 
-Texture::~Texture() {
+void Texture::free(){
     glDeleteTextures(1, &ID);
 }
 
-void Texture::bind(GLenum textureChannel) const
+void Texture::bind(const GLenum textureChannel) const
 {
     glActiveTexture(textureChannel);
     glBindTexture(type, this->ID);
 }
 
-uint Texture::createTexture(glm::ivec2 resolution, GLint internalFormat, GLenum format, GLenum type, GLint wrap, GLint filter, const void * data) {
+uint Texture::createTexture(glm::ivec2 size, GLint internalFormat, GLenum format,
+                            GLenum type, const void * data, GLint wrap, GLint filter) {
     uint textureID = 0;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, resolution.x, resolution.y, 0, format, type, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, size.x, size.y, 0, format, type, data);
+    setParameters(GL_TEXTURE_2D, wrap, filter);
     glBindTexture(GL_TEXTURE_2D, 0);
+    lastCreatedImageSize = size;
+
     return textureID;
 }
 
 uint Texture::createColorTexture(glm::vec3 color) {
-    return createTexture(glm::ivec2(1),  GL_RGB16F, GL_RGB, GL_FLOAT, GL_REPEAT,GL_LINEAR, &color[0]);
+    lastCreatedImageSize = glm::ivec2(1);
+    return createTexture(glm::ivec2(1),  GL_RGB, GL_RGB, GL_FLOAT, &color[0]);
 }
 
-uint Texture::createCubemapTexture(glm::ivec2 resolution) {
+uint Texture::createCubemapTexture(glm::ivec2 size, GLint wrap, GLint filter) {
     uint textureID = 0;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     for (uint i = 0; i < 6; ++i) {
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, resolution.x, resolution.y, 0, GL_RGB, GL_FLOAT, nullptr);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, size.x, size.y, 0, GL_RGB, GL_FLOAT, nullptr);
     }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    setParameters(GL_TEXTURE_CUBE_MAP, wrap, filter);
+    lastCreatedImageSize = size;
     return textureID;
 }
 
-uint Texture::cubemapFromDirectory(const std::string &directory){
+uint Texture::cubemapFromDirectory(const std::string &directory, GLint wrap, GLint filter){
     uint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
@@ -118,21 +115,26 @@ uint Texture::cubemapFromDirectory(const std::string &directory){
 
     int width, height, nrChannels;
     for (uint i = 0; i < faces.size(); i++){
-        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 
+        unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
         if(data){
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
                     width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            stbi_image_free(data);
+            lastCreatedImageSize = glm::ivec2(width, height);
         }
         else std::cout << "Cubemap failed to load at path: " << faces[i] << "\n";
-        stbi_image_free(data);
     }
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    setParameters(GL_TEXTURE_CUBE_MAP, wrap, filter);
 
     return textureID;
+}
+
+void Texture::setParameters(GLenum type, GLint wrap, GLint filter) {
+    glTexParameteri(type, GL_TEXTURE_MIN_FILTER, filter);
+    glTexParameteri(type, GL_TEXTURE_MAG_FILTER, filter);
+    glTexParameteri(type, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
+    if (type == GL_TEXTURE_CUBE_MAP) glTexParameteri(type, GL_TEXTURE_WRAP_R, wrap);
 }

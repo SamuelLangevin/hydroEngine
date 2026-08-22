@@ -2,18 +2,18 @@
 #include <iostream>
 #include "Texture.hpp"
 
+//todo refactor duplicated code : texture and renderbuffer creation
+
 void Utility::createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
+    //todo move in texture class
     auto generateTextureBuffer = [&](uint & textureBufferId, const GLuint number) {
         glGenTextures(1, &textureBufferId);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureBufferId);
         glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, windowSize.x, windowSize.y, GL_TRUE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        Texture::setParameters(GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, number, GL_TEXTURE_2D_MULTISAMPLE, textureBufferId, 0);
     };
@@ -38,11 +38,11 @@ void Utility::createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool a
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
-    FBO.textureBuffer0 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.textureBuffer0 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.textureBuffer0, 0);
 
     if (colorAttachments == 2 ) {
-        FBO.textureBuffer1 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+        FBO.textureBuffer1 = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, FBO.textureBuffer1, 0);
     }
 
@@ -63,11 +63,11 @@ void Utility::createGBuffer(GeometryFrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
-    FBO.positionTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.positionTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.positionTexture, 0);
-    FBO.normalTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.normalTexture = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, FBO.normalTexture, 0);
-    FBO.albedoSpecTex = Texture::createTexture(windowSize, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE, GL_CLAMP_TO_BORDER, GL_LINEAR);
+    FBO.albedoSpecTex = Texture::createTexture(windowSize, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, FBO.albedoSpecTex, 0);
 
     uint attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -88,7 +88,7 @@ void Utility::createGBuffer(GeometryFrameBuffer & FBO, glm::ivec2 windowSize) {
 void Utility::createDepthFrameBuffer(FrameBuffer & FBO, int shadowsResolution) {
     glGenFramebuffers(1, &FBO.ID);
     FBO.textureBuffer0 = Texture::createTexture(glm::ivec2(shadowsResolution),
-        GL_DEPTH_COMPONENT,GL_DEPTH_COMPONENT,GL_FLOAT,GL_CLAMP_TO_BORDER, GL_NEAREST);
+        GL_DEPTH_COMPONENT,GL_DEPTH_COMPONENT,GL_FLOAT, nullptr, GL_CLAMP_TO_BORDER, GL_NEAREST);
     glBindTexture(GL_TEXTURE_2D, FBO.textureBuffer0);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
@@ -106,13 +106,9 @@ void Utility::createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolu
     glBindTexture(GL_TEXTURE_CUBE_MAP, FBO.textureBuffer0);
     for (int i = 0; i < 6; ++i) {
        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, shadowsResolution,
-            shadowsResolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+            shadowsResolution, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     }
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+    Texture::setParameters(GL_TEXTURE_CUBE_MAP, GL_CLAMP_TO_BORDER, GL_NEAREST);
     float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
     glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, borderColor);
 
@@ -123,16 +119,15 @@ void Utility::createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolu
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void Utility::createSSAOFRameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
+void Utility::createSSAOFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
     glGenFramebuffers(1, &FBO.ID);
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
     glGenTextures(1, &FBO.textureBuffer0);
     glBindTexture(GL_TEXTURE_2D, FBO.textureBuffer0);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, windowSize.x, windowSize.y,
-                0, GL_RED, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                0, GL_RED, GL_FLOAT, nullptr);
+    Texture::setParameters(GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_NEAREST);
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, FBO.textureBuffer0, 0);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -164,6 +159,27 @@ GLenum Utility::glCheckError_(const char *file, int line) {
         std::cout << error << " | " << file << " (" << line << ")" << "\n";
     }
     return errorCode;
+}
+
+glm::vec3 Utility::getIntersectionOfLinePlane(const glm::vec3 lineP1, const glm::vec3 lineP2,
+                                    const glm::vec3 planePosition, const glm::vec3 planeNormal) {
+    constexpr float eps = 0.00001;
+    glm::vec3 line = lineP2 - lineP1;
+    float dot = glm::dot(planeNormal, line);
+
+    if (std::abs(dot) > eps) {
+        const glm::vec3 w = lineP1 - planePosition;
+        float travelFactor = -(glm::dot(planeNormal, w)) / dot;
+        return travelFactor * line + lineP1;
+    }
+
+    return glm::vec3(0.0f); // No intersection
+}
+
+glm::vec3 Utility::getClickPositionOnPlane(const glm::ivec2 clickPos, const Camera & camera,
+                const glm::vec3 planePosition, const glm::vec3 planeNormal, const glm::ivec2 windowSize) {
+    const glm::vec3 p1 = camera.screenClickToNearClip(clickPos, windowSize);
+    return getIntersectionOfLinePlane(camera.position, p1, planePosition, planeNormal);
 }
 
 

@@ -1,7 +1,7 @@
 # HydroEngine
 
 ## About
-This project aims to create simple yet realistic water physics, showcased in an interactive application.
+This project aims to create simple yet realistic wave physics for larges bodies of water, showcased in an interactive application.
 
 ## Setup (linux)
 
@@ -26,6 +26,10 @@ Renderdoc is an optional debugging tool.
 
 ## Attributions
 This project is partially based on the work of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction).
+
+The tessellation shader used for the water was based from [Dr. Jeffrey Paone's guest article on tessellation](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
+
+The frustum culling calculations come from [Six Jonathan's article](https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling).
 
 ## Contributing
 This is a personal project. You may suggest modifications, report bugs through issues but pull requests will not be merged.

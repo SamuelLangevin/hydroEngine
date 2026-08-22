@@ -9,14 +9,14 @@
 SceneRenderer Application::sceneRenderer;
 Camera Application::camera;
 
-Application::AppState Application::state = ACTIVE;
 glm::ivec2 Application::windowSize = glm::ivec2(1080, 810);
 glm::vec2 Application::lastMousePos = glm::vec2(windowSize.x/2,windowSize.y/2);
 float Application::sensitivity = 0.002f;
-bool Application::firsttime = true;
+bool Application::isFirstMouseMvt = true;
 uint Application::keys[1024];
 uint Application::keysProcessed[1024];
 bool Application::leftMouseButtonProcessed = false;
+glm::vec3 Application::worldCursorPos;
 
 Application::Application() {
     initializeWindow();
@@ -49,15 +49,15 @@ void Application::initializeWindow(){
     glViewport(0,0, windowSize.x, windowSize.y);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, key_callback);
 }
 
 void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
 
-    if(firsttime){
+    if(isFirstMouseMvt){
         lastMousePos = glm::vec2(xpos, ypos);
-        firsttime = false;
+        isFirstMouseMvt = false;
     }
 
     float xOffset = sensitivity * (xpos - lastMousePos.x);
@@ -74,7 +74,7 @@ void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
 
 
 void Application::framebuffer_size_callback(GLFWwindow * window, int width, int height) {
-    glViewport(0,0, width, height);
+    windowSize = glm::ivec2(width, height);
 }
 
 void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -82,7 +82,6 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
     if (0 <= key && key < 1024)
     {
         if (action == GLFW_PRESS) keys[key] = true;
-
         else if (action == GLFW_RELEASE)
         {
             keys[key] = false;
@@ -93,57 +92,60 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
 
 
 void Application::processInput(float deltaTime){
-    if (state == ACTIVE) {
 
-        const float cameraSpeed = 3.0f * deltaTime;
-        if(keys[GLFW_KEY_W]) camera.position += cameraSpeed * camera.front;
-        if(keys[GLFW_KEY_S]) camera.position -= cameraSpeed * camera.front;
-        if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
-        if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
-    }
-        if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
+    const float cameraSpeed = 3.0f * deltaTime;
+    if(keys[GLFW_KEY_W]) camera.position += cameraSpeed * camera.front;
+    if(keys[GLFW_KEY_S]) camera.position -= cameraSpeed * camera.front;
+    if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+    if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+
+    const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
+    worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
+                                                    glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
+
+    if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
         double x, y;
         glfwGetCursorPos(window, &x, &y);
         leftMouseButtonProcessed = true;
 
-        sceneRenderer.waves.emplace_back(glm::vec2(x/windowSize.x, (windowSize.y - y)/windowSize.y), glfwGetTime());
+        PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(), 3.0,3, 20.0);
+        sceneRenderer.pointWaves.push_back(wave);
     }
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 }
 
-bool Application::shouldWindowClose(){
+bool Application::shouldWindowClose() const {
     return !glfwWindowShouldClose(window);
 }
 
-void Application::draw(){
-    float currentframe = glfwGetTime();
-    deltatime = currentframe - lastFrame;
-    lastFrame = currentframe;
+void Application::processFrame(){
+    const float currentFrame = static_cast<float>(glfwGetTime());
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
 
-    if (state == ACTIVE) {
-        sceneRenderer.draw(camera, windowSize);
-        updateWaves();
-        
-    } else if (state == MENU) {
-        
-    } else glfwSetWindowShouldClose(window, true);
+    processInput(deltaTime);
+    glfwPollEvents();
+    updateWaves();
+
+    sceneRenderer.draw(camera, windowSize);
+    sceneRenderer.drawWorldCursor(worldCursorPos);
 
     glfwSwapBuffers(window);
-    processInput(deltatime);
-    glfwPollEvents();
     Utility::glCheckError();
-    //checkFPS(deltatime);
+    //checkFPS(deltaTime);
 }
 
 void Application::updateWaves() {
-    if (!sceneRenderer.waves.empty())
-    if (glfwGetTime() - sceneRenderer.waves.at(0).dropTime > PointWave::lifeTime)
-        sceneRenderer.waves.erase(sceneRenderer.waves.begin());
+    for (uint i = 0; i < sceneRenderer.pointWaves.size(); ++i){
+        if (glfwGetTime() - sceneRenderer.pointWaves.at(i).dropTime > PointWave::lifeTime)
+            sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
+        else break; // expired waves will always be at the beginning of the vector;
+    }
 }
 
-void Application::checkFPS(float dt) {
+void Application::printFPS(float dt) {
     static int fCounter = 0;
     if(fCounter > 500) {
         std::cout << "FPS: " << 1 / dt << std::endl;
