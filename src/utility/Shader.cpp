@@ -14,7 +14,7 @@ Shader::Shader(const char* vertexName, const char* fragmentName, const char* geo
     uint geometryShader = prepareShader(geometryName, GL_GEOMETRY_SHADER);
     uint tesselControlShader = prepareShader(tesselControlName, GL_TESS_CONTROL_SHADER);
     uint tesselEvalShader = prepareShader(tesselEvalName, GL_TESS_EVALUATION_SHADER);
-    ID = prepareProgramm(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
+    ID = prepareProgram(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
 }
 
 Shader::Shader(const char* computeName) {
@@ -40,10 +40,9 @@ uint Shader::prepareShader(const char* fileName, const uint shaderType){
         std::string code;
 
         try {
-            std::ifstream file;
-            readShaderFile(filePath, file, code);
+            readFile(filePath, code);
             code = processIncludes(code,{directory});
-        } catch (std::ifstream::failure & f){std::cout << "ERROR::SHADER::FAILURE_TO_READ_FILE\n";}
+        } catch (std::ifstream::failure&){std::cout << "ERROR::SHADER::FAILURE_TO_READ_FILE\n";}
 
         shader = compileShader(shaderType, code.c_str(), filePath);
     }
@@ -71,37 +70,38 @@ void Shader::printLinkStatus(const uint program){
     }
 }
 
-uint Shader::compileShader(const uint shaderType, const char *shaderSource, const std::string & name){
+uint Shader::compileShader(const uint shaderType, const char *code, const std::string & name){
     uint shader = glCreateShader(shaderType);
-    glShaderSource(shader, 1, &shaderSource, nullptr);
+    glShaderSource(shader, 1, &code, nullptr);
     glCompileShader(shader);
     printCompileStatus(shader, name);
     return shader;
 }
 
-uint Shader::prepareProgramm(uint vertexShader, uint fragmentShader, uint geometryShader, uint tesselControlShader, uint tesselEvalShader){
+uint Shader::prepareProgram(uint vertexShaderID, uint fragmentShaderID, uint geometryShaderID, uint tesselControlShaderID, uint tesselEvalShader){
     uint shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    if (geometryShader != 0) glAttachShader(shaderProgram, geometryShader);
-    if (tesselControlShader != 0) glAttachShader(shaderProgram, tesselControlShader);
+    glAttachShader(shaderProgram, vertexShaderID);
+    glAttachShader(shaderProgram, fragmentShaderID);
+    if (geometryShaderID != 0) glAttachShader(shaderProgram, geometryShaderID);
+    if (tesselControlShaderID != 0) glAttachShader(shaderProgram, tesselControlShaderID);
     if (tesselEvalShader != 0) glAttachShader(shaderProgram, tesselEvalShader);
     glLinkProgram(shaderProgram);
     printLinkStatus(shaderProgram);
 
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-    glDeleteShader(geometryShader);
-    glDeleteShader(tesselControlShader);
+    glDeleteShader(vertexShaderID);
+    glDeleteShader(fragmentShaderID);
+    glDeleteShader(geometryShaderID);
+    glDeleteShader(tesselControlShaderID);
     glDeleteShader(tesselEvalShader);
     return shaderProgram;
 }
 
-void Shader::readShaderFile(const char* path, std::ifstream & shaderFile, std::string &code){
+void Shader::readFile(const char* path, std::string &code){
+    std::ifstream file;
     std::stringstream shaderStream;
-    shaderFile.open(path);
-    shaderStream << shaderFile.rdbuf();
-    shaderFile.close();
+    file.open(path);
+    shaderStream << file.rdbuf();
+    file.close();
     code = shaderStream.str();
 }
 
@@ -127,15 +127,12 @@ std::string Shader::processIncludes(const std::string& input, const std::vector<
     std::string output = input;
     std::string::const_iterator searchStart(output.cbegin());
 
-    std::ifstream file;
-    file.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-
     while (std::regex_search(searchStart, output.cend(), match, includeRegex)) {
         std::string includeFile = match[1].str();
         std::string fileContent;
         try {
             std::string filePath = findIncludeFile(includeFile, includeDirs);
-            readShaderFile(filePath.c_str(), file, fileContent);
+            readFile(filePath.c_str(), fileContent);
         }
         catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
@@ -153,7 +150,7 @@ std::string Shader::processIncludes(const std::string& input, const std::vector<
 void Shader::use() const{ glUseProgram(ID);}
 
 void Shader::setBool(const std::string &name, bool value) const{
-    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int) value);
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), static_cast<int>(value));
 }
 
 void Shader::setInt(const std::string &name, int value) const{

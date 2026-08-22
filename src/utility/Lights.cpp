@@ -7,11 +7,13 @@ AmbientLight::AmbientLight(glm::vec3 color): Light(color) {}
 
 void AmbientLight::draw(Shader * shader) {}
 
-void AmbientLight::setUniforms(Shader * shader, int lightIndex) {}
+void AmbientLight::setUniforms(Shader * shader, int lightIndex) {
+    //todo
+}
 
 
 
-DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+DirectionalLight::DirectionalLight(): Light(glm::vec3(1.0f)), direction(glm::vec3(0.0f, -1.0f, 0.0f)) {}
 
 DirectionalLight::DirectionalLight(glm::vec3 color, glm::vec3 direction): Light(color), direction(direction) {}
 
@@ -25,7 +27,7 @@ void DirectionalLight::setUniforms(Shader * shader, int lightIndex) {
 
 
 
-PointLight::PointLight() : Light(glm::vec3(1.0f)) {}
+PointLight::PointLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)) {}
 
 PointLight::PointLight(glm::vec3 color, glm::vec3 position): Light(color), position(position) {}
 
@@ -47,7 +49,7 @@ void PointLight::setUniforms(Shader * shader, int lightIndex) {
 
 
 
-SpotLight::SpotLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)), direction(glm::vec3(1.0f, 0.0f, 0.0f)) {}
+SpotLight::SpotLight() : Light(glm::vec3(1.0f)), position(glm::vec3(0.0f)), direction(glm::vec3(0.0f, -1.0f, 0.0f)) {}
 
 SpotLight::SpotLight(glm::vec3 color, glm::vec3 position, glm::vec3 direction)
     : Light(color), position(position), direction(direction) {}
@@ -71,8 +73,8 @@ void SpotLight::setUniforms(Shader * shader, int lightIndex) {
     shader->setFloat("spotLights[" + std::to_string(lightIndex) + "].angularAttenuation", angularAttenuation);
 }
 
-glm::quat SpotLight::getLookAtQuat(){
+glm::quat SpotLight::getLookAtQuat() const{
     const glm::vec3 down = glm::vec3(0.0f, -1.0f, 0.0f);
-    const float angle = acos(glm::dot(glm::normalize(direction), down));
+    const float angle = static_cast<float>(acos(glm::dot(glm::normalize(direction), down)));
     return glm::quat(-angle, normalize(glm::cross(direction, down)));
 }

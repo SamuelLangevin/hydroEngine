@@ -1,8 +1,6 @@
 #include "Camera.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 
-Camera::Camera()= default;
-
 glm::mat4 Camera::getViewMatrix() const {
     return glm::lookAt(position, position + front, up);
 }
