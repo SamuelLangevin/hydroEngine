@@ -5,6 +5,9 @@
 
 #include "utility/ResourceManager.hpp"
 #include "utility/Utility.hpp"
+#include "imgui.h"
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 SceneRenderer Application::sceneRenderer;
 Camera Application::camera;
@@ -20,11 +23,24 @@ glm::vec3 Application::worldCursorPos;
 
 Application::Application() {
     initializeWindow();
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 430");
+
+
     sceneRenderer.init(windowSize);
 }
 
 Application::~Application(){
     sceneRenderer.free();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwTerminate();
 }
 
@@ -131,6 +147,19 @@ void Application::processFrame(){
 
     sceneRenderer.draw(camera, windowSize);
     sceneRenderer.drawWorldCursor(worldCursorPos);
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    // Your GUI
+    ImGui::Begin("Hello");
+    ImGui::Text("Hello, OpenGL!");
+    ImGui::End();
+
+    // Render
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     glfwSwapBuffers(window);
     Utility::glCheckError();
