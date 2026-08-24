@@ -52,20 +52,20 @@ void GuiManager::draw() {
     if (ImGui::CollapsingHeader("Wave parameters")) {
         ImGui::Text("Directional wave");
         ImGui::Separator();
-        GuiManager::InputFloat(directionalWave.waveLength, "Wave length", "##len1");
-        GuiManager::InputFloat(directionalWave.magnitude, "Magnitude", "##mag1");
-        GuiManager::InputFloat(directionalWave.speed, "Speed", "##spd1");
+        InputFloat(directionalWave.waveLength, "Wave length", "##len1");
+        InputFloat(directionalWave.magnitude, "Magnitude", "##mag1");
+        InputFloat(directionalWave.speed, "Speed", "##spd1");
         if (ImGui::Button("Reset to default values##1")) directionalWave = DEFAULT_DIRECTIONAL_WAVE;
-        GuiManager::InputVec2(directionalWave.direction, "Direction", "##direct", true);
+        InputVec2(directionalWave.direction, "Direction", "##direct");
 
         ImGui::Spacing();
         ImGui::Spacing();
 
         ImGui::Text("Point wave");
         ImGui::Separator();
-        GuiManager::InputFloat(pointWave.waveLength, "Wave length", "##len2");
-        GuiManager::InputFloat(pointWave.magnitude, "Magnitude", "##mag2");
-        GuiManager::InputFloat(pointWave.speed, "Speed", "##spd2");
+        InputFloat(pointWave.waveLength, "Wave length", "##len2");
+        InputFloat(pointWave.magnitude, "Magnitude", "##mag2");
+        InputFloat(pointWave.speed, "Speed", "##spd2");
         if (ImGui::Button("Reset to default values##2")) pointWave = DEFAULT_POINT_WAVE;
     }
     ImGui::End();
@@ -76,29 +76,26 @@ void GuiManager::draw() {
 
 void GuiManager::setCaptureInput(bool capture) {
     ImGuiIO& io = ImGui::GetIO();
-
-    io.WantCaptureMouse = capture;
-    io.WantCaptureKeyboard = capture;
-    io.WantTextInput = capture;
+    io.SetAppAcceptingEvents(capture);
 }
 
 void GuiManager::InputText(std::string & text, const std::string & label, ImGuiInputTextFlags textFlags) {
     char * buf = text.data();
-    ImGui::Text(label.data());
+    ImGui::TextUnformatted(label.c_str());
     ImGui::SameLine();
     bool input = ImGui::InputText(("##" + label).c_str(), buf, 20, textFlags);
     std::string str(buf);
     if (input) text = std::string(buf);
 }
 
-void GuiManager::InputFloat(float & value, const std::string & label, const std::string & id) {
-    ImGui::Text(label.c_str());
+void GuiManager::InputFloat(float & value, const char * label, const char * id) {
+    ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    ImGui::InputFloat(id.c_str(), &value);
+    ImGui::InputFloat(id, &value);
 }
 
-void GuiManager::InputVec2(glm::vec2 & values, const std::string & label, const std::string & id, bool normalize) {
-    ImGui::Text(label.c_str());
+void GuiManager::InputVec2(glm::vec2 & values, const char * label, const char * id) {
+    ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    ImGui::InputFloat2(id.c_str(),glm::value_ptr(values));
+    ImGui::InputFloat2(id,glm::value_ptr(values));
 }

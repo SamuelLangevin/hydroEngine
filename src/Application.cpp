@@ -18,6 +18,9 @@ glm::ivec2 Application::windowSize = glm::ivec2(1080, 810);
 glm::vec2 Application::lastMousePos = glm::vec2(windowSize.x/2,windowSize.y/2);
 float Application::sensitivity = 0.002f;
 bool Application::isFirstMouseMvt = true;
+
+uint Application::mouseButtons[3];
+uint Application::mouseButtonsProcessed[3];
 uint Application::keys[1024];
 uint Application::keysProcessed[1024];
 bool Application::leftMouseButtonProcessed = false;
@@ -56,6 +59,7 @@ void Application::initializeWindow(){
     glViewport(0,0, windowSize.x, windowSize.y);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, key_callback);
 }
@@ -78,7 +82,6 @@ void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
         glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
         camera.front = glm::normalize(qYaw * qPitch * camera.front);
     }
-
 }
 
 
@@ -87,8 +90,7 @@ void Application::framebuffer_size_callback(GLFWwindow * window, int width, int 
     windowSize = glm::ivec2(width, height);
 }
 
-void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
+void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
     if (0 <= key && key < 1024)
     {
         if (action == GLFW_PRESS) keys[key] = true;
@@ -96,6 +98,18 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
         {
             keys[key] = false;
             keysProcessed[key] = false;
+        }
+    }
+}
+
+void Application::mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (0 <= button && button < 3)
+    {
+        if (action == GLFW_PRESS) mouseButtons[button] = true;
+        else if (action == GLFW_RELEASE)
+        {
+            mouseButtons[button] = false;
+            mouseButtonsProcessed[button] = false;
         }
     }
 }
@@ -117,16 +131,13 @@ void Application::processInput(float deltaTime){
             worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
                                                             glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
 
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
-                double x, y;
-                glfwGetCursorPos(window, &x, &y);
-                leftMouseButtonProcessed = true;
-
+            if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {leftMouseButtonProcessed = true;
                 PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z),
                     glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.magnitude, guiManager.pointWave.speed);
                 sceneRenderer.pointWaves.push_back(wave);
+
+                mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
             }
-            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -166,7 +177,7 @@ void Application::processFrame(){
     updateWaves();
 
     sceneRenderer.draw(camera, windowSize);
-    sceneRenderer.drawWorldCursor(worldCursorPos);
+    if (appState == ACTIVE) sceneRenderer.drawWorldCursor(worldCursorPos);
 
     guiManager.draw();
 

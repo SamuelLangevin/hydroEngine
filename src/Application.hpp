@@ -48,6 +48,8 @@ class Application{
         static glm::vec2 lastMousePos; /**< Mouse position for the current frame. */
         static float sensitivity; /**< Mouse sensitivity. */
         static bool isFirstMouseMvt; /**< Is the first mouse movement processed ? */
+        static uint mouseButtons[3]; /**< Is the indexed mouse button being pressed ?.*/
+        static uint mouseButtonsProcessed[3]; /**< Has the indexed mouse button's initial press been processed ?.*/
         static uint keys[1024]; /**< Is the indexed key being pressed ?.*/
         static uint keysProcessed[1024]; /**< Has the indexed key's initial press been processed ?.*/
         static bool leftMouseButtonProcessed; /**< Has the left mouse button's initial press been processed ?.*/
@@ -62,7 +64,7 @@ class Application{
         /** Processes the user's key inputs and mouse movements. */
         void processInput(float deltaTime);
 
-        /** Deletes expired waves according to their lifeTime. */
+        /** Deletes expired waves according to their lifeTime and updates the directional wave's attributes. */
         void updateWaves();
 
         /** Keeps track of mouse movements and updates the camera's point of view. */
@@ -73,6 +75,9 @@ class Application{
 
         /** Keeps track of key events. */
         static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+
+        /** keeps track of mouse inputs. */
+        static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 
         /** Prints the frames-per-second count. */
         static void printFPS(float dt);
