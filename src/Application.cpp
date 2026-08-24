@@ -1,6 +1,5 @@
 #include "Application.hpp"
 
-#include <imgui_impl_glfw.h>
 #include <iostream>
 #include <detail/type_quat.hpp>
 #include <ext/quaternion_trigonometric.hpp>
@@ -63,27 +62,21 @@ void Application::initializeWindow(){
 
 void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
 
-    if(isFirstMouseMvt){
+    if (appState == ACTIVE) {
+
+        if(isFirstMouseMvt){
+            lastMousePos = glm::vec2(xpos, ypos);
+            isFirstMouseMvt = false;
+        }
+
+        float xOffset = sensitivity * (xpos - lastMousePos.x);
+        float yOffset = sensitivity * -(ypos - lastMousePos.y);
+
         lastMousePos = glm::vec2(xpos, ypos);
-        isFirstMouseMvt = false;
-    }
 
-    float xOffset = sensitivity * (xpos - lastMousePos.x);
-    float yOffset = sensitivity * -(ypos - lastMousePos.y);
-
-    lastMousePos = glm::vec2(xpos, ypos);
-
-    switch (appState) {
-
-        case ACTIVE: {
-            glm::quat qYaw = glm::angleAxis(xOffset, glm::vec3(0, -1, 0));
-            glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
-            camera.front = glm::normalize(qYaw * qPitch * camera.front);
-        } break;
-
-        case MENU: {
-            //ImGui_ImplGlfw_CursorPosCallback(window, lastMousePos.x, lastMousePos.y);
-        } break;
+        glm::quat qYaw = glm::angleAxis(xOffset, glm::vec3(0, -1, 0));
+        glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
+        camera.front = glm::normalize(qYaw * qPitch * camera.front);
     }
 
 }
@@ -129,30 +122,31 @@ void Application::processInput(float deltaTime){
                 glfwGetCursorPos(window, &x, &y);
                 leftMouseButtonProcessed = true;
 
-                PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(), 3.0,3, 20.0);
+                PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z),
+                    glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.magnitude, guiManager.pointWave.speed);
                 sceneRenderer.pointWaves.push_back(wave);
             }
             if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
-                //glfwSetCursorPosCallback(window, nullptr);
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                 appState = MENU;
-                keysProcessed[GLFW_KEY_ESCAPE] = true;
                 guiManager.setCaptureInput(true);
+
+                keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
 
         } break;
 
         case MENU: {
-            if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
 
+            if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
                 isFirstMouseMvt = true;
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                //glfwSetCursorPosCallback(window, mouse_callback);
                 appState = ACTIVE;
-                keysProcessed[GLFW_KEY_ESCAPE] = true;
                 guiManager.setCaptureInput(false);
+
+                keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
         } break;
     }
@@ -187,6 +181,8 @@ void Application::updateWaves() {
             sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
         else break; // expired waves will always be at the beginning of the vector;
     }
+    *sceneRenderer.directionalWave = guiManager.directionalWave;
+    sceneRenderer.directionalWave->direction = glm::normalize(sceneRenderer.directionalWave->direction);
 }
 
 void Application::printFPS(float dt) {
