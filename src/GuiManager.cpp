@@ -53,7 +53,7 @@ void GuiManager::draw() {
         ImGui::Text("Directional wave");
         ImGui::Separator();
         InputFloat(directionalWave.waveLength, "Wave length", "##len1");
-        InputFloat(directionalWave.magnitude, "Magnitude", "##mag1");
+        InputFloat(directionalWave.amplitude, "Amplitude", "##amp1");
         InputFloat(directionalWave.speed, "Speed", "##spd1");
         if (ImGui::Button("Reset to default values##1")) directionalWave = DEFAULT_DIRECTIONAL_WAVE;
         InputVec2(directionalWave.direction, "Direction", "##direct");
@@ -64,9 +64,10 @@ void GuiManager::draw() {
         ImGui::Text("Point wave");
         ImGui::Separator();
         InputFloat(pointWave.waveLength, "Wave length", "##len2");
-        InputFloat(pointWave.magnitude, "Magnitude", "##mag2");
+        InputFloat(pointWave.amplitude, "Amplitude", "##amp2");
         InputFloat(pointWave.speed, "Speed", "##spd2");
         if (ImGui::Button("Reset to default values##2")) pointWave = DEFAULT_POINT_WAVE;
+        resetWaves = ImGui::Button("Clear waves");
     }
     ImGui::End();
 

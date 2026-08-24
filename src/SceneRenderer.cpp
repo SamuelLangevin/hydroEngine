@@ -87,7 +87,7 @@ void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {
     monoColorShader.setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
 
     Sphere worldCursor;
-    worldCursor.position = worldCursorPos + glm::vec3(0.0, directionalWave->magnitude, 0.0);
+    worldCursor.position = worldCursorPos + glm::vec3(0.0, directionalWave->amplitude, 0.0);
     worldCursor.draw(&monoColorShader);
 }
 

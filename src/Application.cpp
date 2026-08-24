@@ -133,7 +133,7 @@ void Application::processInput(float deltaTime){
 
             if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {leftMouseButtonProcessed = true;
                 PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z),
-                    glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.magnitude, guiManager.pointWave.speed);
+                    glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.amplitude, guiManager.pointWave.speed);
                 sceneRenderer.pointWaves.push_back(wave);
 
                 mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
@@ -187,11 +187,15 @@ void Application::processFrame(){
 }
 
 void Application::updateWaves() {
+    if (guiManager.resetWaves) sceneRenderer.pointWaves.clear();
+
     for (uint i = 0; i < sceneRenderer.pointWaves.size(); ++i){
-        if (glfwGetTime() - sceneRenderer.pointWaves.at(i).dropTime > PointWave::lifeTime)
+        const PointWave & wave = sceneRenderer.pointWaves[i];
+        if (glfwGetTime() - wave.dropTime > wave.lifetime)
             sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
         else break; // expired waves will always be at the beginning of the vector;
     }
+
     *sceneRenderer.directionalWave = guiManager.directionalWave;
     sceneRenderer.directionalWave->direction = glm::normalize(sceneRenderer.directionalWave->direction);
 }
