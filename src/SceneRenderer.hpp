@@ -13,6 +13,10 @@
 class SceneRenderer {
     public:
 
+        Surface * water = nullptr; /**< The water surface's mesh.*/
+        DirectionalWave * directionalWave = nullptr; /**< The wave front applied on the water surface. */
+        std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
+
         SceneRenderer() = default;
         ~SceneRenderer() = default;
 
@@ -41,10 +45,6 @@ class SceneRenderer {
          * @param worldCursorPos
          */
         void drawWorldCursor(glm::vec3 worldCursorPos) const;
-
-        Surface * water = nullptr; /**< The water surface's mesh.*/
-        DirectionalWave * directionalWave = nullptr; /**< The wave front applied on the water surface. */
-        std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
 
     private:
         uint matricesUBO = 0; /**< The view and projection matrices uniform block's ID. */

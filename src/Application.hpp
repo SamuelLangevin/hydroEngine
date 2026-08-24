@@ -7,11 +7,20 @@
 #include "SceneRenderer.hpp"
 #include <GLFW/glfw3.h>
 
+#include "GuiManager.hpp"
+
 /** \class Application
- * Manages windowing and user interaction. Uses SceneRenderer sub module.
+ * Manages windowing and user interaction. Uses SceneRenderer and GUIManager submodules.
  */
 class Application{
     public:
+        /** \enum AppState
+         * ACTIVE - The application focuses on the scene.
+         *
+         * MENU - The application focuses on the interface.
+         */
+        enum AppState {ACTIVE, MENU};
+
         /** Initializes the GLFWwindow and the SceneRenderer. */
         Application();
 
@@ -29,10 +38,12 @@ class Application{
 
     private:
 
-        GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
+        static GLFWwindow* window; /**< The window object, making the bridge between the app and the user. */
         static SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
+        static GuiManager guiManager; /**< Manages ImGUI's state and widgets rendering. */
         static Camera camera; /**< First person camera point of view for rendering. */
 
+        static AppState appState; /**< The state the application is in. @see AppState enum. */
         static glm::ivec2 windowSize; /**< AKA viewport size in pixels. */
         static glm::vec2 lastMousePos; /**< Mouse position for the current frame. */
         static float sensitivity; /**< Mouse sensitivity. */

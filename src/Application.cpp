@@ -1,4 +1,6 @@
 #include "Application.hpp"
+
+#include <imgui_impl_glfw.h>
 #include <iostream>
 #include <detail/type_quat.hpp>
 #include <ext/quaternion_trigonometric.hpp>
@@ -6,12 +8,13 @@
 #include "utility/ResourceManager.hpp"
 #include "utility/Utility.hpp"
 #include "imgui.h"
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
 
 SceneRenderer Application::sceneRenderer;
+GuiManager Application::guiManager;
+GLFWwindow* Application::window = nullptr;
 Camera Application::camera;
 
+Application::AppState Application::appState = ACTIVE;
 glm::ivec2 Application::windowSize = glm::ivec2(1080, 810);
 glm::vec2 Application::lastMousePos = glm::vec2(windowSize.x/2,windowSize.y/2);
 float Application::sensitivity = 0.002f;
@@ -23,24 +26,13 @@ glm::vec3 Application::worldCursorPos;
 
 Application::Application() {
     initializeWindow();
-
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    ImGui::StyleColorsDark();
-    ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init("#version 430");
-
-
+    guiManager.init(window);
     sceneRenderer.init(windowSize);
 }
 
 Application::~Application(){
     sceneRenderer.free();
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    guiManager.free();
     glfwTerminate();
 }
 
@@ -78,12 +70,21 @@ void Application::mouse_callback(GLFWwindow * window, double xpos, double ypos){
 
     float xOffset = sensitivity * (xpos - lastMousePos.x);
     float yOffset = sensitivity * -(ypos - lastMousePos.y);
-    
+
     lastMousePos = glm::vec2(xpos, ypos);
 
-    glm::quat qYaw = glm::angleAxis(xOffset, glm::vec3(0, -1, 0));
-    glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
-    camera.front = glm::normalize(qYaw * qPitch * camera.front);
+    switch (appState) {
+
+        case ACTIVE: {
+            glm::quat qYaw = glm::angleAxis(xOffset, glm::vec3(0, -1, 0));
+            glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
+            camera.front = glm::normalize(qYaw * qPitch * camera.front);
+        } break;
+
+        case MENU: {
+            //ImGui_ImplGlfw_CursorPosCallback(window, lastMousePos.x, lastMousePos.y);
+        } break;
+    }
 
 }
 
@@ -109,27 +110,52 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
 
 void Application::processInput(float deltaTime){
 
-    const float cameraSpeed = 3.0f * deltaTime;
-    if(keys[GLFW_KEY_W]) camera.position += cameraSpeed * camera.front;
-    if(keys[GLFW_KEY_S]) camera.position -= cameraSpeed * camera.front;
-    if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
-    if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+    switch (appState) {
 
-    const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
-    worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
-                                                    glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
+        case ACTIVE: {
 
-    if(keys[GLFW_KEY_ESCAPE]) glfwSetWindowShouldClose(window, true);
+            const float cameraSpeed = 3.0f * deltaTime;
+            if(keys[GLFW_KEY_W]) camera.position += cameraSpeed * camera.front;
+            if(keys[GLFW_KEY_S]) camera.position -= cameraSpeed * camera.front;
+            if(keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
+            if(keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
-        double x, y;
-        glfwGetCursorPos(window, &x, &y);
-        leftMouseButtonProcessed = true;
+            const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
+            worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
+                                                            glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
 
-        PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(), 3.0,3, 20.0);
-        sceneRenderer.pointWaves.push_back(wave);
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !leftMouseButtonProcessed) {
+                double x, y;
+                glfwGetCursorPos(window, &x, &y);
+                leftMouseButtonProcessed = true;
+
+                PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(), 3.0,3, 20.0);
+                sceneRenderer.pointWaves.push_back(wave);
+            }
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
+
+            if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
+                //glfwSetCursorPosCallback(window, nullptr);
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                appState = MENU;
+                keysProcessed[GLFW_KEY_ESCAPE] = true;
+                guiManager.setCaptureInput(true);
+            }
+
+        } break;
+
+        case MENU: {
+            if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
+
+                isFirstMouseMvt = true;
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                //glfwSetCursorPosCallback(window, mouse_callback);
+                appState = ACTIVE;
+                keysProcessed[GLFW_KEY_ESCAPE] = true;
+                guiManager.setCaptureInput(false);
+            }
+        } break;
     }
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) leftMouseButtonProcessed = false;
 }
 
 bool Application::shouldWindowClose() const {
@@ -148,18 +174,7 @@ void Application::processFrame(){
     sceneRenderer.draw(camera, windowSize);
     sceneRenderer.drawWorldCursor(worldCursorPos);
 
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    // Your GUI
-    ImGui::Begin("Hello");
-    ImGui::Text("Hello, OpenGL!");
-    ImGui::End();
-
-    // Render
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    guiManager.draw();
 
     glfwSwapBuffers(window);
     Utility::glCheckError();
