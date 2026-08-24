@@ -10,17 +10,17 @@
 class Wave {
 public:
     float waveLength; /**< The length between two crests or two "highs". */
-    float magnitude; /**< The height of the wave. */
+    float amplitude; /**< The height of the wave. */
     float speed; /**< how fast the wave fronts travel. */
 
     /**
      * Base wave constructor
      * @param waveLength
-     * @param magnitude
+     * @param amplitude
      * @param speed
      */
-    explicit Wave(const float waveLength, const float magnitude, const float speed)
-        : waveLength(waveLength), magnitude(magnitude), speed(speed){}
+    explicit Wave(const float waveLength, const float amplitude, const float speed)
+        : waveLength(waveLength), amplitude(amplitude), speed(speed){}
     virtual ~Wave() = default;
 
     /**
@@ -45,10 +45,10 @@ public:
      * Non default constructor.
      * @param direction
      * @param waveLength defaults to 1.0f
-     * @param magnitude defaults to 0.5f
+     * @param amplitude defaults to 0.5f
      * @param speed defaults to 3.0f
      */
-    explicit DirectionalWave(glm::vec2 direction, float waveLength = 1.0f, float magnitude = 0.5f, float speed = 3.0f);
+    explicit DirectionalWave(glm::vec2 direction, float waveLength = 1.0f, float amplitude = 0.5f, float speed = 3.0f);
 
     /**
      * Sends the wave's attributes to the shader.
@@ -66,8 +66,7 @@ public:
 class PointWave : public Wave {
 public:
 
-    //todo calculate lifetime instead of giving arbitrary value
-    static constexpr float lifeTime = 10.0f; /**< The lifetime of a pointWave's effect. */
+    float lifetime; /**< The lifetime of a pointWave's effect. Calculated from its amplitude. */
     glm::vec2 origin; /**< or epicenter*/
     float dropTime; /**< The absolute time its effect starts. */
 
@@ -77,10 +76,10 @@ public:
      * @param origin
      * @param dropTime
      * @param waveLength
-     * @param magnitude
+     * @param amplitude
      * @param speed
      */
-    explicit PointWave(glm::vec2 origin, float dropTime, float waveLength = 5.0f, float magnitude = 4.0f, float speed = 10.0f);
+    explicit PointWave(glm::vec2 origin, float dropTime, float waveLength = 5.0f, float amplitude = 4.0f, float speed = 10.0f);
 
     /**
      * Sends the wave's attributes to the shader.
