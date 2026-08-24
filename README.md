@@ -26,6 +26,7 @@ Renderdoc is an optional debugging tool.
 
 ## Attributions
 This project is partially based on the work of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction).
+Notably, [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-irradiance) and [specular](https://learnopengl.com/PBR/IBL/Specular-IBL) IBL.
 
 The tessellation shader used for the water was based from [Dr. Jeffrey Paone's guest article on tessellation](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
 

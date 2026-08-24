@@ -62,12 +62,12 @@ public:
                                     GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
-     * Creates a 2D texture from pre-loaded or no data.
+     * Creates a 2D texture from preloaded or no data.
      * @param size of the image
      * @param internalFormat see the openGL documentation
      * @param format see the openGL documentation
      * @param type 2D ? Cubemap ?
-     * @param data the pre-loaded data. Defaults to nullptr
+     * @param data the preloaded data. Defaults to nullptr
      * @param wrap method to apply. Defaults to GL_CLAMP_TO_EDGE
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
@@ -110,6 +110,28 @@ public:
      * @param filter
      */
     static void setParameters(GLenum type, GLint wrap, GLint filter);
+
+    /**
+     * https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl
+     * takes the color attachment of the current framebuffer and writes to an image to the corresponding name.
+     *
+     * Bash script to convert .tga images to .png :
+    * Install the image converter
+
+    sudo apt install graphicsmagick-imagemagick-compat  # version 1.4+really1.3.42-1
+
+    for oldFileName in *.tga; do
+        [ -f "$oldFileName" ] || break
+        newFileName=${oldFileName//.tga/.png}
+        convert $oldFileName $newFileName
+        rm $oldFileName
+        echo "Converted $oldFileName to $newFileName"
+    done
+
+    * @param filename name of the image to generate
+    * @param size the size of the image to generate
+    */
+    static void saveTextureToFile(const std::string& filename, glm::ivec2 size);
 
 private:;
 

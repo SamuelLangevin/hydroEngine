@@ -44,6 +44,7 @@ add_executable(hydroEngine
     src/draw/Surface.cpp
     src/GuiManager.cpp
     src/GuiManager.hpp
+    src/draw/Cube.cpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/glm)
