@@ -29,5 +29,5 @@ float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos
 }
 
 float computeDirectionalWaveHeight(DirectionalWave dWave, float absoluteTime, vec2 vertexPos){
-    return dWave.amplitude * sin(-dot(dWave.direction, vertexPos)/dWave.waveLength + absoluteTime * dWave.speed) + 0.5;
+    return dWave.amplitude * sin(-dot(dWave.direction, vertexPos)/dWave.waveLength + absoluteTime * dWave.speed);
 }

@@ -1,9 +1,9 @@
 #ifndef SURFACE_HPP
 #define SURFACE_HPP
 
-#include "Shape.hpp"
+#include "BasicShape.hpp"
 
-class Surface : public Shape{
+class Surface : public BasicShape{
 public:
 
     explicit Surface(glm::ivec2 size);

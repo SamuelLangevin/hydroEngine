@@ -69,9 +69,10 @@ void Texture::free(){
     glDeleteTextures(1, &ID);
 }
 
-void Texture::bind(const GLenum textureChannel) const
+void Texture::bind(Shader * shader, const std::string &name, int channel) const
 {
-    glActiveTexture(textureChannel);
+    shader->setInt(name, channel);
+    glActiveTexture(GL_TEXTURE0 + channel);
     glBindTexture(type, this->ID);
 }
 

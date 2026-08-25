@@ -86,7 +86,7 @@ void Cube::load(){
 
 void Cube::draw(Shader * shader) const {
     load();
-    setUniforms(shader);
+    setUniforms(shader, 0);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

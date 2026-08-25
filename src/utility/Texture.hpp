@@ -4,6 +4,7 @@
 #include <vec2.hpp>
 #include <vec3.hpp>
 
+#include "Shader.hpp"
 #include "../../includes/glad.h"
 
 /** \class Texture
@@ -34,9 +35,11 @@ public:
 
     /**
      * Binds the texture to the specified texture channel.
-     * @param textureChannel
+     * @param shader to send the textureID to
+     * @param name of the sampler uniform
+     * @param channel to bind the uniform to
      */
-    void bind(GLenum textureChannel) const;
+    void bind(Shader * shader, const std::string &name, int channel) const;
 
     /**
      * Loads and creates a basic texture from a filename and applies the

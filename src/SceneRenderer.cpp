@@ -32,15 +32,15 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 void SceneRenderer::loadTextures() {
     using RM =  ResourceManager;
 
-    stbi_set_flip_vertically_on_load(false);
     RM::addTexture("lakeSkybox", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_CUBE_MAP);
+    stbi_set_flip_vertically_on_load(true);
     RM::addTexture("lakeIrradianceMap", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake_IrradianceMap/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_CUBE_MAP);
-    stbi_set_flip_vertically_on_load(false);
-
     RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_2D);
+    stbi_set_flip_vertically_on_load(false);
+    RM::addTexture("white", Texture::createColorTexture(glm::vec3(0.9f)), glm::ivec2(1), GL_TEXTURE_2D);
 
     createIBLTextures();
 }
@@ -50,8 +50,9 @@ void SceneRenderer::loadShaders() {
     using RM =  ResourceManager;
     RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
-        "waterSurface.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
+        "waterSurfacePBR.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
     RM::addShader("monoColorShader", Shader::createShader("object.vert", "monoColor.frag"));
+    RM::addShader("skyboxShader", Shader::createShader("cubemap.vert", "cubemap.frag"));
 }
 
 void SceneRenderer::setUniformBlocks() {
@@ -64,6 +65,7 @@ void SceneRenderer::setUniformBlocks() {
 
     ResourceManager::getShader("monoColorShader").setUniformBlock("Matrices", 0);
     ResourceManager::getShader("waterSurfaceShader").setUniformBlock("Matrices", 0);
+    ResourceManager::getShader("skyboxShader").setUniformBlock("Matrices", 0);
 }
 
 void SceneRenderer::initializeScene() {
@@ -75,6 +77,14 @@ void SceneRenderer::initializeScene() {
     water = new Surface(glm::ivec2(1000));
     water->scale = glm::vec3(0.1f);
     water->position = glm::vec3(0.0f, -10.0f, 0.0f);
+    water->material.metallic = 0.3;
+    water->material.roughness = 1.0f;
+    water->material.ao = 1.0f;
+    water->material.texture_diffuse0 = ResourceManager::getTexture("white").ID;
+    ResourceManager::getTexture("lakeIrradianceMap").bind(&waterSurfaceShader, "environment.irradianceMap",1);
+    ResourceManager::getTexture("prefilterMap").bind(&waterSurfaceShader, "environment.prefilterMap",2);
+    ResourceManager::getTexture("lutTexture").bind(&waterSurfaceShader, "environment.brdfLUT",3);
+
 }
 
 void SceneRenderer::createIBLTextures() {
@@ -93,9 +103,9 @@ void SceneRenderer::createIBLTextures() {
 
     glBindFramebuffer(GL_FRAMEBUFFER, envCubemapFBO.ID);
         glBindRenderbuffer(GL_RENDERBUFFER, envCubemapFBO.renderBuffer);
-        //createEnvIrradianceCubemap(captureProjection, &captureView[0], false);
+        //createEnvIrradianceCubemap(captureProjection, &captureView[0], false); // has been pre-generated
         createPrefilteredMipMaps(captureProjection, &captureView[0]);
-        //createLUTTexture(false);
+        //createLUTTexture(false); // has been pre-generated
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDeleteFramebuffers(1, &envCubemapFBO.ID);
@@ -114,7 +124,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
     cubemapConvolutionShader.use();
     cubemapConvolutionShader.setInt("environmentMap", 0);
     cubemapConvolutionShader.setMat4("projection", captureProjection);
-    ResourceManager::getTexture("lakeSkybox").bind(GL_TEXTURE0);
+    ResourceManager::getTexture("lakeSkybox").bind(&cubemapConvolutionShader, "environmentMap", 0);
 
     glViewport(0, 0, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
     for (uint i = 0; i < 6; i++) {
@@ -140,9 +150,8 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     Shader prefilterConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag"));
     prefilterConvolutionShader.use();
-    prefilterConvolutionShader.setInt("environmentMap", 0);
     prefilterConvolutionShader.setMat4("projection", captureProjection);
-    ResourceManager::getTexture("lakeSkybox").bind(GL_TEXTURE0);
+    ResourceManager::getTexture("lakeSkybox").bind(&prefilterConvolutionShader, "environmentMap", 0);
 
     uint maxMipLevels = 5;
     for (uint mipLevel = 0; mipLevel < maxMipLevels; mipLevel++) {
@@ -198,13 +207,19 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
 
     waterSurfaceShader.use();
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
+    waterSurfaceShader.setVec3("viewPos", camera.position);
 
     waterSurfaceShader.setInt("nbOfPointWaves", pointWaves.size());
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
         pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
     }
     directionalWave->setUniforms(&waterSurfaceShader, "dirWave");
+
+    water->setUniforms(&waterSurfaceShader, 0);
     water->draw(&waterSurfaceShader);
+
+    Shader skyboxShader = ResourceManager::getShader("skyboxShader");
+    Cube::drawSkyBox(&skyboxShader, ResourceManager::getTexture("lakeSkybox").ID, "skybox");
 }
 
 void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {

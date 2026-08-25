@@ -15,16 +15,14 @@ public:
 
     Material material;
 
-protected:
-
-    void setUniforms(Shader * shader) const {
+    void setUniforms(Shader * shader, int channel) const {
         setMatricesUniforms(shader);
 
-        shader->setInt("material.texture_diffuse0", 0);
         shader->setFloat("material.metallic", material.metallic);
         shader->setFloat("material.roughness", material.roughness);
         shader->setFloat("material.ao", material.ao);
-        glActiveTexture(GL_TEXTURE0);
+        shader->setInt("material.texture_diffuse0", channel);
+        glActiveTexture(GL_TEXTURE0 + channel);
         glBindTexture(GL_TEXTURE_2D, material.texture_diffuse0);
     }
 };

@@ -79,7 +79,7 @@ class SceneRenderer {
 
         /**
          * Creates the pre-filtered environment map of the skybox for specular light calculations.
-         * Gives for a combination of reflection direction and roughness what the environment looks like after being blurred according to the BRDF.
+         * Gives for a combination of reflection direction and roughness what the environment looks like from the light's dispersed reflection.
          * Based on https://learnopengl.com/PBR/IBL/Specular-IBL
          * @param captureProjection projection matrix
          * @param captureView view matrix
