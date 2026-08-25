@@ -4,18 +4,27 @@
 #include "../utility/Texture.hpp"
 #include "../../includes/glad.h"
 
+/** \class BasicShape
+ * Base of a shape class with a material
+ */
 class BasicShape : public Shape {
 public:
 
+    /** PBR material for light computation. */
     struct Material {
-        Texture texture_diffuse0 {0,glm::ivec2(0),GL_TEXTURE_2D};
-        float metallic = 0.5f;
-        float roughness = 0.5f;
-        float ao = 1.0f;
+        Texture texture_diffuse0 {0,glm::ivec2(0),GL_TEXTURE_2D}; /**< AKA albedo */
+        float metallic = 0.5f; /** Proportion of specular reflection [0, 1]. */
+        float roughness = 0.5f; /** Reverse of smoothness*/
+        float ao = 1.0f; /**< Ambient occlusion. Factor of self occlusion. */
     };
 
     Material material;
 
+    /**
+     * Sets the model matrix uniform and the material uniforms.
+     * @param shader
+     * @param channel
+     */
     void setUniforms(const Shader & shader, int channel) const {
         setMatricesUniforms(shader);
 

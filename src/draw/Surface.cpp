@@ -3,29 +3,34 @@
 
 uint Surface::resolution = 20;
 
-Surface::Surface(const glm::ivec2 size) : size(size) {
+
+Surface::Surface(const glm::ivec2 size) {
     std::vector<float> vertices;
 
     for (int i = 0; i < resolution-1; ++i) {
         for (int j = 0; j < resolution-1; ++j) {
+            //top left
             vertices.push_back(-size.x/2.0f + size.x*i/(float)resolution);
             vertices.push_back(0.0f);
             vertices.push_back(-size.y/2.0f + size.y*j/(float)resolution);
             vertices.push_back(i / (float)resolution);
             vertices.push_back(j / (float)resolution);
 
-            vertices.push_back(-size.x/2.0f + size.x*(i+1)/(float)resolution);
-            vertices.push_back(0.0f);
-            vertices.push_back(-size.y/2.0f + size.y*j/(float)resolution);
-            vertices.push_back((i+1) / (float)resolution);
-            vertices.push_back(j / (float)resolution);
-
+            //bottom left
             vertices.push_back(-size.x/2.0f + size.x*i/(float)resolution);
             vertices.push_back(0.0f); // v.y
             vertices.push_back(-size.y/2.0f + size.y*(j+1)/(float)resolution);
             vertices.push_back(i / (float)resolution);
             vertices.push_back((j+1) / (float)resolution);
 
+            //bottom right
+            vertices.push_back(-size.x/2.0f + size.x*(i+1)/(float)resolution);
+            vertices.push_back(0.0f);
+            vertices.push_back(-size.y/2.0f + size.y*j/(float)resolution);
+            vertices.push_back((i+1) / (float)resolution);
+            vertices.push_back(j / (float)resolution);
+
+            //top right
             vertices.push_back(-size.x/2.0f + size.x*(i+1)/(float)resolution);
             vertices.push_back(0.0f);
             vertices.push_back(-size.y/2.0f + size.y*(j+1)/(float)resolution);
@@ -55,8 +60,12 @@ Surface::~Surface() {
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Surface::draw(const Shader & shader) const {
+void Surface::load() const {
     glBindVertexArray(VAO);
+}
+
+void Surface::draw(const Shader & shader) const {
+    load();
     setMatricesUniforms(shader);
     glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution);
 }

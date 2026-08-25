@@ -10,10 +10,10 @@
 
 /** Stores the surface's properties of an object. */
 struct Material {
-    float metallic;
-    float roughness;
-    float ao;
-    sampler2D texture_diffuse0;
+    float metallic; /** Proportion of specular reflection [0, 1]. */
+    float roughness; /** Reverse of smoothness [0, 1. ]*/
+    float ao; /**< Ambient occlusion. Factor of self occlusion. */
+    sampler2D texture_diffuse0;  /**< AKA albedo */
 };
 
 /** Stores the environment light's properties. */

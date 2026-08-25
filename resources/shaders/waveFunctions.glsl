@@ -1,6 +1,7 @@
 #define PI 3.14159
 #define e 2.71828
 
+/** Stores the properties of a direcitonal wave */
 struct DirectionalWave {
     vec2 direction;
     float waveLength;
@@ -8,6 +9,7 @@ struct DirectionalWave {
     float speed;
 };
 
+/** Stores the properties of a point wave */
 struct PointWave {
     vec2 origin;
     float waveLength;
@@ -16,6 +18,12 @@ struct PointWave {
     float dropTime;
 };
 
+/**
+ * @param pWave the point wave to compute
+ * @param absoluteTime the current time in seconds
+ * @param vertexPos
+ * returns the wave's contribution to the height of the vertex
+ */
 float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos){
     vec2 originToVert = pWave.origin - vertexPos;
     float relativeTime = absoluteTime - pWave.dropTime;
@@ -28,6 +36,12 @@ float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos
     return pointWaveHeight;
 }
 
+/**
+ * @param dWave the directional wave to compute
+ * @param absoluteTime the current time in seconds
+ * @param vertexPos
+ * returns the wave's contribution to the height of the vertex
+ */
 float computeDirectionalWaveHeight(DirectionalWave dWave, float absoluteTime, vec2 vertexPos){
     return dWave.amplitude * sin(-dot(dWave.direction, vertexPos)/dWave.waveLength + absoluteTime * dWave.speed);
 }

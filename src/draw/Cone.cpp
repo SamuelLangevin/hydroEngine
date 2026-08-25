@@ -6,9 +6,7 @@
 #define PI 3.14159265359
 
 uint Cone::VAO, Cone::VBO, Cone::EBO;
-int Cone::lonResolution = 40;
-
-Cone::Cone()= default;
+const int Cone::lonResolution = 40;
 
 void Cone::free() {
     glDeleteBuffers(1, &VBO);

@@ -1,12 +1,10 @@
 #include "../../includes/glad.h"
 #include "Cube.hpp"
 
-uint Cube::cubeVAO;
-
-Cube::Cube()= default;
+uint Cube::VAO, Cube::VBO, Cube::EBO;
 
 void Cube::load(){
-    if (cubeVAO == 0) {
+    if (VAO == 0) {
         float vertices[] = {
         //vertices          //normals         //tex coords
 
@@ -55,12 +53,11 @@ void Cube::load(){
         16,17,18, 17,19,18,//right
         20,21,22,  21,23,22//left
     };
-    uint EBO, VBO;
     glGenBuffers(1, &EBO);
-    glGenVertexArrays(1, &cubeVAO);
+    glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
-    glBindVertexArray(cubeVAO);
+    glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -79,7 +76,7 @@ void Cube::load(){
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
     glEnableVertexAttribArray(2);//texcoords
     }
-    glBindVertexArray(cubeVAO);
+    glBindVertexArray(VAO);
 
     
 }
@@ -91,17 +88,23 @@ void Cube::draw(const Shader & shader) const {
     glBindVertexArray(0);
 }
 
+void Cube::free() {
+    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
+}
+
 void Cube::draw(){
     load();
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
 
-void Cube::drawSkyBox(const Shader & shader, const Texture & skyboxTex, const std::string & var) {
+void Cube::drawSkyBox(const Shader & shader, const Texture & skyboxTex, const std::string & samplerName) {
     glDepthFunc(GL_LEQUAL);
     glCullFace(GL_FRONT);
     shader.use();
-    skyboxTex.bind(shader, var, 0);
+    skyboxTex.bind(shader, samplerName, 0);
     draw();
     glCullFace(GL_BACK);
     glDepthFunc(GL_LESS);

@@ -6,34 +6,37 @@
 
 #include "Camera.hpp"
 
+/** \class
+ * Holdall class to put useful functions.
+ */
 class Utility{
     public:
-
+        /** \struct FrameBuffer
+         * Stores the ID, the buffers IDs and the render buffer ID of a renderbuffer.
+         */
         struct FrameBuffer {
             uint ID{};
-            uint textureBuffer0{};
-            uint textureBuffer1{};
-            uint textureBuffer2{};
-            uint renderBuffer{};
-        };
-
-        struct GeometryFrameBuffer {
-            uint ID{};
-            uint positionTexture{};
-            uint normalTexture{};
-            uint albedoSpecTex{};
+            uint buffers[4]{};
             uint renderBuffer{};
         };
 
         Utility() = delete;
 
+        /**
+         * Generates a base framebuffers, and its attachments.
+         * @param FBO object store the IDs in
+         * @param windowSize the size of the framebuffer
+         * @param attachRenderBuffer to generate and attach a render buffer
+         * @param colorAttachments the number of textures to generate and attach
+         */
         static void createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool attachRenderBuffer, int colorAttachments);
-        static void createGBuffer(GeometryFrameBuffer & FBO, glm::ivec2 windowSize);
+
+        /**
+         * Generates a multisample framebuffer for anti-aliasing
+         * @param FBO object to store the IDs in
+         * @param windowSize the size of the framebuffer
+         */
         static void createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
-        static void createDepthFrameBuffer(FrameBuffer & FBO, int shadowsResolution);
-        static void createDepthCubeMapFrameBuffer(FrameBuffer & FBO, int shadowsResolution);
-        static void createSSAOFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
-        static void createHDRCubemapFramebuffer(FrameBuffer & FBO, glm::ivec2 resolution);
 
         /**
          * Prints the latest OpenGL error. Does not specify the error's location.

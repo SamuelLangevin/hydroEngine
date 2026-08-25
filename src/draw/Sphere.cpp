@@ -5,9 +5,7 @@
 #define PI 3.14159265359
 
 uint Sphere::VAO, Sphere::VBO, Sphere::EBO;
-int Sphere::latResolution = 20, Sphere::lonResolution = 20;
-
-Sphere::Sphere()= default;
+const int Sphere::latResolution = 20, Sphere::lonResolution = 20;
 
 void Sphere::load(){
     if (VAO == 0) {
