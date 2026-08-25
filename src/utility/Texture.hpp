@@ -4,17 +4,19 @@
 #include <vec2.hpp>
 #include <vec3.hpp>
 
+#include "Shader.hpp"
 #include "../../includes/glad.h"
 
 /** \class Texture
  * Represents an OpenGL texture.
  */
 class Texture{
-public:
+private:
+    uint ID; /**< The OpenGL texture ID. */
+    glm::ivec2 size; /**< The width and height of the image. */
+    GLenum type; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
 
-    const uint ID; /**< The OpenGL texture ID. */
-    const glm::ivec2 size; /**< The width and height of the image. */
-    const GLenum type; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
+public:
 
     static glm::ivec2 lastCreatedImageSize; /**< The size of the last created image by this class functions.*/
 
@@ -34,9 +36,11 @@ public:
 
     /**
      * Binds the texture to the specified texture channel.
-     * @param textureChannel
+     * @param shader to send the textureID to
+     * @param name of the sampler uniform
+     * @param channel to bind the uniform to
      */
-    void bind(GLenum textureChannel) const;
+    void bind(const Shader & shader, const std::string &name, int channel) const;
 
     /**
      * Loads and creates a basic texture from a filename and applies the
@@ -62,12 +66,12 @@ public:
                                     GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
-     * Creates a 2D texture from pre-loaded or no data.
+     * Creates a 2D texture from preloaded or no data.
      * @param size of the image
      * @param internalFormat see the openGL documentation
      * @param format see the openGL documentation
      * @param type 2D ? Cubemap ?
-     * @param data the pre-loaded data. Defaults to nullptr
+     * @param data the preloaded data. Defaults to nullptr
      * @param wrap method to apply. Defaults to GL_CLAMP_TO_EDGE
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
@@ -110,6 +114,28 @@ public:
      * @param filter
      */
     static void setParameters(GLenum type, GLint wrap, GLint filter);
+
+    /**
+     * https://stackoverflow.com/questions/5844858/how-to-take-screenshot-in-opengl
+     * takes the color attachment of the current framebuffer and writes to an image to the corresponding name.
+     *
+     * Bash script to convert .tga images to .png :
+    * Install the image converter
+
+    sudo apt install graphicsmagick-imagemagick-compat  # version 1.4+really1.3.42-1
+
+    for oldFileName in *.tga; do
+        [ -f "$oldFileName" ] || break
+        newFileName=${oldFileName//.tga/.png}
+        convert $oldFileName $newFileName
+        rm $oldFileName
+        echo "Converted $oldFileName to $newFileName"
+    done
+
+    * @param filename name of the image to generate
+    * @param size the size of the image to generate
+    */
+    static void saveTextureToFile(const std::string& filename, glm::ivec2 size);
 
 private:;
 

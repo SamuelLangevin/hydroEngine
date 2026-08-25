@@ -38,9 +38,9 @@ class Application{
 
     private:
 
-        static GLFWwindow* window; /**< The window object, making the bridge between the app and the user. */
-        static SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
-        static GuiManager guiManager; /**< Manages ImGUI's state and widgets rendering. */
+        GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
+        SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
+        GuiManager guiManager; /**< Manages ImGUI's state and widgets rendering. */
         static Camera camera; /**< First person camera point of view for rendering. */
 
         static AppState appState; /**< The state the application is in. @see AppState enum. */
@@ -52,8 +52,8 @@ class Application{
         static uint mouseButtonsProcessed[3]; /**< Has the indexed mouse button's initial press been processed ?.*/
         static uint keys[1024]; /**< Is the indexed key being pressed ?.*/
         static uint keysProcessed[1024]; /**< Has the indexed key's initial press been processed ?.*/
-        static bool leftMouseButtonProcessed; /**< Has the left mouse button's initial press been processed ?.*/
-        static glm::vec3 worldCursorPos; /**< World position of the screen's center on the water surface. */
+
+        glm::vec3 worldCursorPos = glm::vec3(0.0f); /**< World position of the screen's center on the water surface. */
 
         float deltaTime = 0.0f; /**< Time passed between the previous frame and the current frame in seconds. */
         float lastFrame = 0.0f; /**< Time stamp of the previous frame. */
@@ -62,7 +62,7 @@ class Application{
         void initializeWindow();
 
         /** Processes the user's key inputs and mouse movements. */
-        void processInput(float deltaTime);
+        void processInput();
 
         /** Deletes expired waves according to their lifeTime and updates the directional wave's attributes. */
         void updateWaves();

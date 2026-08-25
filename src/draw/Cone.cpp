@@ -6,9 +6,7 @@
 #define PI 3.14159265359
 
 uint Cone::VAO, Cone::VBO, Cone::EBO;
-int Cone::lonResolution = 40;
-
-Cone::Cone()= default;
+const int Cone::lonResolution = 40;
 
 void Cone::free() {
     glDeleteBuffers(1, &VBO);
@@ -77,9 +75,9 @@ void Cone::load(){
     glBindVertexArray(VAO);
 }
 
-void Cone::draw(Shader * shader) const {
+void Cone::draw(const Shader & shader) const {
     load();
-    setUniforms(shader);
+    setUniforms(shader, 0);
     glDrawElements(GL_TRIANGLES, lonResolution * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

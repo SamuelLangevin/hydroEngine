@@ -7,51 +7,73 @@
 #include "../utility/Shader.hpp"
 #include "../utility/Camera.hpp"
 
+/**
+ * Entity class to draw something in the scene
+ */
 class Shape {
     public:
 
+        /** \struct BoundingSphere
+         * Base bounding volume to calculate the frustum culling.
+         * Based on https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling
+         */
         struct BoundingSphere {
-            glm::vec3 center = glm::vec3(0.0f);
-            float radius = std::sqrt(2.0f);
+            glm::vec3 center = glm::vec3(0.0f); /**< The position of the enntity. */
+            float radius = std::sqrt(2.0f); /**< The radius of the sphere that wraps the whole entity. */
 
             BoundingSphere() = default;
             BoundingSphere(const glm::vec3 & inCenter, float inRadius) : center(inCenter), radius(inRadius){}
 
-            [[nodiscard]] bool isOnOrForwardPlane(const Camera::Plane& plane) const
+            /**
+             * Checks the distance to see if the volume is behind/through the plane or in front.
+             * @param plane
+             * @returns true if the plane cuts through part of the bounding sphere.
+             */
+            [[nodiscard]] bool isInFrontOfPlane(const Camera::Plane& plane) const
             {
                 return plane.getSignedDistanceToPlane(center) > -radius;
             }
 
+            /**
+             * Generates the bounding sphere and checks if the volume is in front of each plane (inside the frustum).
+             * @param frustum of the camera
+             * @param modelMatrix of entity.
+             * @returns true if the bounding volume is inside the camera's frustum.
+             */
             [[nodiscard]] bool isOnFrustum(const Camera::Frustum & frustum, const glm::mat4 & modelMatrix) const  {
                 const glm::vec3 globalScale = glm::vec3(glm::length(modelMatrix[0]), glm::length(modelMatrix[1]), glm::length(modelMatrix[2]));
                 const glm::vec3 globalCenter = modelMatrix * glm::vec4(center, 1.0f);
                 const float maxScale = std::max(std::max(globalScale.x, globalScale.y), globalScale.z);
                 BoundingSphere globalSphere(globalCenter, radius * maxScale * 0.5f);
                 
-                return (globalSphere.isOnOrForwardPlane(frustum.leftFace) &&
-                    globalSphere.isOnOrForwardPlane(frustum.rightFace) &&
-                    globalSphere.isOnOrForwardPlane(frustum.farFace) &&
-                    globalSphere.isOnOrForwardPlane(frustum.nearFace) &&
-                    globalSphere.isOnOrForwardPlane(frustum.topFace) &&
-                    globalSphere.isOnOrForwardPlane(frustum.bottomFace));
+                return (globalSphere.isInFrontOfPlane(frustum.leftFace) &&
+                    globalSphere.isInFrontOfPlane(frustum.rightFace) &&
+                    globalSphere.isInFrontOfPlane(frustum.farFace) &&
+                    globalSphere.isInFrontOfPlane(frustum.nearFace) &&
+                    globalSphere.isInFrontOfPlane(frustum.topFace) &&
+                    globalSphere.isInFrontOfPlane(frustum.bottomFace));
             }
         };
 
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::quat orientation = glm::quat(0, glm::vec3(1.0f, 0.0f, 0.0f));
-        glm::vec3 scale = glm::vec3(1.0f);
+        glm::vec3 position = glm::vec3(0.0f); /**< Relative position. */
+        glm::quat orientation = glm::quat(0, glm::vec3(1.0f, 0.0f, 0.0f)); /**< Relative orientation /rotation. */
+        glm::vec3 scale = glm::vec3(1.0f); /**< Relative size. */
 
         virtual ~Shape() = default;
 
-        void setMatricesUniforms(Shader * shader) const {
+        /**
+         * Sets the model matrix of the shape.
+         * @param shader to send the matrix to
+         */
+        void setMatricesUniforms(const Shader & shader) const {
             glm::mat4 model(1.0f);
             model = glm::translate(model, position);
             model = glm::rotate(model, orientation.w, glm::vec3(orientation.x, orientation.y, orientation.z));
             model = glm::scale(model, scale);
-            shader->setMat4("model", model);
+            shader.setMat4("model", model);
         }
 
-        virtual void draw(Shader * shader) const = 0;
+        virtual void draw(const Shader & shader) const = 0;
 };
 
 #endif

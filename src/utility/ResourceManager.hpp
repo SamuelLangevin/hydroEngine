@@ -26,7 +26,7 @@ class ResourceManager{
 
         /**
          * @param name of the shader
-         * @returns pointer to the named shader
+         * @returns a copy the named shader
          * @throws std::invalid_argument if there is no shader linked to the given name
          */
         [[nodiscard]] static Shader getShader(const std::string & name);
@@ -42,7 +42,7 @@ class ResourceManager{
 
         /**
         * @param name of the texture
-        * @returns pointer to the named texture
+        * @returns a copy of the named texture
         * @throws std::invalid_argument if there is no texture linked to the given name
         */
         [[nodiscard]] static Texture getTexture(const std::string & name);

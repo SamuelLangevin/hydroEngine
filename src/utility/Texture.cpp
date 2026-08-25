@@ -5,6 +5,7 @@
 #include "../../includes/stb_image.h"
 #include <string>
 #include <vector>
+#include <GL/glext.h>
 
 glm::ivec2 Texture::lastCreatedImageSize = glm::ivec2(0);
 
@@ -68,9 +69,10 @@ void Texture::free(){
     glDeleteTextures(1, &ID);
 }
 
-void Texture::bind(const GLenum textureChannel) const
+void Texture::bind(const Shader & shader, const std::string &name, int channel) const
 {
-    glActiveTexture(textureChannel);
+    shader.setInt(name, channel);
+    glActiveTexture(GL_TEXTURE0 + channel);
     glBindTexture(type, this->ID);
 }
 
@@ -137,4 +139,22 @@ void Texture::setParameters(GLenum type, GLint wrap, GLint filter) {
     glTexParameteri(type, GL_TEXTURE_WRAP_S, wrap);
     glTexParameteri(type, GL_TEXTURE_WRAP_T, wrap);
     if (type == GL_TEXTURE_CUBE_MAP) glTexParameteri(type, GL_TEXTURE_WRAP_R, wrap);
+}
+
+void Texture::saveTextureToFile(const std::string& filename, glm::ivec2 size) {
+    const int numberOfPixels = size.x * size.y * 3;
+    unsigned char pixels[numberOfPixels];
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadBuffer(GL_COLOR_ATTACHMENT0);
+    glReadPixels(0, 0, size.x, size.y, GL_BGR_EXT, GL_UNSIGNED_BYTE, pixels);
+
+    FILE *outputFile = fopen(filename.c_str(), "w");
+    short header[] = {0, 2, 0, 0, 0, 0, (short) size.x, (short) size.y, 24};
+
+    fwrite(&header, sizeof(header), 1, outputFile);
+    fwrite(pixels, numberOfPixels, 1, outputFile);
+    fclose(outputFile);
+
+    std::cout << "Finish writing to " + filename + "\n";
 }

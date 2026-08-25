@@ -8,9 +8,6 @@
 #include "utility/Utility.hpp"
 #include "imgui.h"
 
-SceneRenderer Application::sceneRenderer;
-GuiManager Application::guiManager;
-GLFWwindow* Application::window = nullptr;
 Camera Application::camera;
 
 Application::AppState Application::appState = ACTIVE;
@@ -23,8 +20,6 @@ uint Application::mouseButtons[3];
 uint Application::mouseButtonsProcessed[3];
 uint Application::keys[1024];
 uint Application::keysProcessed[1024];
-bool Application::leftMouseButtonProcessed = false;
-glm::vec3 Application::worldCursorPos;
 
 Application::Application() {
     initializeWindow();
@@ -115,7 +110,7 @@ void Application::mouse_button_callback(GLFWwindow* window, int button, int acti
 }
 
 
-void Application::processInput(float deltaTime){
+void Application::processInput(){
 
     switch (appState) {
 
@@ -131,7 +126,7 @@ void Application::processInput(float deltaTime){
             worldCursorPos = Utility::getClickPositionOnPlane(screenCenter, camera, sceneRenderer.water->position,
                                                             glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
 
-            if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {leftMouseButtonProcessed = true;
+            if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {
                 PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z),
                     glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.amplitude, guiManager.pointWave.speed);
                 sceneRenderer.pointWaves.push_back(wave);
@@ -172,7 +167,7 @@ void Application::processFrame(){
     deltaTime = currentFrame - lastFrame;
     lastFrame = currentFrame;
 
-    processInput(deltaTime);
+    processInput();
     glfwPollEvents();
     updateWaves();
 

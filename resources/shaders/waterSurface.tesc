@@ -1,7 +1,7 @@
 //from https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation
 
 #version 430 core
-layout (vertices=4) out;
+in vec2 TexCoord[];
 
 layout (std140) uniform Matrices{
     mat4 projection;
@@ -9,8 +9,12 @@ layout (std140) uniform Matrices{
 };
 uniform mat4 model;
 
+layout (vertices=4) out;
+out vec2 TextureCoord[];
+
 void main() {
     gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+    TextureCoord[gl_InvocationID] = TexCoord[gl_InvocationID];
 
     if(gl_InvocationID == 0){
 

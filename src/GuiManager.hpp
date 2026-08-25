@@ -14,7 +14,7 @@ class GuiManager {
     public:
         DirectionalWave directionalWave{glm::vec2(0.2f, 0.7f)}; /**< Stores the parameters the user has set for directional waves.*/
         PointWave pointWave{glm::vec2(0.0f), 0.0f}; /**< Stores the parameters the user has set for point waves.*/
-        bool resetWaves = false;
+        bool resetWaves = false; /**< Tells if the application should clear waves. */
 
         GuiManager() = default;
         ~GuiManager() = default;

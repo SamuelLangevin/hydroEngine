@@ -22,13 +22,13 @@ class Light {
         /** Some light types may be observable in the scene.
          * @param shader used to display the light's solid body.
          */
-        virtual void draw(Shader * shader) = 0;
+        virtual void draw(const Shader & shader) = 0;
 
         /** Every light needs to be sent to the shaders to calculate illumination.
          * @param shader to send the data to
          * @param name of the light struct instance
          */
-        virtual void setUniforms(Shader * shader, const std::string &name) = 0;
+        virtual void setUniforms(const Shader & shader, const std::string &name) = 0;
 };
 
 /** \class AmbientLight
@@ -43,13 +43,13 @@ class AmbientLight : public Light{
         explicit AmbientLight(glm::vec3 color);
 
         /** An ambient cannot be seen by itself. This function has no effect. */
-        void draw(Shader * shader) override;
+        void draw(const Shader & shader) override;
 
         /** Sends the light's color to the shader for lighting calculations.
         * @param shader to send the data for computing
         * @param name of the light struct instance
         */
-        void setUniforms(Shader * shader, const std::string &name) override;
+        void setUniforms(const Shader & shader, const std::string &name) override;
 };
 
 /** \class DirectionalLight
@@ -72,14 +72,14 @@ class DirectionalLight : public Light{
 
 
         /** An ambient cannot be seen by itself. This function has no effect. */
-        void draw(Shader * shader) override;
+        void draw(const Shader & shader) override;
 
         /**
          * Sends the light's attributes to the shader.
          * @param shader to send the data for computing
          * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, const std::string &name) override;
+        void setUniforms(const Shader & shader, const std::string &name) override;
 
 };
 
@@ -109,14 +109,14 @@ class PointLight : public Light{
          * Draws the light as a sphere in the scene.
          * @param shader used to draw the light's solid body.
          */
-        void draw(Shader * shader) override;
+        void draw(const Shader & shader) override;
 
         /**
          * Sends the light's attributes to the shader.
          * @param shader to send the data for computing
          * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, const std::string &name) override;
+        void setUniforms(const Shader & shader, const std::string &name) override;
 };
 
 
@@ -130,7 +130,7 @@ class SpotLight : public Light{
         float strength = 32.0f; /**< Linear range factor of the light's effect. */
         float angularAttenuation = 5.0f; /**< Angle at which point the light no longer illuminates. */
 
-        /** Default spot light : white, positioned at the origin and points down*/
+        /** Default spotlight : white, positioned at the origin and points down*/
         SpotLight();
 
         /**
@@ -145,14 +145,14 @@ class SpotLight : public Light{
          * Draws the light as a cone in the scene.
          * @param shader
          */
-        void draw(Shader * shader) override;
+        void draw(const Shader & shader) override;
 
         /**
          * Sends the light's color, position, to the shader.
          * @param shader to send the data for computing
          * @param name of the light struct instance
          */
-        void setUniforms(Shader * shader, const std::string &name) override;
+        void setUniforms(const Shader & shader, const std::string &name) override;
 
         /**
          * Used to orientate the cone's base towards the direction it illuminates.

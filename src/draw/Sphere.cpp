@@ -5,9 +5,7 @@
 #define PI 3.14159265359
 
 uint Sphere::VAO, Sphere::VBO, Sphere::EBO;
-int Sphere::latResolution = 20, Sphere::lonResolution = 20;
-
-Sphere::Sphere()= default;
+const int Sphere::latResolution = 20, Sphere::lonResolution = 20;
 
 void Sphere::load(){
     if (VAO == 0) {
@@ -65,9 +63,9 @@ void Sphere::free() {
     glDeleteVertexArrays(1, & VAO);
 }
 
-void Sphere::draw(Shader * shader) const {
+void Sphere::draw(const Shader & shader) const {
     load();
-    setUniforms(shader);
+    setUniforms(shader, 0);
     glDrawElements(GL_TRIANGLES, lonResolution * latResolution * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

@@ -10,11 +10,12 @@
  * Represents an OpenGL program.
  */
 class Shader{
+    private:
+        uint ID; /**< The OpenGL program ID. */
+
     public :
         /** Shaders directory path. */
         static constexpr const char * directory = "../resources/shaders/";
-
-        const uint ID; /**< The OpenGL program ID. */
 
         /**
          * Creates a shader object from an OpenGL program.
@@ -174,6 +175,7 @@ class Shader{
          * @return code with the included file's content added
          */
         static std::string processIncludes(const std::string& input, const std::vector<std::string>& includeDirs);
+
 };
 
 #endif
