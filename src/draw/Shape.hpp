@@ -43,15 +43,15 @@ class Shape {
 
         virtual ~Shape() = default;
 
-        void setMatricesUniforms(Shader * shader) const {
+        void setMatricesUniforms(const Shader & shader) const {
             glm::mat4 model(1.0f);
             model = glm::translate(model, position);
             model = glm::rotate(model, orientation.w, glm::vec3(orientation.x, orientation.y, orientation.z));
             model = glm::scale(model, scale);
-            shader->setMat4("model", model);
+            shader.setMat4("model", model);
         }
 
-        virtual void draw(Shader * shader) const = 0;
+        virtual void draw(const Shader & shader) const = 0;
 };
 
 #endif

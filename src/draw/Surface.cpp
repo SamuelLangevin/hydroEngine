@@ -55,7 +55,7 @@ Surface::~Surface() {
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Surface::draw(Shader * shader) const {
+void Surface::draw(const Shader & shader) const {
     glBindVertexArray(VAO);
     setMatricesUniforms(shader);
     glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution);

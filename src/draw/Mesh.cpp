@@ -39,7 +39,7 @@ void Mesh::free() {
     glDeleteVertexArrays(1, & VAO);
 }
 
-void Mesh::draw(Shader &shader) const {
+void Mesh::draw(const Shader & shader) const {
     uint diffuseNr = 1;
     uint specularNr = 1;
     for(uint i = 0; i < textures.size(); i++){

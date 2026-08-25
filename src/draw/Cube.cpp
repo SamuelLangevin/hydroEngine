@@ -84,7 +84,7 @@ void Cube::load(){
     
 }
 
-void Cube::draw(Shader * shader) const {
+void Cube::draw(const Shader & shader) const {
     load();
     setUniforms(shader, 0);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -97,13 +97,11 @@ void Cube::draw(){
     glBindVertexArray(0);
 }
 
-void Cube::drawSkyBox(Shader * shader, uint textureID, const std::string & var) {
+void Cube::drawSkyBox(const Shader & shader, const Texture & skyboxTex, const std::string & var) {
     glDepthFunc(GL_LEQUAL);
     glCullFace(GL_FRONT);
-    shader->use();
-    shader->setInt(var, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    shader.use();
+    skyboxTex.bind(shader, var, 0);
     draw();
     glCullFace(GL_BACK);
     glDepthFunc(GL_LESS);

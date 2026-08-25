@@ -12,7 +12,7 @@ public:
     static void load();
 
     static void free();
-    void draw(Shader * shader) const override;
+    void draw(const Shader & shader) const override;
 
     static int latResolution, lonResolution;
 private:

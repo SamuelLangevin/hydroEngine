@@ -12,8 +12,8 @@ class Cube : public BasicShape {
         Cube();
         static void load();
         static void draw();
-        void draw(Shader * shader) const override;
-        static void drawSkyBox(Shader * shader, uint textureID, const std::string & var);
+        void draw(const Shader & shader) const override;
+        static void drawSkyBox(const Shader & shader, const Texture & skyBoxTex, const std::string & var);
 };
 
 #endif

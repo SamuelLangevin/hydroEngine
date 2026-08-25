@@ -8,7 +8,7 @@ public:
     Cone();
     static void free();
     static void load();
-    void draw(Shader * shader) const override;
+    void draw(const Shader & shader) const override;
 
     static int lonResolution;
 private:

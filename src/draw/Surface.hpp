@@ -8,7 +8,7 @@ public:
 
     explicit Surface(glm::ivec2 size);
     ~Surface() override;
-    void draw(Shader * shader) const override;
+    void draw(const Shader & shader) const override;
 
 
 private:

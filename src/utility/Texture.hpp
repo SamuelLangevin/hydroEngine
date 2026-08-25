@@ -11,11 +11,12 @@
  * Represents an OpenGL texture.
  */
 class Texture{
-public:
+private:
+    uint ID; /**< The OpenGL texture ID. */
+    glm::ivec2 size; /**< The width and height of the image. */
+    GLenum type; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
 
-    const uint ID; /**< The OpenGL texture ID. */
-    const glm::ivec2 size; /**< The width and height of the image. */
-    const GLenum type; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
+public:
 
     static glm::ivec2 lastCreatedImageSize; /**< The size of the last created image by this class functions.*/
 
@@ -39,7 +40,7 @@ public:
      * @param name of the sampler uniform
      * @param channel to bind the uniform to
      */
-    void bind(Shader * shader, const std::string &name, int channel) const;
+    void bind(const Shader & shader, const std::string &name, int channel) const;
 
     /**
      * Loads and creates a basic texture from a filename and applies the

@@ -69,9 +69,9 @@ void Texture::free(){
     glDeleteTextures(1, &ID);
 }
 
-void Texture::bind(Shader * shader, const std::string &name, int channel) const
+void Texture::bind(const Shader & shader, const std::string &name, int channel) const
 {
-    shader->setInt(name, channel);
+    shader.setInt(name, channel);
     glActiveTexture(GL_TEXTURE0 + channel);
     glBindTexture(type, this->ID);
 }
