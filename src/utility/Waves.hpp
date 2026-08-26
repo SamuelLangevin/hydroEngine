@@ -27,8 +27,22 @@ public:
     [[nodiscard]] float getAmplitude() const;
     [[nodiscard]] float getSpeed() const;
 
+    /**
+     * Sets the wavelength. If wavelength < 0.0, will be set to 0.2.
+     * @param waveLength
+     */
     void setWaveLength(float waveLength);
+
+    /**
+     * Sets the amplitude. If amplitude < 0.0, will be set to 0.0.
+     * @param amplitude
+     */
     void setAmplitude(float amplitude);
+
+    /**
+     * Sets the Speed. If speed < 0.0, will be set to 0.0.
+     * @param speed
+     */
     void setSpeed(float speed);
 
     /**

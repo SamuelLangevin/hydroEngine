@@ -38,24 +38,26 @@ class Application{
 
     private:
 
-        GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
-        SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
-        static Camera camera; /**< First person camera point of view for rendering. */
-
-        static AppState appState; /**< The state the application is in. @see AppState enum. */
         static glm::ivec2 windowSize; /**< AKA viewport size in pixels. */
-        static glm::vec2 lastMousePos; /**< Mouse position for the current frame. */
-        static float sensitivity; /**< Mouse sensitivity. */
-        static bool isFirstMouseMvt; /**< Is the first mouse movement processed ? */
+        static glm::vec2 lastMousePos; /**< Mouse position recorded by glfw. */
         static uint mouseButtons[3]; /**< Is the indexed mouse button being pressed ?.*/
         static uint mouseButtonsProcessed[3]; /**< Has the indexed mouse button's initial press been processed ?.*/
         static uint keys[1024]; /**< Is the indexed key being pressed ?.*/
         static uint keysProcessed[1024]; /**< Has the indexed key's initial press been processed ?.*/
 
-        glm::vec3 worldCursorPos = glm::vec3(0.0f); /**< World position of the screen's center on the water surface. */
+        GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
+        SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
+        Camera camera; /**< First person camera point of view for rendering. */
 
-        float deltaTime = 0.0f; /**< Time passed between the previous frame and the current frame in seconds. */
-        float lastFrame = 0.0f; /**< Time stamp of the previous frame. */
+        AppState appState = ACTIVE; /**< The state the application is in. @see AppState enum. */
+        glm::vec2 activeMousePos = glm::vec2(windowSize.x/2,windowSize.y/2); /**< Mouse position recorded in active state. */
+        glm::vec3 worldCursorPos{}; /**< World position of the screen's center on the water surface. */
+        float deltaTime{}; /**< Time passed between the previous frame and the current frame in seconds. */
+        float lastFrame{}; /**< Time stamp of the previous frame. */
+        float cameraSpeed = 9.0f; /**< Movement speed of the camera*/
+        float sensitivity = 0.002f; /**< Mouse sensitivity for the camera's orientation. */
+        bool isFirstMouseMvt = true; /**< Is the first mouse movement processed ? */
+
 
         /** Initializes the window, its OpenGL context and callbacks. */
         void initializeWindow();
@@ -65,6 +67,12 @@ class Application{
 
         /** Deletes expired waves according to their lifeTime and updates the directional wave's attributes. */
         void updateWaves();
+
+        /** Processes the camera's orientation and position change. */
+        void processCameraMovement();
+
+        /** Creates a wave id the worldCursor points a valid position. */
+        void produceWave();
 
         /** Keeps track of mouse movements and updates the camera's point of view. */
         static void mouse_callback(GLFWwindow * window, double xpos, double ypos);

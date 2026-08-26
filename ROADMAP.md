@@ -14,5 +14,3 @@ TO DO
 3. Frustum culling
 4. Splash particles using compute shader
 5. Water interaction with objects and obstacles
-6. Textureless normal mapping for water mesh
-7. Normal and parallax mapping texture generation for shapes ?

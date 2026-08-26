@@ -15,7 +15,7 @@ class GuiManager {
 
         static DirectionalWave directionalWave; /**< Stores the parameters the user has set for directional waves.*/
         static PointWave pointWave; /**< Stores the parameters the user has set for point waves.*/
-        static glm::vec2 directionData;
+        static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
         static bool resetWaves; /**< Tells if the application should clear waves. */
 
         GuiManager() = delete;
@@ -32,6 +32,7 @@ class GuiManager {
         /** Draws ImGui's windows. */
         static void draw();
 
+        /** Draws the collapsing header for wave parameters. */
         static void drawWaveParametersCollapsingHeader();
 
         /** Tells whether ImGui should capture the user's input. */
@@ -52,7 +53,7 @@ class GuiManager {
          * @param value to use and modify
          * @param label the name of this value
          * @param id for ImGui's management
-         * @param setter
+         * @param setter a function to call on input
          */
         static void InputFloat(float value, const char * label, const char * id, const std::function<void(float)>& setter);
 
@@ -61,7 +62,7 @@ class GuiManager {
          * @param values to use and modify
          * @param label the name of this vector
          * @param id for ImGui's management
-         * @param setter
+         * @param setter a function to call on input
          */
         static void InputVec2(glm::vec2 & values, const char * label, const char * id, const std::function<void(glm::vec2)>& setter);
 
