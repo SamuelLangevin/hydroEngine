@@ -11,8 +11,14 @@
 static const DirectionalWave DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 1.0f, 0.5f, 3.0};
 static const PointWave DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 5.0, 20.0f};
 
+DirectionalWave GuiManager::directionalWave{glm::vec2(0.2f, 0.7f)};
+glm::vec2 GuiManager::directionData{};
+PointWave GuiManager::pointWave{glm::vec2(0.0f), 0.0f};
+bool GuiManager::resetWaves = false;
+GLFWwindow * GuiManager::window = nullptr;
+
 void GuiManager::init(GLFWwindow * _window) {
-    this->window = _window;
+    window = _window;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -24,12 +30,43 @@ void GuiManager::init(GLFWwindow * _window) {
 
     pointWave = DEFAULT_POINT_WAVE;
     directionalWave = DEFAULT_DIRECTIONAL_WAVE;
+    directionData = DEFAULT_DIRECTIONAL_WAVE.getDirection();
 }
 
 void GuiManager::free() {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+}
+
+void GuiManager::drawWaveParametersCollapsingHeader() {
+    if (ImGui::CollapsingHeader("Wave parameters")) {
+        ImGui::Text("Directional wave");
+        ImGui::Separator();
+        InputFloat(directionalWave.getWaveLength(), "Wave length", "##len1",
+            [](float newValue) {directionalWave.setWaveLength(newValue);});
+        InputFloat(directionalWave.getAmplitude(), "Amplitude", "##amp1",
+            [](float newValue){directionalWave.setAmplitude(newValue);});
+        InputFloat(directionalWave.getSpeed(), "Speed", "##spd1",
+            [](float newValue){directionalWave.setSpeed(newValue);});
+        if (ImGui::Button("Reset to default values##1")) directionalWave = DEFAULT_DIRECTIONAL_WAVE;
+        InputVec2(directionData, "Direction", "##direct",
+            [](glm::vec2 newDirection){directionalWave.setDirection(newDirection);});
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        ImGui::Text("Point wave");
+        ImGui::Separator();
+        InputFloat(pointWave.getWaveLength(), "Wave length", "##len2",
+            [](float newValue){pointWave.setWaveLength(newValue);});
+        InputFloat(pointWave.getAmplitude(), "Amplitude", "##amp2",
+            [](float newValue){pointWave.setAmplitude(newValue);});
+        InputFloat(pointWave.getSpeed(), "Speed", "##spd2",
+            [](float newValue){pointWave.setSpeed(newValue);});
+        if (ImGui::Button("Reset to default values##2")) pointWave = DEFAULT_POINT_WAVE;
+        resetWaves = ImGui::Button("Clear waves");
+    }
 }
 
 void GuiManager::draw() {
@@ -48,27 +85,8 @@ void GuiManager::draw() {
     }
     ImGui::EndMainMenuBar();
 
-    ImGui::Begin("Simulation");
-    if (ImGui::CollapsingHeader("Wave parameters")) {
-        ImGui::Text("Directional wave");
-        ImGui::Separator();
-        InputFloat(directionalWave.waveLength, "Wave length", "##len1");
-        InputFloat(directionalWave.amplitude, "Amplitude", "##amp1");
-        InputFloat(directionalWave.speed, "Speed", "##spd1");
-        if (ImGui::Button("Reset to default values##1")) directionalWave = DEFAULT_DIRECTIONAL_WAVE;
-        InputVec2(directionalWave.direction, "Direction", "##direct");
-
-        ImGui::Spacing();
-        ImGui::Spacing();
-
-        ImGui::Text("Point wave");
-        ImGui::Separator();
-        InputFloat(pointWave.waveLength, "Wave length", "##len2");
-        InputFloat(pointWave.amplitude, "Amplitude", "##amp2");
-        InputFloat(pointWave.speed, "Speed", "##spd2");
-        if (ImGui::Button("Reset to default values##2")) pointWave = DEFAULT_POINT_WAVE;
-        resetWaves = ImGui::Button("Clear waves");
-    }
+    ImGui::Begin("Simulation - Press escape to interact");
+    drawWaveParametersCollapsingHeader();
     ImGui::End();
 
     ImGui::Render();
@@ -89,14 +107,17 @@ void GuiManager::InputText(std::string & text, const std::string & label, ImGuiI
     if (input) text = std::string(buf);
 }
 
-void GuiManager::InputFloat(float & value, const char * label, const char * id) {
+void GuiManager::InputFloat(float value, const char * label, const char * id, const std::function<void(float)>& setter) {
     ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    ImGui::InputFloat(id, &value);
+    if (ImGui::InputFloat(id, &value)) setter(value);
 }
 
-void GuiManager::InputVec2(glm::vec2 & values, const char * label, const char * id) {
+void GuiManager::InputVec2(glm::vec2 & values, const char * label, const char * id, const std::function<void(glm::vec2)>& setter) {
     ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    ImGui::InputFloat2(id,glm::value_ptr(values));
+    if (ImGui::InputFloat2(id,glm::value_ptr(values))) setter(values);
 }
+
+
+

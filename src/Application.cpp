@@ -23,13 +23,13 @@ uint Application::keysProcessed[1024];
 
 Application::Application() {
     initializeWindow();
-    guiManager.init(window);
+    GuiManager::init(window);
     sceneRenderer.init(windowSize);
 }
 
 Application::~Application(){
     sceneRenderer.free();
-    guiManager.free();
+    GuiManager::free();
     glfwTerminate();
 }
 
@@ -128,7 +128,7 @@ void Application::processInput(){
 
             if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {
                 PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z),
-                    glfwGetTime(), guiManager.pointWave.waveLength, guiManager.pointWave.amplitude, guiManager.pointWave.speed);
+                    glfwGetTime(), GuiManager::pointWave.getWaveLength(), GuiManager::pointWave.getAmplitude(), GuiManager::pointWave.getSpeed());
                 sceneRenderer.pointWaves.push_back(wave);
 
                 mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
@@ -137,7 +137,7 @@ void Application::processInput(){
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                 appState = MENU;
-                guiManager.setCaptureInput(true);
+                GuiManager::setCaptureInput(true);
 
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
@@ -150,7 +150,7 @@ void Application::processInput(){
                 isFirstMouseMvt = true;
                 glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                 appState = ACTIVE;
-                guiManager.setCaptureInput(false);
+                GuiManager::setCaptureInput(false);
 
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
@@ -174,7 +174,7 @@ void Application::processFrame(){
     sceneRenderer.draw(camera, windowSize);
     if (appState == ACTIVE) sceneRenderer.drawWorldCursor(worldCursorPos);
 
-    guiManager.draw();
+    GuiManager::draw();
 
     glfwSwapBuffers(window);
     Utility::glCheckError();
@@ -182,17 +182,18 @@ void Application::processFrame(){
 }
 
 void Application::updateWaves() {
-    if (guiManager.resetWaves) sceneRenderer.pointWaves.clear();
+    if (GuiManager::resetWaves) sceneRenderer.pointWaves.clear();
 
+    //fixme implement ordered queue instead
     for (uint i = 0; i < sceneRenderer.pointWaves.size(); ++i){
         const PointWave & wave = sceneRenderer.pointWaves[i];
-        if (glfwGetTime() - wave.dropTime > wave.lifetime)
+        if (glfwGetTime() - wave.getDropTime() > wave.getLifetime())
             sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
-        else break; // expired waves will always be at the beginning of the vector;
+        else break;
     }
+    std::cout << sceneRenderer.pointWaves.size() << "\n";
 
-    *sceneRenderer.directionalWave = guiManager.directionalWave;
-    sceneRenderer.directionalWave->direction = glm::normalize(sceneRenderer.directionalWave->direction);
+    *sceneRenderer.directionalWave = GuiManager::directionalWave;
 }
 
 void Application::printFPS(float dt) {

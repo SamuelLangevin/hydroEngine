@@ -40,7 +40,6 @@ class Application{
 
         GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
         SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
-        GuiManager guiManager; /**< Manages ImGUI's state and widgets rendering. */
         static Camera camera; /**< First person camera point of view for rendering. */
 
         static AppState appState; /**< The state the application is in. @see AppState enum. */

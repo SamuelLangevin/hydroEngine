@@ -29,9 +29,9 @@ float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos
     float relativeTime = absoluteTime - pWave.dropTime;
     float advance = pWave.speed * relativeTime;
 
-    //todo replace magic 10, there could be better measures of speed and attenuation based on studies...
-    float attenuation = pow(e, -advance/(pWave.amplitude * 10.0));
-    float reachedPos = ceil(clamp(advance - length(originToVert), 0.0, 1.0));
+    //todo replace magic 5, there could be better measures of speed and attenuation based on studies...
+    float attenuation = pow(e, -advance/(pWave.amplitude * 5.0));
+    float reachedPos = ceil(clamp(PI *advance - length(originToVert), 0.0, 1.0));
     float pointWaveHeight = pWave.amplitude * sin( -length(originToVert)/ pWave.waveLength + advance ) * attenuation * reachedPos;
     return pointWaveHeight;
 }
