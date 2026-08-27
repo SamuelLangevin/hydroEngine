@@ -14,6 +14,7 @@ out vec4 fragColor;
 
 void main() {
 
+    /*
     float directWaveHeight = computeDirectionalWaveHeight(dirWave, time, texCoords);
 
     float pointWaveHeightResult = 0.0;
@@ -22,4 +23,6 @@ void main() {
     }
 
     fragColor = vec4(0.0, 0.0, directWaveHeight + pointWaveHeightResult, 1.0);
+*/
+    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

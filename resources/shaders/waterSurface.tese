@@ -19,20 +19,23 @@ uniform DirectionalWave dirWave;
 uniform PointWave pointWaves[MAX_NUMBER_POINT_WAVES];
 uniform int nbOfPointWaves;
 
+
 out TESE_OUT {
     vec3 FragPos;
     vec3 Normal;
     vec2 TexCoords;
 } tese_out;
 
-float computeWaterHeight(vec4 position){
+vec3 computeWaterHeight(vec4 position){
     vec4 modelSpacePoint = model * position;
-    float directWaveHeight = computeDirectionalWaveHeight(dirWave, time, modelSpacePoint.xz);
-    float pointWaveHeightResult = 0.0;
+    vec3 newPosition = position.xyz;
+    newPosition = computeDirectionalWaveHeight(dirWave, time, newPosition);
+    /*
     for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
         pointWaveHeightResult += computePointWaveHeight(pointWaves[i], time, modelSpacePoint.xz);
     }
-    return (directWaveHeight + pointWaveHeightResult) * 5.0;
+*/
+    return newPosition;
 }
 
 void main() {
@@ -62,14 +65,14 @@ void main() {
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 xzPos = (p1 - p0) * v + p0;
 
-    vec4 p = xzPos + normal * computeWaterHeight(xzPos);
+    vec4 p = vec4(computeWaterHeight(xzPos), 1.0);
     gl_Position = projection * view * model * p;
     tese_out.FragPos = vec3(model * p);
 
     const float dx = 5.0;
-    float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0));
-    float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0));
-    float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0));
-    float minusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, -dx, 0.0));
+    float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0)).y;
+    float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0)).y;
+    float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0)).y;
+    float minusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, -dx, 0.0)).y;
     tese_out.Normal = normalize(normal.xyz + vec3(plusXPos_Height - minusXPos_Height, 0.0, plusZPos_Height - minusZPos_Height));
 }

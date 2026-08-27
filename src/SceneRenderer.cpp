@@ -18,6 +18,8 @@ void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
     Sphere::free();
     ResourceManager::clear();
+    Rectangle::free();
+    Cube::free();
     delete water;
     delete directionalWave;
 }

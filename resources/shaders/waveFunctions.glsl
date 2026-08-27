@@ -42,6 +42,11 @@ float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos
  * @param vertexPos
  * returns the wave's contribution to the height of the vertex
  */
-float computeDirectionalWaveHeight(DirectionalWave dWave, float absoluteTime, vec2 vertexPos){
-    return dWave.amplitude * sin(-dot(dWave.direction, vertexPos)/dWave.waveLength + absoluteTime * dWave.speed);
+vec3 computeDirectionalWaveHeight(DirectionalWave dWave, float absoluteTime, vec3 vertexPos){
+    vec3 newPos;
+    float phase = dot(dWave.direction, vertexPos.xz)/dWave.waveLength - absoluteTime/sqrt(dWave.waveLength);
+    newPos.x = vertexPos.x - dWave.amplitude * sin(phase);
+    newPos.y = dWave.amplitude * cos(phase);
+    newPos.z = vertexPos.z - dWave.amplitude * sin(phase);
+    return newPos;
 }
