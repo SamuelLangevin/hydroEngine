@@ -15,8 +15,6 @@ class SceneRenderer {
     public:
 
         Surface * water = nullptr; /**< The water surface's mesh.*/
-        DirectionalWave * directionalWave = nullptr; /**< The wave front applied on the water surface. */
-        std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
 
         SceneRenderer() = default;
         ~SceneRenderer() = default;
@@ -38,8 +36,10 @@ class SceneRenderer {
          * Renders a frame of the scene according to the camera's view and the windowSize
          * @param camera
          * @param windowSize AKA viewport
+         * @param directionalWaves a reference to the app's directional waves
+         * @param pointWaves a reference to the app's directional waves
          */
-        void draw(const Camera & camera, glm::ivec2 windowSize) const;
+        void draw(const Camera & camera, glm::ivec2 windowSize, const std::vector<DirectionalWave> & directionalWaves, const std::vector<PointWave> & pointWaves) const;
 
         /**
          * Draws a world cursor (sphere) at the specified position.
@@ -96,9 +96,6 @@ class SceneRenderer {
          * @param saveAsImage option to save this texture as an image.
          */
         static void createLUTTexture(bool saveAsImage);
-
-
-
 };
 
 #endif

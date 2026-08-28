@@ -49,7 +49,7 @@ class Application{
         SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
         Camera camera; /**< First person camera point of view for rendering. */
 
-        AppState appState = ACTIVE; /**< The state the application is in. @see AppState enum. */
+        AppState appState; /**< The state the application is in. @see AppState enum. */
         glm::vec2 activeMousePos = glm::vec2(windowSize.x/2,windowSize.y/2); /**< Mouse position recorded in active state. */
         glm::vec3 worldCursorPos{}; /**< World position of the screen's center on the water surface. */
         float deltaTime{}; /**< Time passed between the previous frame and the current frame in seconds. */
@@ -58,12 +58,21 @@ class Application{
         float sensitivity = 0.002f; /**< Mouse sensitivity for the camera's orientation. */
         bool isFirstMouseMvt = true; /**< Is the first mouse movement processed ? */
 
+        std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
+        std::vector<DirectionalWave> directionalWaves; /**< The directional waves applied on the water surface. */
+
 
         /** Initializes the window, its OpenGL context and callbacks. */
         void initializeWindow();
 
         /** Processes the user's key inputs and mouse movements. */
         void processInput();
+
+        /**
+         * Sets the app's state and changes the app input focus
+         * @param state
+         */
+        void setState(AppState state);
 
         /** Deletes expired waves according to their lifeTime and updates the directional wave's attributes. */
         void updateWaves();

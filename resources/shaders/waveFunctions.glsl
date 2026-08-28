@@ -24,7 +24,7 @@ struct PointWave {
  * @param vertexPos
  * returns the wave's contribution to the height of the vertex
  */
-float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos){
+float computePointWave(PointWave pWave, float absoluteTime, vec2 vertexPos){
     vec2 originToVert = pWave.origin - vertexPos;
     float relativeTime = absoluteTime - pWave.dropTime;
     float advance = pWave.speed * relativeTime;
@@ -42,11 +42,11 @@ float computePointWaveHeight(PointWave pWave, float absoluteTime, vec2 vertexPos
  * @param vertexPos
  * returns the wave's contribution to the height of the vertex
  */
-vec3 computeDirectionalWaveHeight(DirectionalWave dWave, float absoluteTime, vec3 vertexPos){
+vec3 computeDirectionalWave(DirectionalWave dWave, float absoluteTime, vec3 vertexPos){
     vec3 newPos;
-    float phase = dot(dWave.direction, vertexPos.xz)/dWave.waveLength - absoluteTime/sqrt(dWave.waveLength);
-    newPos.x = vertexPos.x - dWave.amplitude * sin(phase);
-    newPos.y = dWave.amplitude * cos(phase);
-    newPos.z = vertexPos.z - dWave.amplitude * sin(phase);
+    float timeDivSqrtlength = absoluteTime/sqrt(dWave.waveLength);
+    newPos.x = - dWave.amplitude * sin(  vertexPos.x/dWave.waveLength - timeDivSqrtlength*dot(dWave.direction, vec2(1.0, 0.0))  );
+    newPos.y = dWave.amplitude * cos(  dot(dWave.direction, vertexPos.xz)/dWave.waveLength - timeDivSqrtlength  );
+    newPos.z = - dWave.amplitude * sin(  vertexPos.z/dWave.waveLength - timeDivSqrtlength*dot(dWave.direction, vec2(0.0, 1.0))  );
     return newPos;
 }

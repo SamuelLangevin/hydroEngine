@@ -19,6 +19,11 @@ uniform DirectionalWave dirWave;
 uniform PointWave pointWaves[MAX_NUMBER_POINT_WAVES];
 uniform int nbOfPointWaves;
 
+#define MAX_NUMBER_DIRECTIONAL_WAVES 50
+uniform DirectionalWave directionalWaves[MAX_NUMBER_POINT_WAVES];
+uniform int nbOfDirectionalWaves;
+
+
 
 out TESE_OUT {
     vec3 FragPos;
@@ -29,7 +34,10 @@ out TESE_OUT {
 vec3 computeWaterHeight(vec4 position){
     vec4 modelSpacePoint = model * position;
     vec3 newPosition = position.xyz;
-    newPosition = computeDirectionalWaveHeight(dirWave, time, newPosition);
+
+    for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
+        newPosition += computeDirectionalWave(directionalWaves[i], time, newPosition);
+    }
     /*
     for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
         pointWaveHeightResult += computePointWaveHeight(pointWaves[i], time, modelSpacePoint.xz);
@@ -47,7 +55,6 @@ void main() {
     vec2 t10 = TextureCoord[2];
     vec2 t11 = TextureCoord[3];
 
-    // bilinearly interpolate texture coordinate across patch
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     tese_out.TexCoords = (t1 - t0) * v + t0;
@@ -69,7 +76,7 @@ void main() {
     gl_Position = projection * view * model * p;
     tese_out.FragPos = vec3(model * p);
 
-    const float dx = 5.0;
+    const float dx = 2.0;
     float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0)).y;
     float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0)).y;
     float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0)).y;

@@ -11,20 +11,29 @@
  * Manages ImGui's state and renders its windows.
  */
 class GuiManager {
-    public:
+    private:
 
-        static DirectionalWave directionalWave; /**< Stores the parameters the user has set for directional waves.*/
-        static PointWave pointWave; /**< Stores the parameters the user has set for point waves.*/
+        static GLFWwindow * window; /**< A pointer on the application's window. */
+        static std::vector<DirectionalWave> * directionalWaves; /**< A pointer on the app's directional waves */
+        static std::vector<PointWave> * pointWaves; /**< A pointer on the app's point wave */
+        static int selectedDirectionalWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
+        static int selectedPointWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
         static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
+
+    public:
+        static const DirectionalWave DEFAULT_DIRECTIONAL_WAVE; /**< The default parameters when adding/resetting a directional wave. */
+        static const PointWave DEFAULT_POINT_WAVE; /**< The default parameters when adding/resetting a point wave. */
         static bool resetWaves; /**< Tells if the application should clear waves. */
 
         GuiManager() = delete;
 
         /**
          * Initializes ImGui's state, sets the flags and default values.
-         * @param _window
+         * @param _window object of the app class
+         * @param dirWaves the pointer to the app's directional waves
+         * @param ptWaves the pointer to the app's point waves
          */
-        static void init(GLFWwindow * _window);
+        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves);
 
         /** Shuts down ImGui's interface. */
         static void free();
@@ -32,8 +41,12 @@ class GuiManager {
         /** Draws ImGui's windows. */
         static void draw();
 
-        /** Draws the collapsing header for wave parameters. */
-        static void drawWaveParametersCollapsingHeader();
+        /** Draws the lists of directional and point waves and their attributes. */
+        static void drawGraph();
+
+        /** Draws the inputs to modify a directional wave's attributes. */
+        static void showADirWaveProperties();
+
 
         /** Tells whether ImGui should capture the user's input. */
         static void setCaptureInput(bool capture);
@@ -50,24 +63,21 @@ class GuiManager {
 
         /**
          * Displays a text and a float input on the same line.
-         * @param value to use and modify
+         * @param value to display
          * @param label the name of this value
          * @param id for ImGui's management
-         * @param setter a function to call on input
+         * @returns true if the user finished inputting and its input value
          */
-        static void InputFloat(float value, const char * label, const char * id, const std::function<void(float)>& setter);
+        static std::pair<bool, float> InputFloat(float value, const char * label, const char * id);
 
         /**
          * Displays a text and a 2D vector input on the same line.
          * @param values to use and modify
          * @param label the name of this vector
          * @param id for ImGui's management
-         * @param setter a function to call on input
+         * @returns true if the user clicked the set button and the input values
          */
-        static void InputVec2(glm::vec2 & values, const char * label, const char * id, const std::function<void(glm::vec2)>& setter);
-
-    private:
-        static GLFWwindow * window; /**< A pointer on the application's window. */
+        static std::pair<bool, glm::vec2> InputVec2(glm::vec2 & values, const char * label, const char * id);
 };
 
 

@@ -8,16 +8,19 @@
 #include <string>
 #include <gtc/type_ptr.hpp>
 
-static const DirectionalWave DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 1.0f, 0.5f, 3.0};
-static const PointWave DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 5.0, 20.0f};
+const DirectionalWave GuiManager::DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 4.0f, 3.0f, 3.0};
+const PointWave GuiManager::DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 5.0, 20.0f};
 
-DirectionalWave GuiManager::directionalWave{glm::vec2(0.2f, 0.7f)};
-glm::vec2 GuiManager::directionData{};
-PointWave GuiManager::pointWave{glm::vec2(0.0f), 0.0f};
-bool GuiManager::resetWaves = false;
 GLFWwindow * GuiManager::window = nullptr;
+std::vector<DirectionalWave> * GuiManager::directionalWaves = nullptr;
+std::vector<PointWave> * GuiManager::pointWaves = nullptr;
+int GuiManager::selectedDirectionalWave = -1;
+int GuiManager::selectedPointWave = -1;
 
-void GuiManager::init(GLFWwindow * _window) {
+glm::vec2 GuiManager::directionData{};
+bool GuiManager::resetWaves = false;
+
+void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves) {
     window = _window;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -28,9 +31,9 @@ void GuiManager::init(GLFWwindow * _window) {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 430");
 
-    pointWave = DEFAULT_POINT_WAVE;
-    directionalWave = DEFAULT_DIRECTIONAL_WAVE;
     directionData = DEFAULT_DIRECTIONAL_WAVE.getDirection();
+    directionalWaves = dirWaves;
+    pointWaves = ptWaves;
 }
 
 void GuiManager::free() {
@@ -39,39 +42,7 @@ void GuiManager::free() {
     ImGui::DestroyContext();
 }
 
-void GuiManager::drawWaveParametersCollapsingHeader() {
-    if (ImGui::CollapsingHeader("Wave parameters")) {
-        ImGui::Text("Directional wave");
-        ImGui::Separator();
-        InputFloat(directionalWave.getWaveLength(), "Wave length", "##len1",
-            [](float newValue) {directionalWave.setWaveLength(newValue);});
-        InputFloat(directionalWave.getAmplitude(), "Amplitude", "##amp1",
-            [](float newValue){directionalWave.setAmplitude(newValue);});
-        InputFloat(directionalWave.getSpeed(), "Speed", "##spd1",
-            [](float newValue){directionalWave.setSpeed(newValue);});
-        if (ImGui::Button("Reset to default values##1")) directionalWave = DEFAULT_DIRECTIONAL_WAVE;
-        InputVec2(directionData, "Direction", "##direct",
-            [](glm::vec2 newDirection){directionalWave.setDirection(newDirection);});
-
-        ImGui::Spacing();
-        ImGui::Spacing();
-
-        ImGui::Text("Point wave");
-        ImGui::Separator();
-        InputFloat(pointWave.getWaveLength(), "Wave length", "##len2",
-            [](float newValue){pointWave.setWaveLength(newValue);});
-        InputFloat(pointWave.getAmplitude(), "Amplitude", "##amp2",
-            [](float newValue){pointWave.setAmplitude(newValue);});
-        InputFloat(pointWave.getSpeed(), "Speed", "##spd2",
-            [](float newValue){pointWave.setSpeed(newValue);});
-        if (ImGui::Button("Reset to default values##2")) pointWave = DEFAULT_POINT_WAVE;
-        resetWaves = ImGui::Button("Clear waves");
-    }
-}
-
 void GuiManager::draw() {
-    ImGuiInputTextFlags textFlags = ImGuiInputTextFlags_EnterReturnsTrue;
-
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -86,7 +57,7 @@ void GuiManager::draw() {
     ImGui::EndMainMenuBar();
 
     ImGui::Begin("Simulation - Press escape to interact");
-    drawWaveParametersCollapsingHeader();
+    drawGraph();
     ImGui::End();
 
     ImGui::Render();
@@ -107,16 +78,76 @@ void GuiManager::InputText(std::string & text, const std::string & label, ImGuiI
     if (input) text = std::string(buf);
 }
 
-void GuiManager::InputFloat(float value, const char * label, const char * id, const std::function<void(float)>& setter) {
+std::pair<bool, float> GuiManager::InputFloat(float value, const char * label, const char * id) {
     ImGui::TextUnformatted(label);
     ImGui::SameLine();
-    if (ImGui::InputFloat(id, &value)) setter(value);
+    bool entered = ImGui::InputFloat(id, &value);
+    return {entered, value};
 }
 
-void GuiManager::InputVec2(glm::vec2 & values, const char * label, const char * id, const std::function<void(glm::vec2)>& setter) {
-    ImGui::TextUnformatted(label);
+std::pair<bool, glm::vec2> GuiManager::InputVec2(glm::vec2 & values, const char * label, const char * id) {
+    bool entered = ImGui::Button((std::string(label)).c_str());
     ImGui::SameLine();
-    if (ImGui::InputFloat2(id,glm::value_ptr(values))) setter(values);
+    ImGui::InputFloat2(id,glm::value_ptr(values));
+    return {entered, values};
+}
+
+void GuiManager::drawGraph() {
+
+    ImGuiTreeNodeFlags treeFlag = ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf, ImGuiTreeNodeFlags_OpenOnArrow;
+    if (ImGui::CollapsingHeader("Wave parameters")) {
+        if (ImGui::Button("Add directional wave")) {
+            directionalWaves->push_back(DEFAULT_DIRECTIONAL_WAVE);
+        }
+        ImGui::BeginChild("ChildList", ImVec2(ImGui::GetContentRegionAvail().x, 100), ImGuiChildFlags_None);
+        if (ImGui::TreeNodeEx("Waves", treeFlag)) {
+
+
+            if (ImGui::TreeNodeEx("Directional", treeFlag)) {
+
+                for (int i = 0; i < directionalWaves->size(); i++) {
+                    bool isClicked = ImGui::Selectable(("DWave" + std::to_string(i)).c_str(), i == selectedDirectionalWave);
+                    if (isClicked) selectedDirectionalWave = (i == selectedDirectionalWave ? -1 : i);
+                }
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
+        }
+        ImGui::EndChild();
+
+        ImGui::SeparatorText("Inspecteur");
+        ImGui::BeginGroup();
+        if (0 <= selectedDirectionalWave && selectedDirectionalWave < directionalWaves->size()) showADirWaveProperties();
+        ImGui::EndGroup();
+    }
+}
+
+void GuiManager::showADirWaveProperties() {
+    ImGui::Text("Directional wave");
+    ImGui::Separator();
+    DirectionalWave & wave = directionalWaves->at(selectedDirectionalWave);
+
+    if (ImGui::Button("Reset to default values##1")) wave = DEFAULT_DIRECTIONAL_WAVE;
+    auto [enteredLength, lengthValue] = InputFloat(wave.getWaveLength(), "Wave length", "##len1");
+    if (enteredLength) wave.setWaveLength(lengthValue);
+    auto [enteredAmpl, amplValue] = InputFloat(wave.getAmplitude(), "Amplitude", "##amp1");
+    if (enteredAmpl) wave.setAmplitude(amplValue);
+    auto [enteredSpeed, speedValue] = InputFloat(wave.getSpeed(), "Speed", "##spd1");
+    if (enteredSpeed) wave.setSpeed(speedValue);
+
+    static int previousSelected = -1;
+    if (previousSelected != selectedDirectionalWave) directionData = wave.getDirection();
+    previousSelected = selectedDirectionalWave;
+    auto [enteredDirection, directionValue] = InputVec2(directionData, "Set direction", "##dirct1");
+    if (enteredDirection) wave.setDirection(directionValue);
+
+    ImGui::Spacing();
+    ImGui::Spacing();
+    ImGui::Spacing();
+    if (ImGui::Button("Delete wave")) {
+        directionalWaves->erase(directionalWaves->begin() + selectedDirectionalWave);
+        selectedDirectionalWave = -1;
+    }
 }
 
 

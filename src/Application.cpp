@@ -17,8 +17,10 @@ uint Application::keysProcessed[1024];
 
 Application::Application() {
     initializeWindow();
-    GuiManager::init(window);
+    GuiManager::init(window, &directionalWaves, &pointWaves);
     sceneRenderer.init(windowSize);
+    setState(MENU);
+    directionalWaves.push_back(GuiManager::DEFAULT_DIRECTIONAL_WAVE);
 }
 
 Application::~Application(){
@@ -49,7 +51,6 @@ void Application::initializeWindow(){
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetKeyCallback(window, key_callback);
 }
 
@@ -100,15 +101,11 @@ void Application::processInput(){
 
             if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {
                 produceWave();
-
                 mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
             }
 
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-                appState = MENU;
-                GuiManager::setCaptureInput(true);
-
+                setState(MENU);
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
 
@@ -116,15 +113,18 @@ void Application::processInput(){
 
         case MENU: {
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
-                isFirstMouseMvt = true;
-                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-                appState = ACTIVE;
-                GuiManager::setCaptureInput(false);
-
+                setState(ACTIVE);
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
         } break;
     }
+}
+
+void Application::setState(AppState state) {
+    isFirstMouseMvt = true;
+    glfwSetInputMode(window, GLFW_CURSOR, (state == ACTIVE ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL));
+    appState = state;
+    GuiManager::setCaptureInput(state);
 }
 
 void Application::processCameraMovement() {
@@ -154,9 +154,11 @@ void Application::produceWave() {
     const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
     glm::vec3 nearClipClick = camera.screenClickToNearClip(screenCenter, windowSize);
     if (glm::dot(camera.position - nearClipClick, camera.position - worldCursorPos) > 0.0f) {
+        /*
         PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(),
         GuiManager::pointWave.getWaveLength(), GuiManager::pointWave.getAmplitude(), GuiManager::pointWave.getSpeed());
         sceneRenderer.pointWaves.push_back(wave);
+        */
     }
 }
 
@@ -173,7 +175,7 @@ void Application::processFrame(){
     processInput();
     updateWaves();
 
-    sceneRenderer.draw(camera, windowSize);
+    sceneRenderer.draw(camera, windowSize, directionalWaves, pointWaves);
     if (appState == ACTIVE) sceneRenderer.drawWorldCursor(worldCursorPos);
 
     GuiManager::draw();
@@ -184,14 +186,12 @@ void Application::processFrame(){
 }
 
 void Application::updateWaves() {
-    if (GuiManager::resetWaves) sceneRenderer.pointWaves.clear();
+    if (GuiManager::resetWaves) pointWaves.clear();
 
-    *sceneRenderer.directionalWave = GuiManager::directionalWave;
-
-    for (uint i = 0; i < sceneRenderer.pointWaves.size(); ++i){
-        const PointWave & wave = sceneRenderer.pointWaves[i];
+    for (uint i = 0; i < pointWaves.size(); ++i){
+        const PointWave & wave = pointWaves[i];
         if (glfwGetTime() - wave.getDropTime() > wave.getLifetime())
-            sceneRenderer.pointWaves.erase(sceneRenderer.pointWaves.begin() + i);
+            pointWaves.erase(pointWaves.begin() + i);
         else break;
     }
 }
