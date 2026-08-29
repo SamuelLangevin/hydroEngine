@@ -109,8 +109,6 @@ public:
      */
     explicit PointWave(glm::vec2 origin, float dropTime, float waveLength = 5.0f, float amplitude = 4.0f, float speed = 10.0f);
 
-    PointWave& operator= (const PointWave & wave) = default;
-
     [[nodiscard]] glm::vec2 getOrigin() const;
     [[nodiscard]] float getLifetime() const;
     [[nodiscard]] float getDropTime() const;

@@ -74,8 +74,8 @@ void SceneRenderer::initializeScene() {
     waterSurfaceShader.use();
 
     water = new Surface(glm::ivec2(1000));
-    water->scale = glm::vec3(0.1f);
-    water->position = glm::vec3(0.0f, -10.0f, 0.0f);
+    water->scale = glm::vec3(1.0f);
+    water->position = glm::vec3(0.0f, -20.0f, 0.0f);
     water->material.metallic = 1.0;
     water->material.roughness = 0.0f;
     water->material.ao = 1.0f;

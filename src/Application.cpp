@@ -154,11 +154,9 @@ void Application::produceWave() {
     const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
     glm::vec3 nearClipClick = camera.screenClickToNearClip(screenCenter, windowSize);
     if (glm::dot(camera.position - nearClipClick, camera.position - worldCursorPos) > 0.0f) {
-        /*
         PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(),
-        GuiManager::pointWave.getWaveLength(), GuiManager::pointWave.getAmplitude(), GuiManager::pointWave.getSpeed());
-        sceneRenderer.pointWaves.push_back(wave);
-        */
+        GuiManager::DEFAULT_POINT_WAVE.getWaveLength(), GuiManager::DEFAULT_POINT_WAVE.getAmplitude(), GuiManager::DEFAULT_POINT_WAVE.getSpeed());
+        pointWaves.push_back(wave);
     }
 }
 
