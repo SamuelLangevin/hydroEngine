@@ -17,7 +17,7 @@ uint Application::keysProcessed[1024];
 
 Application::Application() {
     initializeWindow();
-    GuiManager::init(window, &directionalWaves, &pointWaves);
+    GuiManager::init(window, &directionalWaves, &pointWaves, &pointWaveParameters);
     sceneRenderer.init(windowSize);
     setState(MENU);
     directionalWaves.push_back(GuiManager::DEFAULT_DIRECTIONAL_WAVE);
@@ -155,7 +155,7 @@ void Application::produceWave() {
     glm::vec3 nearClipClick = camera.screenClickToNearClip(screenCenter, windowSize);
     if (glm::dot(camera.position - nearClipClick, camera.position - worldCursorPos) > 0.0f) {
         PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(),
-        GuiManager::DEFAULT_POINT_WAVE.getWaveLength(), GuiManager::DEFAULT_POINT_WAVE.getAmplitude(), GuiManager::DEFAULT_POINT_WAVE.getSpeed());
+            pointWaveParameters.getWaveLength(), pointWaveParameters.getAmplitude(), pointWaveParameters.getSpeed());
         pointWaves.push_back(wave);
     }
 }

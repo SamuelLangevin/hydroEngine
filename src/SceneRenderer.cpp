@@ -202,6 +202,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, con
     glPatchParameteri(GL_PATCH_VERTICES, 4);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
+    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     Shader waterSurfaceShader = RM::getShader("waterSurfaceShader");
 

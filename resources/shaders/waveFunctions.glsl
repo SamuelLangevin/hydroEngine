@@ -57,8 +57,8 @@ vec3 computePointWaveBinormal(PointWave pWave, float absoluteTime, vec3 vertexPo
     float phase = -length(originToVert)/pWave.waveLength + advance;
 
     vec3 binormal;
-    binormal.x = attenuation * pWave.amplitude * normalize(originToVert).x * originToVert.x * cos(phase);
-    binormal.y = -attenuation * pWave.amplitude * cos(phase);
+    binormal.x = -attenuation * pWave.amplitude * normalize(originToVert).x * cos(phase);
+    binormal.y = attenuation * pWave.amplitude * cos(phase);
     binormal.z = 0.0;
 
     return binormal;
@@ -80,8 +80,8 @@ vec3 computePointWaveTangent(PointWave pWave, float absoluteTime, vec3 vertexPos
 
     vec3 tangent;
     tangent.x = 0.0;
-    tangent.y = -attenuation * pWave.amplitude * cos(phase);
-    tangent.z = attenuation * pWave.amplitude * normalize(originToVert).y *originToVert.y * cos(phase);
+    tangent.y = attenuation * pWave.amplitude * cos(phase);
+    tangent.z = -attenuation * pWave.amplitude * normalize(originToVert).y * cos(phase);
 
     return tangent;
 }

@@ -15,9 +15,8 @@
 class Application{
     public:
         /** \enum AppState
-         * ACTIVE - The application focuses on the scene.
-         *
-         * MENU - The application focuses on the interface.
+         * - ACTIVE - The application focuses on the scene.
+         * - MENU - The application focuses on the interface.
          */
         enum AppState {ACTIVE, MENU};
 
@@ -49,7 +48,7 @@ class Application{
         SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
         Camera camera; /**< First person camera point of view for rendering. */
 
-        AppState appState; /**< The state the application is in. @see AppState enum. */
+        AppState appState = MENU; /**< The state the application is in. @see AppState enum. */
         glm::vec2 activeMousePos = glm::vec2(windowSize.x/2,windowSize.y/2); /**< Mouse position recorded in active state. */
         glm::vec3 worldCursorPos{}; /**< World position of the screen's center on the water surface. */
         float deltaTime{}; /**< Time passed between the previous frame and the current frame in seconds. */
@@ -58,6 +57,7 @@ class Application{
         float sensitivity = 0.002f; /**< Mouse sensitivity for the camera's orientation. */
         bool isFirstMouseMvt = true; /**< Is the first mouse movement processed ? */
 
+        PointWave pointWaveParameters = GuiManager::DEFAULT_POINT_WAVE; /**< The selected parameters to generate point waves.*/
         std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
         std::vector<DirectionalWave> directionalWaves; /**< The directional waves applied on the water surface. */
 

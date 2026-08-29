@@ -10,7 +10,8 @@ DONE
 TO DO
 ***
 1. Capillary waves, wind ripples, wind waves
-2. Water tiles
-3. Frustum culling
-4. Splash particles using compute shader
-5. Water interaction with objects and obstacles
+2. Water interaction with objects and obstacles
+3. Fast Fourrier transform
+4. Water tiles
+5. Frustum culling
+6. Splash particles using compute shader

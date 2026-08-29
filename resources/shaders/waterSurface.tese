@@ -30,8 +30,9 @@ out TESE_OUT {
     vec2 TexCoords;
 } tese_out;
 
-vec3 computeWaterWavesDisplacement(vec4 position){
-    vec3 newPosition = position.xyz; // assumes world position
+//The position is assumed to be in world space
+vec3 computeWavesDisplacement(vec4 position){
+    vec3 newPosition = position.xyz;
 
     for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
         newPosition += computeDirectionalWave(directionalWaves[i], time, position.xyz);
@@ -44,32 +45,23 @@ vec3 computeWaterWavesDisplacement(vec4 position){
     return newPosition;
 }
 
-vec3 computeWaterBinormals(vec4 position){
-    vec3 binormal = vec3(1.0, 0.0, 0.0); // assumes world position
+//The position is assumed to be in world space
+vec3 computeWavesNormal(vec4 position){
+    vec3 binormal = vec3(1.0, 0.0, 0.0);
+    vec3 tangent = vec3(0.0, 0.0, 1.0);
 
     for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
         binormal += computeDirectionalWaveBinormal(directionalWaves[i], time, position.xyz);
-    }
-
-    for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
-        binormal += computePointWave(pointWaves[i], time, position.xyz);
-    }
-
-    return binormal;
-}
-
-vec3 computeWaterTangents(vec4 position){
-    vec3 tangent = vec3(0.0, 0.0, 1.0); // assumes world position
-
-    for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
         tangent += computeDirectionalWaveTangent(directionalWaves[i], time, position.xyz);
     }
 
     for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
-        tangent += computePointWave(pointWaves[i], time, position.xyz);
+        binormal += computePointWaveBinormal(pointWaves[i], time, position.xyz);
+        tangent += computePointWaveTangent(pointWaves[i], time, position.xyz);
+
     }
 
-    return tangent;
+    return normalize(cross(tangent, binormal));
 }
 
 void main() {
@@ -98,11 +90,11 @@ void main() {
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 xzPos = (p1 - p0) * v + p0;
 
-    vec4 p = vec4(computeWaterWavesDisplacement(model * xzPos), 1.0);
+    vec4 p = vec4(computeWavesDisplacement(model * xzPos), 1.0);
     gl_Position = projection * view * p;
     tese_out.FragPos = vec3(p);
 
-    tese_out.Normal = normalize(cross(computeWaterBinormals(model * xzPos), computeWaterTangents(model * xzPos)));
+    tese_out.Normal = computeWavesNormal(model * xzPos);
 }
 
 /* The old way to compute normals.

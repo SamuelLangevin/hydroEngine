@@ -17,8 +17,8 @@ class GuiManager {
         static std::vector<DirectionalWave> * directionalWaves; /**< A pointer on the app's directional waves */
         static std::vector<PointWave> * pointWaves; /**< A pointer on the app's point wave */
         static int selectedDirectionalWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
-        static int selectedPointWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
         static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
+        static PointWave * selectedPointWaveParameters; /**< A point wave representing the selected parameters. */
 
     public:
         static const DirectionalWave DEFAULT_DIRECTIONAL_WAVE; /**< The default parameters when adding/resetting a directional wave. */
@@ -32,24 +32,33 @@ class GuiManager {
          * @param _window object of the app class
          * @param dirWaves the pointer to the app's directional waves
          * @param ptWaves the pointer to the app's point waves
+         * @param pointWaveParameters A pointer to the app's point wave parameters
          */
-        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves);
+        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves, PointWave * pointWaveParameters);
 
         /** Shuts down ImGui's interface. */
         static void free();
 
+        /** Tells whether ImGui should capture the user's input. */
+        static void setCaptureInput(bool capture);
+
         /** Draws ImGui's windows. */
         static void draw();
 
-        /** Draws the lists of directional and point waves and their attributes. */
-        static void drawGraph();
+        /** Draws tha directional wave list collapsable */
+        static void drawDirectionalWaveList();
 
         /** Draws the inputs to modify a directional wave's attributes. */
         static void showADirWaveProperties();
 
+        /** Draws the point wave parameters collapsable. */
+        static void drawPointWaveParameters();
 
-        /** Tells whether ImGui should capture the user's input. */
-        static void setCaptureInput(bool capture);
+        /**
+         * @param wave direcctional or point wave to modify
+         * @param imGuiID
+         */
+        static void showAWaveParameters(Wave * wave, int imGuiID);
 
         /**
          * Displays a text and a text input on the same line.
@@ -78,6 +87,12 @@ class GuiManager {
          * @returns true if the user clicked the set button and the input values
          */
         static std::pair<bool, glm::vec2> InputVec2(glm::vec2 & values, const char * label, const char * id);
+
+        /**
+         * Adds vertical spacing x times
+         * @param times
+         */
+        static void SpacingTimes(uint times);
 };
 
 

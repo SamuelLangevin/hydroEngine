@@ -37,7 +37,7 @@ void DirectionalWave::setUniforms(Shader * shader, const std::string &name) cons
 
 
 PointWave::PointWave(const glm::vec2 origin, const float dropTime, const float waveLength, const float amplitude, const float speed)
-    : Wave(waveLength, amplitude, speed), lifetime(150.0f/(0.1f+ std::max(speed, 0.0f))), origin(origin), dropTime(dropTime) {}
+    : Wave(waveLength, amplitude, speed), lifetime(250.0f*sqrt(std::max(waveLength, 0.2f))/(std::max(speed, 0.1f))), dropTime(dropTime), origin(origin) {}
 
 glm::vec2 PointWave::getOrigin() const { return origin; }
 float PointWave::getLifetime() const { return lifetime; }

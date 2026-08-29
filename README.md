@@ -27,7 +27,7 @@ Renderdoc is an optional debugging tool.
 This application uses ImGui as its graphical user interface, but does not require additional setup.
 
 ## Attributions
-- [Scott Lembcke's blog Water Wave Simulation](https://www.slembcke.net/blog/WaterWaves/) is the main source for the physics of this engine.
+- [Scott Lembcke's blog Water Wave Simulation](https://www.slembcke.net/blog/WaterWaves/) was a great inspiration for the physics of this engine.
 - [NVIDIA article's on water rendering](https://developer.nvidia.com/gpugems/gpugems/part-i-natural-effects/chapter-1-effective-water-simulation-physical-models) was very helpful.
 - Some classes and functions of this application have been built from the book of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction),
 notably the implementation of [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-irradiance) and [specular](https://learnopengl.com/PBR/IBL/Specular-IBL) IBL.
