@@ -6,7 +6,7 @@
 
 #include "Camera.hpp"
 
-/** \class
+/** \class Utility
  * Holdall class to put useful functions.
  */
 class Utility{

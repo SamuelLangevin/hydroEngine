@@ -13,11 +13,16 @@ layout (std140) uniform Matrices{
 
 uniform mat4 model;
 uniform float time;
-uniform DirectionalWave dirWave;
 
 #define MAX_NUMBER_POINT_WAVES 50
 uniform PointWave pointWaves[MAX_NUMBER_POINT_WAVES];
 uniform int nbOfPointWaves;
+
+#define MAX_NUMBER_DIRECTIONAL_WAVES 50
+uniform DirectionalWave directionalWaves[MAX_NUMBER_POINT_WAVES];
+uniform int nbOfDirectionalWaves;
+
+
 
 out TESE_OUT {
     vec3 FragPos;
@@ -25,14 +30,38 @@ out TESE_OUT {
     vec2 TexCoords;
 } tese_out;
 
-float computeWaterHeight(vec4 position){
-    vec4 modelSpacePoint = model * position;
-    float directWaveHeight = computeDirectionalWaveHeight(dirWave, time, modelSpacePoint.xz);
-    float pointWaveHeightResult = 0.0;
-    for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
-        pointWaveHeightResult += computePointWaveHeight(pointWaves[i], time, modelSpacePoint.xz);
+//The position is assumed to be in world space
+vec3 computeWavesDisplacement(vec4 position){
+    vec3 newPosition = position.xyz;
+
+    for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
+        newPosition += computeDirectionalWave(directionalWaves[i], time, position.xyz);
     }
-    return (directWaveHeight + pointWaveHeightResult) * 5.0;
+
+    for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
+        newPosition += computePointWave(pointWaves[i], time, position.xyz);
+    }
+
+    return newPosition;
+}
+
+//The position is assumed to be in world space
+vec3 computeWavesNormal(vec4 position){
+    vec3 binormal = vec3(1.0, 0.0, 0.0);
+    vec3 tangent = vec3(0.0, 0.0, 1.0);
+
+    for (int i = 0; i < min(nbOfDirectionalWaves, MAX_NUMBER_DIRECTIONAL_WAVES); i++) {
+        binormal += computeDirectionalWaveBinormal(directionalWaves[i], time, position.xyz);
+        tangent += computeDirectionalWaveTangent(directionalWaves[i], time, position.xyz);
+    }
+
+    for (int i = 0; i < min(nbOfPointWaves, MAX_NUMBER_POINT_WAVES); i++) {
+        binormal += computePointWaveBinormal(pointWaves[i], time, position.xyz);
+        tangent += computePointWaveTangent(pointWaves[i], time, position.xyz);
+
+    }
+
+    return normalize(cross(tangent, binormal));
 }
 
 void main() {
@@ -44,7 +73,6 @@ void main() {
     vec2 t10 = TextureCoord[2];
     vec2 t11 = TextureCoord[3];
 
-    // bilinearly interpolate texture coordinate across patch
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     tese_out.TexCoords = (t1 - t0) * v + t0;
@@ -62,14 +90,18 @@ void main() {
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 xzPos = (p1 - p0) * v + p0;
 
-    vec4 p = xzPos + normal * computeWaterHeight(xzPos);
-    gl_Position = projection * view * model * p;
-    tese_out.FragPos = vec3(model * p);
+    vec4 p = vec4(computeWavesDisplacement(model * xzPos), 1.0);
+    gl_Position = projection * view * p;
+    tese_out.FragPos = vec3(p);
 
-    const float dx = 5.0;
-    float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0));
-    float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0));
-    float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0));
-    float minusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, -dx, 0.0));
-    tese_out.Normal = normalize(normal.xyz + vec3(plusXPos_Height - minusXPos_Height, 0.0, plusZPos_Height - minusZPos_Height));
+    tese_out.Normal = computeWavesNormal(model * xzPos);
 }
+
+/* The old way to compute normals.
+const float dx = 2.0;
+    float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0)).y;
+    float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0)).y;
+    float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0)).y;
+    float minusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, -dx, 0.0)).y;
+    tese_out.Normal = normalize(normal.xyz + vec3(plusXPos_Height - minusXPos_Height, 0.0, plusZPos_Height - minusZPos_Height));
+*/
