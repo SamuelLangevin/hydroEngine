@@ -6,12 +6,11 @@ DONE
 2. 3D surface using tessellation shader
 3. Basic interface
 4. PBR
+5. Wind waves : trochoidal waves, wave mixing
 
 TO DO
 ***
-1. Capillary waves, wind ripples, wind waves
-2. Water interaction with objects and obstacles
-3. Fast Fourrier transform
-4. Water tiles
-5. Frustum culling
-6. Splash particles using compute shader
+1. Water interaction with objects and obstacles
+2. Fast Fourrier transform
+3. Simplex noise
+4. Splash particles using compute shader

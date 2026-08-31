@@ -8,8 +8,8 @@
 #include <string>
 #include <gtc/type_ptr.hpp>
 
-const DirectionalWave GuiManager::DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 4.0f, 3.0f, 3.0};
-const PointWave GuiManager::DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 5.0, 20.0f};
+const DirectionalWave GuiManager::DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 4.0f, 1.5f, 3.0};
+const PointWave GuiManager::DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 2.0, 20.0f};
 
 GLFWwindow * GuiManager::window = nullptr;
 std::vector<DirectionalWave> * GuiManager::directionalWaves = nullptr;

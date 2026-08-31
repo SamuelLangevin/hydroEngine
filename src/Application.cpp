@@ -20,7 +20,12 @@ Application::Application() {
     GuiManager::init(window, &directionalWaves, &pointWaves, &pointWaveParameters);
     sceneRenderer.init(windowSize);
     setState(MENU);
-    directionalWaves.push_back(GuiManager::DEFAULT_DIRECTIONAL_WAVE);
+
+    directionalWaves.emplace_back(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0);
+    directionalWaves.emplace_back(glm::vec2(0.275f, 0.962f), 2.0f, 0.6f, 4.0);
+    directionalWaves.emplace_back(glm::vec2(0.0f, 1.0f), 0.6f, 0.2f, 1.0);
+    directionalWaves.emplace_back(glm::vec2(-0.275f, 0.962f), 12.0f, 2.0f, 3.0);
+    directionalWaves.emplace_back(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0);
 }
 
 Application::~Application(){
