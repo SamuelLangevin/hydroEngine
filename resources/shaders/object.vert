@@ -10,15 +10,13 @@ layout (std140) uniform Matrices{
 
 uniform mat4 model;
 
-out VS_OUT {
-    vec3 fragPos;
-    vec3 normal;
-    vec2 texCoords;
-} vs_out;
+out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoords;
 
 void main() {
-    vs_out.fragPos = vec3(model * vec4(inPosition, 1.0));
-    vs_out.normal = transpose(inverse(mat3(model))) * inNormal;
-    vs_out.texCoords = inTexCoords;
+    FragPos = vec3(model * vec4(inPosition, 1.0));
+    Normal = transpose(inverse(mat3(model))) * inNormal;
+    TexCoords = inTexCoords;
     gl_Position = projection * view * model * vec4(inPosition, 1.0);
 }

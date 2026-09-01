@@ -22,13 +22,9 @@ uniform int nbOfPointWaves;
 uniform DirectionalWave directionalWaves[MAX_NUMBER_POINT_WAVES];
 uniform int nbOfDirectionalWaves;
 
-
-
-out TESE_OUT {
-    vec3 FragPos;
-    vec3 Normal;
-    vec2 TexCoords;
-} tese_out;
+out vec3 FragPos;
+out vec3 Normal;
+out vec2 TexCoords;
 
 //The position is assumed to be in world space
 vec3 computeWavesDisplacement(vec4 position){
@@ -75,7 +71,7 @@ void main() {
 
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
-    tese_out.TexCoords = (t1 - t0) * v + t0;
+    TexCoords = (t1 - t0) * v + t0; //fixme texcoords will not be tied to a position
 
     vec4 p00 = gl_in[0].gl_Position;
     vec4 p01 = gl_in[1].gl_Position;
@@ -92,16 +88,7 @@ void main() {
 
     vec4 p = vec4(computeWavesDisplacement(model * xzPos), 1.0);
     gl_Position = projection * view * p;
-    tese_out.FragPos = vec3(p);
+    FragPos = vec3(p);
 
-    tese_out.Normal = computeWavesNormal(model * xzPos);
+    Normal = computeWavesNormal(model * xzPos);
 }
-
-/* The old way to compute normals.
-const float dx = 2.0;
-    float plusXPos_Height = computeWaterHeight(xzPos + vec4(dx, 0.0, 0.0, 0.0)).y;
-    float minusXPos_Height = computeWaterHeight(xzPos + vec4(-dx, 0.0, 0.0, 0.0)).y;
-    float plusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, dx, 0.0)).y;
-    float minusZPos_Height = computeWaterHeight(xzPos + vec4(0.0, 0.0, -dx, 0.0)).y;
-    tese_out.Normal = normalize(normal.xyz + vec3(plusXPos_Height - minusXPos_Height, 0.0, plusZPos_Height - minusZPos_Height));
-*/

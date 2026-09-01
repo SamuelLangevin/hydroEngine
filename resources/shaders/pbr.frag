@@ -1,11 +1,9 @@
 #version 330 core
 #include "pbr/pbrFunctions.glsl"
 
-in TESE_OUT {
-    vec3 FragPos;
-    vec3 Normal;
-    vec2 TexCoords;
-} fs_in;
+in vec3 FragPos;
+in vec3 Normal;
+in vec2 TexCoords;
 
 uniform vec3 viewPos;
 uniform Material material;
@@ -15,9 +13,9 @@ out vec4 FragColor;
 
 void main(){
 
-    vec3 N = normalize(fs_in.Normal);
-    vec3 V = normalize(viewPos - fs_in.FragPos);
-    vec3 albedo = vec3(texture(material.texture_diffuse0, fs_in.TexCoords));
+    vec3 N = normalize(Normal);
+    vec3 V = normalize(viewPos - FragPos);
+    vec3 albedo = vec3(texture(material.texture_diffuse0, TexCoords));
     vec3 F_0 = mix(vec3(0.04), albedo, material.metallic);
 
     vec3 ambient = calcAmbientLight(environment, material, albedo, N, V, F_0);

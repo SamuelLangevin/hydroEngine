@@ -51,9 +51,10 @@ void SceneRenderer::loadShaders() {
     using RM =  ResourceManager;
     RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
-        "waterSurfacePBR.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
+        "pbr.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
     RM::addShader("monoColorShader", Shader::createShader("object.vert", "monoColor.frag"));
     RM::addShader("skyboxShader", Shader::createShader("cubemap.vert", "cubemap.frag"));
+    RM::addShader("object", Shader::createShader("object.vert", "pbr.frag"));
 }
 
 void SceneRenderer::setUniformBlocks() {
