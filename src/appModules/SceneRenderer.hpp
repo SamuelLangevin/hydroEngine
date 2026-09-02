@@ -3,10 +3,10 @@
 #include <vec2.hpp>
 #include <vector>
 
-#include "draw/Surface.hpp"
-#include "utility/Camera.hpp"
-#include "utility/Utility.hpp"
-#include "appModules/SceneManager.hpp"
+#include "../draw/Surface.hpp"
+#include "../utility/Camera.hpp"
+#include "../utility/Utility.hpp"
+#include "SceneManager.hpp"
 
 /** \class SceneRenderer
  * Renders the scene view and non-UI elements.

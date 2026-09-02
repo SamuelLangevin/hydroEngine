@@ -29,11 +29,11 @@ add_executable(hydroEngine
     includes/glad.c
     includes/stb_image.cpp
     src/utility/Shader.cpp
-    src/SceneRenderer.cpp
+        src/appModules/SceneRenderer.cpp
     src/appModules/SceneManager.cpp
     src/utility/Utility.cpp
     src/utility/Camera.cpp
-    src/Application.cpp
+        src/Application.cpp
     src/utility/ResourceManager.cpp
     src/utility/Texture.cpp
     src/draw/Cone.cpp
@@ -42,8 +42,8 @@ add_executable(hydroEngine
     src/draw/Rectangle.cpp
     src/utility/Waves.cpp
     src/draw/Surface.cpp
-    src/GuiManager.cpp
-    src/GuiManager.hpp
+        src/appModules/GuiManager.cpp
+        src/appModules/GuiManager.hpp
     src/draw/Cube.cpp
 )
 

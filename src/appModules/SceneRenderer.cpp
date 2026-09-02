@@ -3,15 +3,15 @@
 
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
-#include "draw/Sphere.hpp"
-#include "draw/Cube.hpp"
-#include "utility/ResourceManager.hpp"
+#include "../draw/Sphere.hpp"
+#include "../draw/Cube.hpp"
+#include "../utility/ResourceManager.hpp"
 #include <GLFW/glfw3.h>
 
-#include "draw/Rectangle.hpp"
-#include "utility/Utility.hpp"
-#include "utility/Waves.hpp"
-#include "../includes/stb_image.h"
+#include "../draw/Rectangle.hpp"
+#include "../utility/Utility.hpp"
+#include "../utility/Waves.hpp"
+#include "../../includes/stb_image.h"
 
 
 void SceneRenderer::free() {

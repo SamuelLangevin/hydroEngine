@@ -4,10 +4,10 @@
 #define GLAD_GL_IMPLEMENTATION
 #define GLFW_INCLUDE_NONE
 
-#include "SceneRenderer.hpp"
+#include "appModules/SceneRenderer.hpp"
 #include <GLFW/glfw3.h>
 
-#include "GuiManager.hpp"
+#include "appModules/GuiManager.hpp"
 #include "appModules/SceneManager.hpp"
 
 /** \class Application

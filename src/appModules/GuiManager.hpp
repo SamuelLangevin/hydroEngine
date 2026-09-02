@@ -5,7 +5,7 @@
 #include <string>
 #include <GLFW/glfw3.h>
 
-#include "utility/Waves.hpp"
+#include "../utility/Waves.hpp"
 
 /** \class GuiManager
  * Manages ImGui's state and renders its windows.
