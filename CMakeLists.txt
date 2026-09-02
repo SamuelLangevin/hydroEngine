@@ -30,8 +30,8 @@ add_executable(hydroEngine
     includes/stb_image.cpp
     src/utility/Shader.cpp
     src/SceneRenderer.cpp
+    src/appModules/SceneManager.cpp
     src/utility/Utility.cpp
-    src/utility/Lights.cpp
     src/utility/Camera.cpp
     src/Application.cpp
     src/utility/ResourceManager.cpp

@@ -18,12 +18,11 @@ class GuiManager {
         static std::vector<PointWave> * pointWaves; /**< A pointer on the app's point wave */
         static int selectedDirectionalWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
         static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
-        static PointWave * selectedPointWaveParameters; /**< A point wave representing the selected parameters. */
+        static PointWave pointWaveParameters; /**< The selected parameters to generate point waves.*/
 
     public:
         static const DirectionalWave DEFAULT_DIRECTIONAL_WAVE; /**< The default parameters when adding/resetting a directional wave. */
         static const PointWave DEFAULT_POINT_WAVE; /**< The default parameters when adding/resetting a point wave. */
-        static bool resetWaves; /**< Tells if the application should clear waves. */
 
         GuiManager() = delete;
 
@@ -32,12 +31,13 @@ class GuiManager {
          * @param _window object of the app class
          * @param dirWaves the pointer to the app's directional waves
          * @param ptWaves the pointer to the app's point waves
-         * @param pointWaveParameters A pointer to the app's point wave parameters
          */
-        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves, PointWave * pointWaveParameters);
+        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves);
 
         /** Shuts down ImGui's interface. */
         static void free();
+
+        static PointWave getPointWaveParameters();
 
         /** Tells whether ImGui should capture the user's input. */
         static void setCaptureInput(bool capture);
@@ -55,7 +55,7 @@ class GuiManager {
         static void drawPointWaveParameters();
 
         /**
-         * @param wave direcctional or point wave to modify
+         * @param wave directional or point wave to modify
          * @param imGuiID
          */
         static void showAWaveParameters(Wave * wave, int imGuiID);

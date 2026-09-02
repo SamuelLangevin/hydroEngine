@@ -1,12 +1,6 @@
 #include "Application.hpp"
-
 #include <iostream>
-#include <detail/type_quat.hpp>
-#include <ext/quaternion_trigonometric.hpp>
-
-#include "utility/ResourceManager.hpp"
 #include "utility/Utility.hpp"
-#include "imgui.h"
 
 glm::ivec2 Application::windowSize = glm::ivec2(1080, 810);
 glm::vec2 Application::lastMousePos = glm::vec2(windowSize.x/2,windowSize.y/2);
@@ -17,18 +11,14 @@ uint Application::keysProcessed[1024];
 
 Application::Application() {
     initializeWindow();
-    GuiManager::init(window, &directionalWaves, &pointWaves, &pointWaveParameters);
     sceneRenderer.init(windowSize);
+    sceneManager.init();
+    GuiManager::init(window, sceneManager.getDirWavesPointer(), sceneManager.getPntWavesPointer());
     setState(MENU);
-
-    directionalWaves.emplace_back(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0);
-    directionalWaves.emplace_back(glm::vec2(0.275f, 0.962f), 2.0f, 0.6f, 4.0);
-    directionalWaves.emplace_back(glm::vec2(0.0f, 1.0f), 0.6f, 0.2f, 1.0);
-    directionalWaves.emplace_back(glm::vec2(-0.275f, 0.962f), 12.0f, 2.0f, 3.0);
-    directionalWaves.emplace_back(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0);
 }
 
 Application::~Application(){
+    sceneManager.free();
     sceneRenderer.free();
     GuiManager::free();
     glfwTerminate();
@@ -101,16 +91,15 @@ void Application::processInput(){
         case ACTIVE: {
             processCameraMovement();
 
-            worldCursorPos = Utility::getClickPositionOnPlane(0.5f * glm::vec2(windowSize), camera,
-                sceneRenderer.water->position, glm::vec3(0.0f, 1.0f, 0.0f), windowSize);
-
             if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {
-                produceWave();
+                sceneManager.produceWave(camera, glfwGetTime(), windowSize, GuiManager::getPointWaveParameters());
+
                 mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
             }
 
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
                 setState(MENU);
+
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
 
@@ -138,31 +127,12 @@ void Application::processCameraMovement() {
         activeMousePos = lastMousePos;
         isFirstMouseMvt = false;
     }
-
     float xOffset = sensitivity * (lastMousePos.x - activeMousePos.x);
     float yOffset = sensitivity * -(lastMousePos.y - activeMousePos.y);
-
     activeMousePos = lastMousePos;
 
-    glm::quat qYaw = glm::angleAxis(xOffset, glm::vec3(0, -1, 0));
-    glm::quat qPitch = glm::angleAxis(yOffset, glm::cross(camera.front, camera.up));
-    camera.front = glm::normalize(qYaw * qPitch * camera.front);
-
-    float cameraAdvance = cameraSpeed * deltaTime;
-    if (keys[GLFW_KEY_W]) camera.position += cameraAdvance * camera.front;
-    if (keys[GLFW_KEY_S]) camera.position -= cameraAdvance * camera.front;
-    if (keys[GLFW_KEY_A]) camera.position -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraAdvance;
-    if (keys[GLFW_KEY_D]) camera.position += glm::normalize(glm::cross(camera.front, camera.up)) * cameraAdvance;
-}
-
-void Application::produceWave() {
-    const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
-    glm::vec3 nearClipClick = camera.screenClickToNearClip(screenCenter, windowSize);
-    if (glm::dot(camera.position - nearClipClick, camera.position - worldCursorPos) > 0.0f) {
-        PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), glfwGetTime(),
-            pointWaveParameters.getWaveLength(), pointWaveParameters.getAmplitude(), pointWaveParameters.getSpeed());
-        pointWaves.push_back(wave);
-    }
+    camera.rotate(glm::vec2(xOffset, yOffset));
+    camera.move(deltaTime, keys[GLFW_KEY_W], keys[GLFW_KEY_S], keys[GLFW_KEY_A], keys[GLFW_KEY_D]);
 }
 
 bool Application::shouldWindowClose() const {
@@ -176,27 +146,15 @@ void Application::processFrame(){
 
     glfwPollEvents();
     processInput();
-    updateWaves();
+    sceneManager.update(deltaTime, windowSize, camera);
 
-    sceneRenderer.draw(camera, windowSize, directionalWaves, pointWaves);
-    if (appState == ACTIVE) sceneRenderer.drawWorldCursor(worldCursorPos);
+    sceneRenderer.draw(camera, windowSize, sceneManager.getScene());
+    if (appState == ACTIVE) sceneRenderer.drawWorldCursor(sceneManager.getCursorWorldPos());
 
     GuiManager::draw();
 
     glfwSwapBuffers(window);
     Utility::glCheckError();
-    //checkFPS(deltaTime);
-}
-
-void Application::updateWaves() {
-    if (GuiManager::resetWaves) pointWaves.clear();
-
-    for (uint i = 0; i < pointWaves.size(); ++i){
-        const PointWave & wave = pointWaves[i];
-        if (glfwGetTime() - wave.getDropTime() > wave.getLifetime())
-            pointWaves.erase(pointWaves.begin() + i);
-        else break;
-    }
 }
 
 void Application::printFPS(float dt) {

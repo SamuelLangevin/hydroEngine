@@ -15,12 +15,11 @@ GLFWwindow * GuiManager::window = nullptr;
 std::vector<DirectionalWave> * GuiManager::directionalWaves = nullptr;
 std::vector<PointWave> * GuiManager::pointWaves = nullptr;
 int GuiManager::selectedDirectionalWave = -1;
-PointWave * GuiManager::selectedPointWaveParameters = nullptr;
 
 glm::vec2 GuiManager::directionData{};
-bool GuiManager::resetWaves = false;
+PointWave GuiManager::pointWaveParameters = DEFAULT_POINT_WAVE;
 
-void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves, PointWave * pointWaveParameters) {
+void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves) {
     window = _window;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -34,7 +33,6 @@ void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWa
     directionData = DEFAULT_DIRECTIONAL_WAVE.getDirection();
     directionalWaves = dirWaves;
     pointWaves = ptWaves;
-    selectedPointWaveParameters = pointWaveParameters;
 }
 
 void GuiManager::free() {
@@ -42,6 +40,8 @@ void GuiManager::free() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+
+PointWave GuiManager::getPointWaveParameters() {return pointWaveParameters;}
 
 void GuiManager::setCaptureInput(bool capture) {
     ImGuiIO& io = ImGui::GetIO();
@@ -126,10 +126,10 @@ void GuiManager::showADirWaveProperties() {
 
 void GuiManager::drawPointWaveParameters() {
     if (ImGui::CollapsingHeader("Point waves")) {
-        if (ImGui::Button("Reset to default values##2")) *selectedPointWaveParameters = DEFAULT_POINT_WAVE;
+        if (ImGui::Button("Reset to default values##2")) pointWaveParameters = DEFAULT_POINT_WAVE;
         ImGui::SameLine();
         if (ImGui::Button("Clear waves##2")) pointWaves->clear();
-        showAWaveParameters(selectedPointWaveParameters, 2);
+        showAWaveParameters(&pointWaveParameters, 2);
         SpacingTimes(3);
     }
 }

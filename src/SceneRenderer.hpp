@@ -6,15 +6,13 @@
 #include "draw/Surface.hpp"
 #include "utility/Camera.hpp"
 #include "utility/Utility.hpp"
-#include "utility/Waves.hpp"
+#include "appModules/SceneManager.hpp"
 
 /** \class SceneRenderer
  * Renders the scene view and non-UI elements.
  */
 class SceneRenderer {
     public:
-
-        Surface * water = nullptr; /**< The water surface's mesh.*/
 
         SceneRenderer() = default;
         ~SceneRenderer() = default;
@@ -36,10 +34,9 @@ class SceneRenderer {
          * Renders a frame of the scene according to the camera's view and the windowSize
          * @param camera
          * @param windowSize AKA viewport
-         * @param directionalWaves a reference to the app's directional waves
-         * @param pointWaves a reference to the app's directional waves
+         * @param scene
          */
-        void draw(const Camera & camera, glm::ivec2 windowSize, const std::vector<DirectionalWave> & directionalWaves, const std::vector<PointWave> & pointWaves) const;
+        void draw(const Camera & camera, glm::ivec2 windowSize, const SceneManager::Scene & scene) const;
 
         /**
          * Draws a world cursor (sphere) at the specified position.

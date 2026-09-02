@@ -20,7 +20,6 @@ void SceneRenderer::free() {
     ResourceManager::clear();
     Rectangle::free();
     Cube::free();
-    delete water;
 }
 
 void SceneRenderer::init(glm::ivec2 windowSize) {
@@ -73,14 +72,6 @@ void SceneRenderer::setUniformBlocks() {
 void SceneRenderer::initializeScene() {
     Shader waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
     waterSurfaceShader.use();
-
-    water = new Surface(glm::ivec2(1000));
-    water->scale = glm::vec3(1.0f);
-    water->position = glm::vec3(0.0f, -20.0f, 0.0f);
-    water->material.metallic = 1.0;
-    water->material.roughness = 0.0f;
-    water->material.ao = 1.0f;
-    water->material.texture_diffuse0 = ResourceManager::getTexture("white");
     ResourceManager::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
     ResourceManager::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
     ResourceManager::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
@@ -188,7 +179,7 @@ void SceneRenderer::createLUTTexture(bool saveAsImage) {
 
 }
 
-void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, const std::vector<DirectionalWave> & directionalWaves, const std::vector<PointWave> & pointWaves) const {
+void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, const SceneManager::Scene & scene) const {
     using RM = ResourceManager;
 
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
@@ -209,19 +200,19 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, con
 
     waterSurfaceShader.use();
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
-    waterSurfaceShader.setVec3("viewPos", camera.position);
+    waterSurfaceShader.setVec3("viewPos", camera.getPosition());
 
-    waterSurfaceShader.setInt("nbOfPointWaves", pointWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
-        pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
+    waterSurfaceShader.setInt("nbOfPointWaves", scene.pointWaves.size());
+    for (int i = 0; i < std::min(static_cast<int>(scene.pointWaves.size()), 50); ++i) {
+        scene.pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
     }
-    waterSurfaceShader.setInt("nbOfDirectionalWaves", directionalWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(directionalWaves.size()), 50); ++i) {
-        directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
+    waterSurfaceShader.setInt("nbOfDirectionalWaves", scene.directionalWaves.size());
+    for (int i = 0; i < std::min(static_cast<int>(scene.directionalWaves.size()), 50); ++i) {
+        scene.directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
     }
 
-    water->setUniforms(waterSurfaceShader, 0);
-    water->draw(waterSurfaceShader);
+    scene.water->setUniforms(waterSurfaceShader, 0);
+    scene.water->draw(waterSurfaceShader);
 
     Shader skyboxShader = RM::getShader("skyboxShader");
     Cube::drawSkyBox(skyboxShader, RM::getTexture("lakeSkybox"), "skybox");
