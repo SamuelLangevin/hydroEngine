@@ -146,7 +146,7 @@ void Application::processFrame(){
 
     glfwPollEvents();
     processInput();
-    sceneManager.update(deltaTime, windowSize, camera);
+    sceneManager.update(glfwGetTime(), windowSize, camera);
 
     sceneRenderer.draw(camera, windowSize, sceneManager.getScene());
     if (appState == ACTIVE) sceneRenderer.drawWorldCursor(sceneManager.getCursorWorldPos());

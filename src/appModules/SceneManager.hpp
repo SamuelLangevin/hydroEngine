@@ -18,7 +18,7 @@ public:
         Surface * water = nullptr; /**< The water surface's mesh.*/
         std::vector<DirectionalWave> directionalWaves;
         std::vector<PointWave> pointWaves;
-        std::vector<Shape> entities;
+        std::vector<BasicShape*> entities;
     };
 
     /** Fills the scene and creates the waterSurface mesh. */
@@ -58,13 +58,15 @@ public:
 
 private:
     Scene scene; /**< Stores the entities, the waves and other meshes. */
-    glm::vec3 worldCursorPos; /**< The corresponding world position of the cursor. */
+    glm::vec3 worldCursorPos{}; /**< The corresponding world position of the cursor. */
 
     /**
      * Deletes the waves according to the lifetime.
      * @param time
      */
     void deleteDeadWaves(float time);
+
+    void displaceObjects(float time);
 
 };
 

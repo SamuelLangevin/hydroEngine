@@ -59,6 +59,8 @@ class Shape {
         glm::quat orientation = glm::quat(0, glm::vec3(1.0f, 0.0f, 0.0f)); /**< Relative orientation /rotation. */
         glm::vec3 scale = glm::vec3(1.0f); /**< Relative size. */
 
+        glm::vec3 waterDis = glm::vec3(0.0f);
+
         virtual ~Shape() = default;
 
         /**
@@ -67,7 +69,7 @@ class Shape {
          */
         void setMatricesUniforms(const Shader & shader) const {
             glm::mat4 model(1.0f);
-            model = glm::translate(model, position);
+            model = glm::translate(model, position + waterDis);
             model = glm::rotate(model, orientation.w, glm::vec3(orientation.x, orientation.y, orientation.z));
             model = glm::scale(model, scale);
             shader.setMat4("model", model);

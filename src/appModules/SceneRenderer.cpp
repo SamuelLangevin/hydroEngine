@@ -40,7 +40,9 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_2D);
     stbi_set_flip_vertically_on_load(false);
-    RM::addTexture("white", Texture::createColorTexture(glm::vec3(0.8f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceManager::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceManager::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceManager::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)), glm::ivec2(1), GL_TEXTURE_2D);
 
     createIBLTextures();
 }
@@ -67,6 +69,7 @@ void SceneRenderer::setUniformBlocks() {
     ResourceManager::getShader("monoColorShader").setUniformBlock("Matrices", 0);
     ResourceManager::getShader("waterSurfaceShader").setUniformBlock("Matrices", 0);
     ResourceManager::getShader("skyboxShader").setUniformBlock("Matrices", 0);
+    ResourceManager::getShader("object").setUniformBlock("Matrices", 0);
 }
 
 void SceneRenderer::initializeScene() {
@@ -76,6 +79,11 @@ void SceneRenderer::initializeScene() {
     ResourceManager::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
     ResourceManager::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
 
+    Shader objectShader = ResourceManager::getShader("object");
+    objectShader.use();
+    ResourceManager::getTexture("lakeIrradianceMap").bind(objectShader, "environment.irradianceMap",1);
+    ResourceManager::getTexture("prefilterMap").bind(objectShader, "environment.prefilterMap",2);
+    ResourceManager::getTexture("lutTexture").bind(objectShader, "environment.brdfLUT",3);
 }
 
 void SceneRenderer::createIBLTextures() {
@@ -166,7 +174,7 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
 void SceneRenderer::createLUTTexture(bool saveAsImage) {
     constexpr glm::ivec2 LUT_TEX_SIZE(512);
     uint brdfLUTTexture = Texture::createTexture(LUT_TEX_SIZE, GL_RG16F, GL_RG, GL_FLOAT, nullptr);
-    ResourceManager::addTexture("brdfLUTTexture", brdfLUTTexture, LUT_TEX_SIZE, GL_TEXTURE_2D);
+    ResourceManager::addTexture("lutTexture", brdfLUTTexture, LUT_TEX_SIZE, GL_TEXTURE_2D);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
     glViewport(0, 0, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
@@ -197,6 +205,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, con
     //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     Shader waterSurfaceShader = RM::getShader("waterSurfaceShader");
+    Shader objectShader = RM::getShader("object");
 
     waterSurfaceShader.use();
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
@@ -213,6 +222,13 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, con
 
     scene.water->setUniforms(waterSurfaceShader, 0);
     scene.water->draw(waterSurfaceShader);
+
+    objectShader.use();
+    objectShader.setVec3("viewPos", camera.getPosition());
+    for (auto entity: scene.entities) {
+        entity->setUniforms(objectShader, 0);
+        entity->draw(objectShader);
+    }
 
     Shader skyboxShader = RM::getShader("skyboxShader");
     Cube::drawSkyBox(skyboxShader, RM::getTexture("lakeSkybox"), "skybox");
