@@ -92,7 +92,7 @@ glm::vec3 Utility::getIntersectionOfLinePlane(const glm::vec3 lineP1, const glm:
 glm::vec3 Utility::getClickPositionOnPlane(const glm::ivec2 clickPos, const Camera & camera,
                 const glm::vec3 planePosition, const glm::vec3 planeNormal, const glm::ivec2 windowSize) {
     const glm::vec3 p1 = camera.screenClickToNearClip(clickPos, windowSize);
-    return getIntersectionOfLinePlane(camera.position, p1, planePosition, planeNormal);
+    return getIntersectionOfLinePlane(camera.getPosition(), p1, planePosition, planeNormal);
 }
 
 

@@ -4,10 +4,11 @@
 #define GLAD_GL_IMPLEMENTATION
 #define GLFW_INCLUDE_NONE
 
-#include "SceneRenderer.hpp"
+#include "appModules/SceneRenderer.hpp"
 #include <GLFW/glfw3.h>
 
-#include "GuiManager.hpp"
+#include "appModules/GuiManager.hpp"
+#include "appModules/SceneManager.hpp"
 
 /** \class Application
  * Manages windowing and user interaction. Uses SceneRenderer and GUIManager submodules.
@@ -45,22 +46,16 @@ class Application{
         static uint keysProcessed[1024]; /**< Has the indexed key's initial press been processed ?.*/
 
         GLFWwindow* window = nullptr; /**< The window object, making the bridge between the app and the user. */
+        SceneManager sceneManager; /**< Manages the scene entities (objects) and the waves. */
         SceneRenderer sceneRenderer; /**< Renders the scene and manages the OpenGL state. */
         Camera camera; /**< First person camera point of view for rendering. */
 
         AppState appState = MENU; /**< The state the application is in. @see AppState enum. */
         glm::vec2 activeMousePos = glm::vec2(windowSize.x/2,windowSize.y/2); /**< Mouse position recorded in active state. */
-        glm::vec3 worldCursorPos{}; /**< World position of the screen's center on the water surface. */
         float deltaTime{}; /**< Time passed between the previous frame and the current frame in seconds. */
         float lastFrame{}; /**< Time stamp of the previous frame. */
-        float cameraSpeed = 9.0f; /**< Movement speed of the camera*/
         float sensitivity = 0.002f; /**< Mouse sensitivity for the camera's orientation. */
         bool isFirstMouseMvt = true; /**< Is the first mouse movement processed ? */
-
-        PointWave pointWaveParameters = GuiManager::DEFAULT_POINT_WAVE; /**< The selected parameters to generate point waves.*/
-        std::vector<PointWave> pointWaves; /**< The point waves applied on the water surface. */
-        std::vector<DirectionalWave> directionalWaves; /**< The directional waves applied on the water surface. */
-
 
         /** Initializes the window, its OpenGL context and callbacks. */
         void initializeWindow();
@@ -74,14 +69,8 @@ class Application{
          */
         void setState(AppState state);
 
-        /** Deletes expired waves according to their lifeTime and updates the directional wave's attributes. */
-        void updateWaves();
-
         /** Processes the camera's orientation and position change. */
         void processCameraMovement();
-
-        /** Creates a wave id the worldCursor points a valid position. */
-        void produceWave();
 
         /** Keeps track of mouse movements and updates the camera's point of view. */
         static void mouse_callback(GLFWwindow * window, double xpos, double ypos);

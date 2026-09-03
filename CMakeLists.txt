@@ -25,25 +25,24 @@ target_include_directories(imgui PUBLIC
         ${imgui_external_SOURCE_DIR}/backends
 )
 add_executable(hydroEngine
-    src/main.cpp
     includes/glad.c
     includes/stb_image.cpp
-    src/utility/Shader.cpp
-    src/SceneRenderer.cpp
-    src/utility/Utility.cpp
-    src/utility/Lights.cpp
-    src/utility/Camera.cpp
+    src/main.cpp
     src/Application.cpp
+    src/appModules/SceneRenderer.cpp
+    src/appModules/SceneManager.cpp
+    src/appModules/GuiManager.cpp
+    src/repositories/SceneRepository.cpp
+    src/utility/Shader.cpp
+    src/utility/Utility.cpp
+    src/utility/Camera.cpp
     src/utility/ResourceManager.cpp
     src/utility/Texture.cpp
-    src/draw/Cone.cpp
+    src/utility/Waves.cpp
     src/draw/Sphere.cpp
     src/draw/Mesh.cpp
     src/draw/Rectangle.cpp
-    src/utility/Waves.cpp
     src/draw/Surface.cpp
-    src/GuiManager.cpp
-    src/GuiManager.hpp
     src/draw/Cube.cpp
 )
 

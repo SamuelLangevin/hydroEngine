@@ -7,20 +7,18 @@
 #include <iostream>
 #include <string>
 #include <gtc/type_ptr.hpp>
+#include "../repositories/SceneRepository.hpp"
 
 const DirectionalWave GuiManager::DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 4.0f, 1.5f, 3.0};
 const PointWave GuiManager::DEFAULT_POINT_WAVE{glm::vec2(0.0f,0.0f), 0.0f, 3.0f, 2.0, 20.0f};
 
 GLFWwindow * GuiManager::window = nullptr;
-std::vector<DirectionalWave> * GuiManager::directionalWaves = nullptr;
-std::vector<PointWave> * GuiManager::pointWaves = nullptr;
 int GuiManager::selectedDirectionalWave = -1;
-PointWave * GuiManager::selectedPointWaveParameters = nullptr;
 
 glm::vec2 GuiManager::directionData{};
-bool GuiManager::resetWaves = false;
+PointWave GuiManager::pointWaveParameters = DEFAULT_POINT_WAVE;
 
-void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves, PointWave * pointWaveParameters) {
+void GuiManager::init(GLFWwindow * _window) {
     window = _window;
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -32,9 +30,6 @@ void GuiManager::init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWa
     ImGui_ImplOpenGL3_Init("#version 430");
 
     directionData = DEFAULT_DIRECTIONAL_WAVE.getDirection();
-    directionalWaves = dirWaves;
-    pointWaves = ptWaves;
-    selectedPointWaveParameters = pointWaveParameters;
 }
 
 void GuiManager::free() {
@@ -42,6 +37,8 @@ void GuiManager::free() {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 }
+
+PointWave GuiManager::getPointWaveParameters() {return pointWaveParameters;}
 
 void GuiManager::setCaptureInput(bool capture) {
     ImGuiIO& io = ImGui::GetIO();
@@ -72,20 +69,21 @@ void GuiManager::draw() {
 }
 
 void GuiManager::drawDirectionalWaveList() {
+    using SR = SceneRepository;
 
     ImGuiTreeNodeFlags treeFlag = ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf, ImGuiTreeNodeFlags_OpenOnArrow;
     if (ImGui::CollapsingHeader("Directional waves")) {
-        if (ImGui::Button("Add wave")) directionalWaves->push_back(DEFAULT_DIRECTIONAL_WAVE);
+        if (ImGui::Button("Add wave")) SR::directionalWaves.push_back(DEFAULT_DIRECTIONAL_WAVE);
         ImGui::SameLine();
         if (ImGui::Button("Clear waves##1")) {
-            directionalWaves->clear();
+            SR::directionalWaves.clear();
             selectedDirectionalWave = -1;
         }
 
         ImGui::BeginChild("ChildList", ImVec2(ImGui::GetContentRegionAvail().x, 100), ImGuiChildFlags_None);
         if (ImGui::TreeNodeEx("Waves", treeFlag)) {
 
-            for (int i = 0; i < directionalWaves->size(); i++) {
+            for (int i = 0; i < SR::directionalWaves.size(); i++) {
                 bool isClicked = ImGui::Selectable(("DWave " + std::to_string(i + 1)).c_str(), i == selectedDirectionalWave);
                 if (isClicked) selectedDirectionalWave = (i == selectedDirectionalWave ? -1 : i);
             }
@@ -94,17 +92,19 @@ void GuiManager::drawDirectionalWaveList() {
         ImGui::EndChild();
 
         ImGui::BeginGroup();
-        if (0 <= selectedDirectionalWave && selectedDirectionalWave < directionalWaves->size()) showADirWaveProperties();
+        if (0 <= selectedDirectionalWave && selectedDirectionalWave < SR::directionalWaves.size()) showADirWaveProperties();
         ImGui::EndGroup();
         SpacingTimes(3);
     }
 }
 
 void GuiManager::showADirWaveProperties() {
+    using SR = SceneRepository;
+
     ImGui::SeparatorText("Inspector");
     ImGui::TextUnformatted(("Directional wave " + std::to_string(selectedDirectionalWave + 1)).c_str());
     ImGui::Separator();
-    DirectionalWave & wave = directionalWaves->at(selectedDirectionalWave);
+    DirectionalWave & wave = SR::directionalWaves.at(selectedDirectionalWave);
 
     if (ImGui::Button("Reset to default values##1")) wave = DEFAULT_DIRECTIONAL_WAVE;
     showAWaveParameters(&wave, 1);
@@ -118,7 +118,7 @@ void GuiManager::showADirWaveProperties() {
     SpacingTimes(2);
 
     if (ImGui::Button("Delete wave")) {
-        directionalWaves->erase(directionalWaves->begin() + selectedDirectionalWave);
+        SR::eraseDirWave(selectedDirectionalWave);
         selectedDirectionalWave = -1;
     }
     ImGui::SeparatorText("");
@@ -126,10 +126,10 @@ void GuiManager::showADirWaveProperties() {
 
 void GuiManager::drawPointWaveParameters() {
     if (ImGui::CollapsingHeader("Point waves")) {
-        if (ImGui::Button("Reset to default values##2")) *selectedPointWaveParameters = DEFAULT_POINT_WAVE;
+        if (ImGui::Button("Reset to default values##2")) pointWaveParameters = DEFAULT_POINT_WAVE;
         ImGui::SameLine();
-        if (ImGui::Button("Clear waves##2")) pointWaves->clear();
-        showAWaveParameters(selectedPointWaveParameters, 2);
+        if (ImGui::Button("Clear waves##2")) SceneRepository::pointWaves.clear();
+        showAWaveParameters(&pointWaveParameters, 2);
         SpacingTimes(3);
     }
 }

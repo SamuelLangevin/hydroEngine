@@ -1,10 +1,8 @@
 #version 430 core
 
-in VS_OUT {
-    vec3 fragPos;
-    vec3 normal;
-    vec2 texCoords;
-} fs_in;
+in vec3 FragPos;
+in vec3 Normal;
+in vec2 TexCoords;
 
 uniform vec4 color;
 

@@ -45,13 +45,10 @@ public:
      */
     void setSpeed(float speed);
 
-    /**
-     * Every wave needs to be sent to the shader for computation.
-     * Sends the wave's attributes to the shader.
-     * @param shader to send data for computation
-     * @param name of the wave struct instance
-     */
+
     virtual void setUniforms(Shader * shader, const std::string &name) const = 0;
+    [[nodiscard]] virtual std::pair<glm::vec3, glm::vec3> computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const = 0;
+    [[nodiscard]] virtual glm::vec3 computeDisplacement(float absoluteTime, glm::vec3 position) const = 0;
 };
 
 
@@ -85,6 +82,21 @@ public:
      * @param name of the wave struct instance
      */
     void setUniforms(Shader * shader, const std::string &name) const override;
+
+    /**
+     * @param absoluteTime current time in seconds
+     * @param position of the water to sample
+     * @return the binormal and the tangent resulting from the wave
+     */
+    [[nodiscard]] std::pair<glm::vec3, glm::vec3> computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const override;
+
+    /**
+     * @param absoluteTime current time in seconds
+     * @param position of the water to sample
+     * @return the water displacement created by the wave
+     */
+    [[nodiscard]] glm::vec3 computeDisplacement(float absoluteTime, glm::vec3 position) const override;
+
 };
 
 /** \class PointWave
@@ -122,6 +134,20 @@ public:
      * @param name of the wave struct instance
      */
     void setUniforms(Shader * shader, const std::string &name) const override;
+
+    /**
+     * @param absoluteTime current time in seconds
+     * @param position of the water to sample
+     * @return the binormal and the tangent resulting from the wave
+     */
+    [[nodiscard]] std::pair<glm::vec3, glm::vec3> computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const override;
+
+    /**
+     * @param absoluteTime current time in seconds
+     * @param position of the water to sample
+     * @return the water displacement created by the wave
+     */
+    [[nodiscard]] glm::vec3 computeDisplacement(float absoluteTime, glm::vec3 position) const override;
 };
 
 

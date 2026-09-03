@@ -37,9 +37,9 @@ vec3 computePointWave(PointWave pWave, float absoluteTime, vec3 vertexPos){
 
     vec3 newPos;
     float phase = -length(originToVert)/pWave.waveLength + advance;
-    newPos.x = 0.0;//-attenuation * pWave.amplitude * normalize(originToVert).x * sin(phase);
+    newPos.x = 0.0;
     newPos.y = attenuation * pWave.amplitude * sin(phase);
-    newPos.z = 0.0;//-attenuation * pWave.amplitude * normalize(originToVert).y * sin(phase);
+    newPos.z = 0.0;
     return newPos;
 }
 
@@ -55,12 +55,9 @@ vec3 computePointWaveBinormal(PointWave pWave, float absoluteTime, vec3 vertexPo
     float advance = pWave.speed * (absoluteTime - pWave.dropTime) /sqrt(pWave.waveLength);
     float attenuation = computePointWaveAttenuation(advance, originToVert, pWave.amplitude);
     float phase = -length(originToVert)/pWave.waveLength + advance;
+    float phaseXderivate = (vertexPos.x - pWave.origin.x) / (sqrt(pWave.waveLength) * -length(originToVert));
 
-    vec3 binormal;
-    binormal.x = 0.0;//-attenuation * pWave.amplitude * normalize(originToVert).x * cos(phase);
-    binormal.y = attenuation * pWave.amplitude * cos(phase);
-    binormal.z = 0.0;
-    return binormal;
+    return vec3( 0.0, phaseXderivate * attenuation * pWave.amplitude * cos(phase), 0.0);
 }
 
 
@@ -76,12 +73,9 @@ vec3 computePointWaveTangent(PointWave pWave, float absoluteTime, vec3 vertexPos
     float advance = pWave.speed * (absoluteTime - pWave.dropTime) /sqrt(pWave.waveLength);
     float attenuation = computePointWaveAttenuation(advance, originToVert, pWave.amplitude);
     float phase = -length(originToVert)/pWave.waveLength + advance;
+    float phaseZderivate = (vertexPos.z - pWave.origin.y) / (sqrt(pWave.waveLength) * -length(originToVert));
 
-    vec3 tangent;
-    tangent.x = 0.0;
-    tangent.y = attenuation * pWave.amplitude * cos(phase);
-    tangent.z = 0.0;//-attenuation * pWave.amplitude * normalize(originToVert).y * cos(phase);
-    return tangent;
+    return vec3(0.0, phaseZderivate * attenuation * pWave.amplitude * cos(phase), 0.0);
 }
 
 
