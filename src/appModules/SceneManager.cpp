@@ -88,6 +88,7 @@ void SceneManager::displaceObjects(float time) {
         }
         glm::vec3 normal = glm::normalize(glm::cross(binormal, tangent));
 
+        float dot = glm::dot(glm::normalize(normal), glm::vec3(0.0f, -1.0f, 0.0f));
         entity->orientation = glm::mix(entity->orientation, getLookAtQuat(normal), 1.0f);
         entity->waterDis = newPosition;
     }
@@ -95,8 +96,12 @@ void SceneManager::displaceObjects(float time) {
 
 glm::quat SceneManager::getLookAtQuat(glm::vec3 direction) {
     glm::vec3 down = glm::vec3(0.0f, -1.0f, 0.0f);
-    float angle = std::acos(glm::dot(glm::normalize(direction), down));
-    return {-angle, normalize(glm::cross(direction, down))};
+    float dot = glm::dot(glm::normalize(direction), down);
+    if (-1.0f < dot && dot < 1.0f) {
+        return {-std::acos(dot), normalize(glm::cross(direction, down))};
+    }
+    return {0.0f, glm::vec3(-1.0f, 0.0f, 0.0f)};
+
 }
 
 
