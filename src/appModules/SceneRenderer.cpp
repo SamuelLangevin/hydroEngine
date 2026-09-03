@@ -5,7 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "../draw/Sphere.hpp"
 #include "../draw/Cube.hpp"
-#include "../utility/ResourceManager.hpp"
+#include "../repositories/ResourceRepository.hpp"
 #include <GLFW/glfw3.h>
 
 #include "../draw/Rectangle.hpp"
@@ -18,7 +18,7 @@
 void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
     Sphere::free();
-    ResourceManager::clear();
+    ResourceRepository::clear();
     Rectangle::free();
     Cube::free();
 }
@@ -31,7 +31,7 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 }
 
 void SceneRenderer::loadTextures() {
-    using RM =  ResourceManager;
+    using RM =  ResourceRepository;
 
     RM::addTexture("lakeSkybox", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_CUBE_MAP);
@@ -41,16 +41,16 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"),
         Texture::lastCreatedImageSize, GL_TEXTURE_2D);
     stbi_set_flip_vertically_on_load(false);
-    ResourceManager::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)), glm::ivec2(1), GL_TEXTURE_2D);
-    ResourceManager::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)), glm::ivec2(1), GL_TEXTURE_2D);
-    ResourceManager::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceRepository::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceRepository::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceRepository::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)), glm::ivec2(1), GL_TEXTURE_2D);
 
     createIBLTextures();
 }
 
 
 void SceneRenderer::loadShaders() {
-    using RM =  ResourceManager;
+    using RM =  ResourceRepository;
     RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
         "pbr.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
@@ -67,24 +67,24 @@ void SceneRenderer::setUniformBlocks() {
 
     glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUBO, 0, 2*sizeof(glm::mat4));
 
-    ResourceManager::getShader("monoColorShader").setUniformBlock("Matrices", 0);
-    ResourceManager::getShader("waterSurfaceShader").setUniformBlock("Matrices", 0);
-    ResourceManager::getShader("skyboxShader").setUniformBlock("Matrices", 0);
-    ResourceManager::getShader("object").setUniformBlock("Matrices", 0);
+    ResourceRepository::getShader("monoColorShader").setUniformBlock("Matrices", 0);
+    ResourceRepository::getShader("waterSurfaceShader").setUniformBlock("Matrices", 0);
+    ResourceRepository::getShader("skyboxShader").setUniformBlock("Matrices", 0);
+    ResourceRepository::getShader("object").setUniformBlock("Matrices", 0);
 }
 
 void SceneRenderer::initializeScene() {
-    Shader waterSurfaceShader = ResourceManager::getShader("waterSurfaceShader");
+    Shader waterSurfaceShader = ResourceRepository::getShader("waterSurfaceShader");
     waterSurfaceShader.use();
-    ResourceManager::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
-    ResourceManager::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
-    ResourceManager::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
+    ResourceRepository::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
+    ResourceRepository::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
+    ResourceRepository::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
 
-    Shader objectShader = ResourceManager::getShader("object");
+    Shader objectShader = ResourceRepository::getShader("object");
     objectShader.use();
-    ResourceManager::getTexture("lakeIrradianceMap").bind(objectShader, "environment.irradianceMap",1);
-    ResourceManager::getTexture("prefilterMap").bind(objectShader, "environment.prefilterMap",2);
-    ResourceManager::getTexture("lutTexture").bind(objectShader, "environment.brdfLUT",3);
+    ResourceRepository::getTexture("lakeIrradianceMap").bind(objectShader, "environment.irradianceMap",1);
+    ResourceRepository::getTexture("prefilterMap").bind(objectShader, "environment.prefilterMap",2);
+    ResourceRepository::getTexture("lutTexture").bind(objectShader, "environment.brdfLUT",3);
 }
 
 void SceneRenderer::createIBLTextures() {
@@ -115,7 +115,7 @@ void SceneRenderer::createIBLTextures() {
 void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjection, const glm::mat4 * captureView, bool saveAsImage){
     constexpr glm::ivec2 IRRADIANCE_TEX_SIZE(32);
     uint envIrradianceTexture = Texture::createCubemapTexture(IRRADIANCE_TEX_SIZE);
-    ResourceManager::addTexture("envIrradianceTexture", envIrradianceTexture,
+    ResourceRepository::addTexture("envIrradianceTexture", envIrradianceTexture,
                                 IRRADIANCE_TEX_SIZE, GL_TEXTURE_CUBE_MAP);
 
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
@@ -124,7 +124,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
     cubemapConvolutionShader.use();
     cubemapConvolutionShader.setInt("environmentMap", 0);
     cubemapConvolutionShader.setMat4("projection", captureProjection);
-    ResourceManager::getTexture("lakeSkybox").bind(cubemapConvolutionShader, "environmentMap", 0);
+    ResourceRepository::getTexture("lakeSkybox").bind(cubemapConvolutionShader, "environmentMap", 0);
 
     glViewport(0, 0, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
     for (uint i = 0; i < 6; i++) {
@@ -142,7 +142,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
     constexpr glm::ivec2 MIPMAPS_SIZE(128);
     uint prefilterMap = Texture::createCubemapTexture(MIPMAPS_SIZE);
-    ResourceManager::addTexture("prefilterMap", prefilterMap, MIPMAPS_SIZE,  GL_TEXTURE_CUBE_MAP);
+    ResourceRepository::addTexture("prefilterMap", prefilterMap, MIPMAPS_SIZE,  GL_TEXTURE_CUBE_MAP);
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
@@ -151,7 +151,7 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
     Shader prefilterConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag"));
     prefilterConvolutionShader.use();
     prefilterConvolutionShader.setMat4("projection", captureProjection);
-    ResourceManager::getTexture("lakeSkybox").bind(prefilterConvolutionShader, "environmentMap", 0);
+    ResourceRepository::getTexture("lakeSkybox").bind(prefilterConvolutionShader, "environmentMap", 0);
 
     uint maxMipLevels = 5;
     for (uint mipLevel = 0; mipLevel < maxMipLevels; mipLevel++) {
@@ -175,7 +175,7 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
 void SceneRenderer::createLUTTexture(bool saveAsImage) {
     constexpr glm::ivec2 LUT_TEX_SIZE(512);
     uint brdfLUTTexture = Texture::createTexture(LUT_TEX_SIZE, GL_RG16F, GL_RG, GL_FLOAT, nullptr);
-    ResourceManager::addTexture("lutTexture", brdfLUTTexture, LUT_TEX_SIZE, GL_TEXTURE_2D);
+    ResourceRepository::addTexture("lutTexture", brdfLUTTexture, LUT_TEX_SIZE, GL_TEXTURE_2D);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
     glViewport(0, 0, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
@@ -189,7 +189,7 @@ void SceneRenderer::createLUTTexture(bool saveAsImage) {
 }
 
 void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) const {
-    using RM = ResourceManager;
+    using RM = ResourceRepository;
     using SR = SceneRepository;
 
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
@@ -237,7 +237,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
 }
 
 void SceneRenderer::drawWorldCursor(const glm::vec3 worldCursorPos) const {
-    Shader monoColorShader = ResourceManager::getShader("monoColorShader");
+    Shader monoColorShader = ResourceRepository::getShader("monoColorShader");
     monoColorShader.use();
     monoColorShader.setVec4("color", glm::vec4(0.0, 0.5, 1.0, 0.5));
 

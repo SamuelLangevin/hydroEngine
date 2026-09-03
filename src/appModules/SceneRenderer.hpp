@@ -22,7 +22,7 @@ class SceneRenderer {
         void init(glm::ivec2 windowSize);
 
         /**
-         * Frees the ResourceManager's resources, scene objects data and OpenGL resources.
+         * Frees the ResourceRepository's resources, scene objects data and OpenGL resources.
          * Must be called before glfwTerminate().
          * @see ResourceManager.
          */
@@ -44,7 +44,7 @@ class SceneRenderer {
     private:
         uint matricesUBO = 0; /**< The view and projection matrices uniform block's ID. */
 
-        /** Loads the shaders to the ResourceManager. */
+        /** Loads the shaders to the ResourceRepository. */
         static void loadShaders();
 
         /** Generates and sets the uniform blocks used by the shaders. */
@@ -53,7 +53,7 @@ class SceneRenderer {
         /** Creates the scene's objects and sets their uniforms to the shaders they are rendered with. */
         void initializeScene();
 
-        /** Loads the needed textures to the ResourceManager. */
+        /** Loads the needed textures to the ResourceRepository. */
         static void loadTextures();
 
         /**

@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "../utility/Utility.hpp"
-#include "../utility/ResourceManager.hpp"
+#include "../repositories/ResourceRepository.hpp"
 #include "../draw/Cube.hpp"
 #include "../repositories/SceneRepository.hpp"
 
@@ -16,7 +16,7 @@ void SceneManager::init() {
     waterSurface->material.metallic = 1.0;
     waterSurface->material.roughness = 0.0f;
     waterSurface->material.ao = 1.0f;
-    waterSurface->material.texture_diffuse0 = ResourceManager::getTexture("deepBlue");
+    waterSurface->material.texture_diffuse0 = ResourceRepository::getTexture("deepBlue");
     SR::water = waterSurface;
 
     SR::directionalWaves.emplace_back(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0);
@@ -26,7 +26,7 @@ void SceneManager::init() {
     SR::directionalWaves.emplace_back(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0);
 
     Cube * cube = new Cube();
-    cube->material.texture_diffuse0 = ResourceManager::getTexture("red");
+    cube->material.texture_diffuse0 = ResourceRepository::getTexture("red");
     cube->scale = glm::vec3(3.0f);
     SR::entities.push_back(cube);
 }
