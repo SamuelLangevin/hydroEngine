@@ -4,9 +4,9 @@
 #include <map>
 #include <string>
 
-#include "../utility/Texture.hpp"
+#include "../resources/Texture.hpp"
 #include "../../includes/glad.h"
-#include "../utility/Shader.hpp"
+#include "../resources/Shader.hpp"
 
 //todo allow to store framebuffers
 //todo allow to store meshes{VAO, VBO, EBO} ?

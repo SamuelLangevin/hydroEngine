@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../utility/Utility.hpp"
+#include "../resources/Utility.hpp"
 #include "../repositories/ResourceRepository.hpp"
 #include "../draw/Cube.hpp"
 #include "../repositories/SceneRepository.hpp"

@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include "../utility/Shader.hpp"
+#include "../resources/Shader.hpp"
 #include "../scene/Camera.hpp"
 
 /**

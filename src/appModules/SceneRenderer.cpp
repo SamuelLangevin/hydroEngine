@@ -9,7 +9,7 @@
 #include <GLFW/glfw3.h>
 
 #include "../draw/Rectangle.hpp"
-#include "../utility/Utility.hpp"
+#include "../resources/Utility.hpp"
 #include "../scene/Waves.hpp"
 #include "../../includes/stb_image.h"
 #include "../repositories/SceneRepository.hpp"

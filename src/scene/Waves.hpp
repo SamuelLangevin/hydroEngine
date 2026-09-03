@@ -2,7 +2,7 @@
 #define WAVES_HPP
 #include <vec2.hpp>
 
-#include "../utility/Shader.hpp"
+#include "../resources/Shader.hpp"
 
 /** \class Wave
  * Base wave attributes and functions.

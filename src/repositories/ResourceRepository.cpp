@@ -1,4 +1,4 @@
-#include "../repositories/ResourceRepository.hpp"
+#include "ResourceRepository.hpp"
 #include <iostream>
 
 std::map<std::string, Shader> ResourceRepository::shaders;

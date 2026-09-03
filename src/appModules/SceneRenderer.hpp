@@ -4,7 +4,7 @@
 
 #include "../draw/Surface.hpp"
 #include "../scene/Camera.hpp"
-#include "../utility/Utility.hpp"
+#include "../resources/Utility.hpp"
 
 /** \class SceneRenderer
  * Renders the scene view and non-UI elements.
