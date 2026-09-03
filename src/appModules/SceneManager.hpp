@@ -54,6 +54,8 @@ private:
      */
     void displaceObjects(float time);
 
+    static glm::quat getLookAtQuat(glm::vec3 direction);
+
 };
 
 

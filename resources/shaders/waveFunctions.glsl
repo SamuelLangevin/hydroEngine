@@ -55,8 +55,9 @@ vec3 computePointWaveBinormal(PointWave pWave, float absoluteTime, vec3 vertexPo
     float advance = pWave.speed * (absoluteTime - pWave.dropTime) /sqrt(pWave.waveLength);
     float attenuation = computePointWaveAttenuation(advance, originToVert, pWave.amplitude);
     float phase = -length(originToVert)/pWave.waveLength + advance;
+    float phaseXderivate = (vertexPos.x - pWave.origin.x) / (sqrt(pWave.waveLength) * -length(originToVert));
 
-    return vec3(0.0, attenuation * pWave.amplitude * cos(phase), 0.0);
+    return vec3( 0.0, phaseXderivate * attenuation * pWave.amplitude * cos(phase), 0.0);
 }
 
 
@@ -68,8 +69,13 @@ vec3 computePointWaveBinormal(PointWave pWave, float absoluteTime, vec3 vertexPo
  * returns the wave's contribution to the tangent of the vertex
  */
 vec3 computePointWaveTangent(PointWave pWave, float absoluteTime, vec3 vertexPos){
+    vec2 originToVert = pWave.origin - vertexPos.xz;
+    float advance = pWave.speed * (absoluteTime - pWave.dropTime) /sqrt(pWave.waveLength);
+    float attenuation = computePointWaveAttenuation(advance, originToVert, pWave.amplitude);
+    float phase = -length(originToVert)/pWave.waveLength + advance;
+    float phaseZderivate = (vertexPos.z - pWave.origin.y) / (sqrt(pWave.waveLength) * -length(originToVert));
 
-    return computePointWaveBinormal(pWave, absoluteTime, vertexPos);
+    return vec3(0.0, phaseZderivate * attenuation * pWave.amplitude * cos(phase), 0.0);
 }
 
 

@@ -86,9 +86,11 @@ std::pair<glm::vec3, glm::vec3> PointWave::computeBinormalAndTangent(float absol
     float reachedPos = ceil(glm::clamp(PI * advance - length(originToVert), 0.0f, 1.0f));
     float attenuation = std::pow(e, -advance/(amplitude * 5.0)) * reachedPos;
     float phase = -length(originToVert)/waveLength + advance;
+    float phaseXderivate = (position.x - origin.x) / (sqrt(waveLength) * -length(originToVert));
+    float phaseZderivate = (position.z - origin.y) / (sqrt(waveLength) * -length(originToVert));
 
-    glm::vec3 binormal = glm::vec3(0.0, attenuation * amplitude * std::sin(phase), 0.0);
-    glm::vec3 tangent = binormal;
+    glm::vec3 binormal = glm::vec3(0.0, attenuation * phaseXderivate * amplitude * std::sin(phase), 0.0);
+    glm::vec3 tangent = glm::vec3(0.0, attenuation * phaseZderivate * amplitude * std::sin(phase), 0.0);
     return {binormal, tangent};
 }
 

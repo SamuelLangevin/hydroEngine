@@ -4,7 +4,7 @@
 
 #include "../utility/Utility.hpp"
 #include "../utility/ResourceManager.hpp"
-#include "../draw/Sphere.hpp"
+#include "../draw/Cube.hpp"
 #include "../repositories/SceneRepository.hpp"
 
 void SceneManager::init() {
@@ -25,10 +25,10 @@ void SceneManager::init() {
     SR::directionalWaves.emplace_back(glm::vec2(-0.275f, 0.962f), 12.0f, 2.0f, 3.0);
     SR::directionalWaves.emplace_back(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0);
 
-    Sphere * sphere = new Sphere();
-    sphere->material.texture_diffuse0 = ResourceManager::getTexture("red");
-    sphere->scale = glm::vec3(3.0f);
-    SR::entities.push_back(sphere);
+    Cube * cube = new Cube();
+    cube->material.texture_diffuse0 = ResourceManager::getTexture("red");
+    cube->scale = glm::vec3(3.0f);
+    SR::entities.push_back(cube);
 }
 
 void SceneManager::free() {
@@ -86,9 +86,17 @@ void SceneManager::displaceObjects(float time) {
             binormal += binormalAndTangent.first;
             tangent += binormalAndTangent.second;
         }
+        glm::vec3 normal = glm::normalize(glm::cross(binormal, tangent));
 
+        entity->orientation = glm::mix(entity->orientation, getLookAtQuat(normal), 1.0f);
         entity->waterDis = newPosition;
     }
+}
+
+glm::quat SceneManager::getLookAtQuat(glm::vec3 direction) {
+    glm::vec3 down = glm::vec3(0.0f, -1.0f, 0.0f);
+    float angle = std::acos(glm::dot(glm::normalize(direction), down));
+    return {-angle, normalize(glm::cross(direction, down))};
 }
 
 
