@@ -3,6 +3,7 @@
 
 #include <imgui.h>
 #include <string>
+#include "../../includes/glad.h"
 #include <GLFW/glfw3.h>
 
 #include "../utility/Waves.hpp"
@@ -14,8 +15,6 @@ class GuiManager {
     private:
 
         static GLFWwindow * window; /**< A pointer on the application's window. */
-        static std::vector<DirectionalWave> * directionalWaves; /**< A pointer on the app's directional waves */
-        static std::vector<PointWave> * pointWaves; /**< A pointer on the app's point wave */
         static int selectedDirectionalWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
         static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
         static PointWave pointWaveParameters; /**< The selected parameters to generate point waves.*/
@@ -29,10 +28,8 @@ class GuiManager {
         /**
          * Initializes ImGui's state, sets the flags and default values.
          * @param _window object of the app class
-         * @param dirWaves the pointer to the app's directional waves
-         * @param ptWaves the pointer to the app's point waves
          */
-        static void init(GLFWwindow * _window, std::vector<DirectionalWave> * dirWaves, std::vector<PointWave> * ptWaves);
+        static void init(GLFWwindow * _window);
 
         /** Shuts down ImGui's interface. */
         static void free();

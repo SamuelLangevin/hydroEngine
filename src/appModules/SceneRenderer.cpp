@@ -12,6 +12,7 @@
 #include "../utility/Utility.hpp"
 #include "../utility/Waves.hpp"
 #include "../../includes/stb_image.h"
+#include "../repositories/SceneRepository.hpp"
 
 
 void SceneRenderer::free() {
@@ -187,8 +188,9 @@ void SceneRenderer::createLUTTexture(bool saveAsImage) {
 
 }
 
-void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, const SceneManager::Scene & scene) const {
+void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) const {
     using RM = ResourceManager;
+    using SR = SceneRepository;
 
     glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(camera.getProjectionMatrix(windowSize)));
@@ -211,21 +213,21 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize, con
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
     waterSurfaceShader.setVec3("viewPos", camera.getPosition());
 
-    waterSurfaceShader.setInt("nbOfPointWaves", scene.pointWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(scene.pointWaves.size()), 50); ++i) {
-        scene.pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
+    waterSurfaceShader.setInt("nbOfPointWaves", SR::pointWaves.size());
+    for (int i = 0; i < std::min(static_cast<int>(SR::pointWaves.size()), 50); ++i) {
+        SR::pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
     }
-    waterSurfaceShader.setInt("nbOfDirectionalWaves", scene.directionalWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(scene.directionalWaves.size()), 50); ++i) {
-        scene.directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
+    waterSurfaceShader.setInt("nbOfDirectionalWaves", SR::directionalWaves.size());
+    for (int i = 0; i < std::min(static_cast<int>(SR::directionalWaves.size()), 50); ++i) {
+        SR::directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
     }
 
-    scene.water->setUniforms(waterSurfaceShader, 0);
-    scene.water->draw(waterSurfaceShader);
+    SR::water->setUniforms(waterSurfaceShader, 0);
+    SR::water->draw(waterSurfaceShader);
 
     objectShader.use();
     objectShader.setVec3("viewPos", camera.getPosition());
-    for (auto entity: scene.entities) {
+    for (auto entity: SR::entities) {
         entity->setUniforms(objectShader, 0);
         entity->draw(objectShader);
     }

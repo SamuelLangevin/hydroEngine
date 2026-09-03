@@ -1,12 +1,10 @@
 #ifndef SCENE_RENDERER_HPP
 #define SCENE_RENDERER_HPP
 #include <vec2.hpp>
-#include <vector>
 
 #include "../draw/Surface.hpp"
 #include "../utility/Camera.hpp"
 #include "../utility/Utility.hpp"
-#include "SceneManager.hpp"
 
 /** \class SceneRenderer
  * Renders the scene view and non-UI elements.
@@ -34,9 +32,8 @@ class SceneRenderer {
          * Renders a frame of the scene according to the camera's view and the windowSize
          * @param camera
          * @param windowSize AKA viewport
-         * @param scene
          */
-        void draw(const Camera & camera, glm::ivec2 windowSize, const SceneManager::Scene & scene) const;
+        void draw(const Camera & camera, glm::ivec2 windowSize) const;
 
         /**
          * Draws a world cursor (sphere) at the specified position.

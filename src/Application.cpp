@@ -13,7 +13,7 @@ Application::Application() {
     initializeWindow();
     sceneRenderer.init(windowSize);
     sceneManager.init();
-    GuiManager::init(window, sceneManager.getDirWavesPointer(), sceneManager.getPntWavesPointer());
+    GuiManager::init(window);
     setState(MENU);
 }
 
@@ -148,7 +148,7 @@ void Application::processFrame(){
     processInput();
     sceneManager.update(glfwGetTime(), windowSize, camera);
 
-    sceneRenderer.draw(camera, windowSize, sceneManager.getScene());
+    sceneRenderer.draw(camera, windowSize);
     if (appState == ACTIVE) sceneRenderer.drawWorldCursor(sceneManager.getCursorWorldPos());
 
     GuiManager::draw();

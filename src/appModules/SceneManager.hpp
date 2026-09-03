@@ -13,31 +13,14 @@
 class SceneManager {
 public:
 
-
-    struct Scene {
-        Surface * water = nullptr; /**< The water surface's mesh.*/
-        std::vector<DirectionalWave> directionalWaves;
-        std::vector<PointWave> pointWaves;
-        std::vector<BasicShape*> entities;
-    };
-
     /** Fills the scene and creates the waterSurface mesh. */
     void init();
 
     /** Frees the allocated memory */
     void free();
 
-    /** @returns a const reference to the scene's objects. */
-    [[nodiscard]] const Scene & getScene() const;
-
     /** @returns the corresponding world position of the cursor. */
     [[nodiscard]] glm::vec3 getCursorWorldPos() const;
-
-    /** @returns a pointer to the list of directional waves. */
-    [[nodiscard]] std::vector<DirectionalWave>* getDirWavesPointer();
-
-    /** @returns a pointer to the list of point waves. */
-    [[nodiscard]] std::vector<PointWave>* getPntWavesPointer();
 
     /**
      * Deletes the unactive point waves and updates the worldCursorPos
@@ -57,7 +40,6 @@ public:
     void produceWave(const Camera & camera, float currentTime, glm::ivec2 windowSize, const PointWave & pointWaveParameters);
 
 private:
-    Scene scene; /**< Stores the entities, the waves and other meshes. */
     glm::vec3 worldCursorPos{}; /**< The corresponding world position of the cursor. */
 
     /**
@@ -66,6 +48,10 @@ private:
      */
     void deleteDeadWaves(float time);
 
+    /**
+     * Displaces the scene's entities according to the waves and the time.
+     * @param time absolute time
+     */
     void displaceObjects(float time);
 
 };

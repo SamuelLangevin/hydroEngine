@@ -32,6 +32,7 @@ add_executable(hydroEngine
     src/appModules/SceneRenderer.cpp
     src/appModules/SceneManager.cpp
     src/appModules/GuiManager.cpp
+    src/repositories/SceneRepository.cpp
     src/utility/Shader.cpp
     src/utility/Utility.cpp
     src/utility/Camera.cpp

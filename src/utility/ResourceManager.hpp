@@ -9,6 +9,7 @@
 #include "Shader.hpp"
 
 //todo allow to store framebuffers
+//todo allow to store meshes{VAO, VBO, EBO} ?
 /** \class ResourceManager
  * Singleton managing the shaders and textures creation, usage and destruction.
  */
