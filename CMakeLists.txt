@@ -33,17 +33,17 @@ add_executable(hydroEngine
     src/appModules/SceneManager.cpp
     src/appModules/GuiManager.cpp
     src/repositories/SceneRepository.cpp
-    src/utility/Shader.cpp
-    src/utility/Utility.cpp
-    src/utility/Camera.cpp
-    src/utility/ResourceManager.cpp
-    src/utility/Texture.cpp
-    src/utility/Waves.cpp
-    src/draw/Sphere.cpp
-    src/draw/Mesh.cpp
-    src/draw/Rectangle.cpp
-    src/draw/Surface.cpp
-    src/draw/Cube.cpp
+        src/resources/Shader.cpp
+        src/resources/Utility.cpp
+        src/scene/Camera.cpp
+        src/repositories/ResourceRepository.cpp
+        src/resources/Texture.cpp
+        src/scene/Waves.cpp
+        src/scene/draw/Sphere.cpp
+        src/scene/draw/Mesh.cpp
+        src/scene/draw/Rectangle.cpp
+        src/scene/draw/Surface.cpp
+        src/scene/draw/Cube.cpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/glm)

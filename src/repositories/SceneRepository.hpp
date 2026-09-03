@@ -1,8 +1,8 @@
 #ifndef SCENE_REPOSITORY_H
 #define SCENE_REPOSITORY_H
 
-#include "../utility/Waves.hpp"
-#include "../draw/Surface.hpp"
+#include "../scene/Waves.hpp"
+#include "../scene/draw/Surface.hpp"
 
 
 class SceneRepository {

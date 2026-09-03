@@ -2,7 +2,7 @@
 #define MESH_HPP
 
 #include <glm/glm.hpp>
-#include "../utility/Shader.hpp"
+#include "../../resources/Shader.hpp"
 #include <vector>
 
 /** \class Mesh

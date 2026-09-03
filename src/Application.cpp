@@ -1,6 +1,6 @@
 #include "Application.hpp"
 #include <iostream>
-#include "utility/Utility.hpp"
+#include "resources/Utility.hpp"
 
 glm::ivec2 Application::windowSize = glm::ivec2(1080, 810);
 glm::vec2 Application::lastMousePos = glm::vec2(windowSize.x/2,windowSize.y/2);

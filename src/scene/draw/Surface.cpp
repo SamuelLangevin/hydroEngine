@@ -1,5 +1,5 @@
 #include "Surface.hpp"
-#include "../utility/Utility.hpp"
+#include "../../resources/Utility.hpp"
 
 uint Surface::resolution = 20;
 

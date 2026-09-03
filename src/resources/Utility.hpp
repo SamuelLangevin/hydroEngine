@@ -4,7 +4,7 @@
 #include "../../includes/glad.h"
 #include <glm/glm.hpp>
 
-#include "Camera.hpp"
+#include "../scene/Camera.hpp"
 
 /** \class Utility
  * Holdall class to put useful functions.

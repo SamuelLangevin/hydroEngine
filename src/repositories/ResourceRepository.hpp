@@ -4,19 +4,19 @@
 #include <map>
 #include <string>
 
-#include "Texture.hpp"
+#include "../resources/Texture.hpp"
 #include "../../includes/glad.h"
-#include "Shader.hpp"
+#include "../resources/Shader.hpp"
 
 //todo allow to store framebuffers
 //todo allow to store meshes{VAO, VBO, EBO} ?
-/** \class ResourceManager
+/** \class ResourceRepository
  * Singleton managing the shaders and textures creation, usage and destruction.
  */
-class ResourceManager{
+class ResourceRepository{
     public:
 
-        ResourceManager() = delete;
+        ResourceRepository() = delete;
 
         /**
          * Creates and stores a shader object by name from an existing OpenGL program.

@@ -1,8 +1,8 @@
 #ifndef BASIC_SHAPE_HPP
 #define BASIC_SHAPE_HPP
 #include "Shape.hpp"
-#include "../utility/Texture.hpp"
-#include "../../includes/glad.h"
+#include "../../resources/Texture.hpp"
+#include "../../../includes/glad.h"
 
 /** \class BasicShape
  * Base of a shape class with a material

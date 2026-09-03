@@ -1,4 +1,5 @@
-#include "../../includes/glad.h"
+#include "../../../includes/glad.h"
+#include "../../resources/Texture.hpp"
 #include "Cube.hpp"
 
 uint Cube::VAO, Cube::VBO, Cube::EBO;
