@@ -5,7 +5,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include "../utility/Shader.hpp"
-#include "../utility/Camera.hpp"
+#include "../scene/Camera.hpp"
 
 /**
  * Entity class to draw something in the scene

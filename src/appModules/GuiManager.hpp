@@ -6,7 +6,7 @@
 #include "../../includes/glad.h"
 #include <GLFW/glfw3.h>
 
-#include "../utility/Waves.hpp"
+#include "../scene/Waves.hpp"
 
 /** \class GuiManager
  * Manages ImGui's state and renders its windows.

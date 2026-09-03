@@ -35,10 +35,10 @@ add_executable(hydroEngine
     src/repositories/SceneRepository.cpp
     src/utility/Shader.cpp
     src/utility/Utility.cpp
-    src/utility/Camera.cpp
+        src/scene/Camera.cpp
         src/repositories/ResourceRepository.cpp
     src/utility/Texture.cpp
-    src/utility/Waves.cpp
+        src/scene/Waves.cpp
     src/draw/Sphere.cpp
     src/draw/Mesh.cpp
     src/draw/Rectangle.cpp

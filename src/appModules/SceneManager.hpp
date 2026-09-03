@@ -4,7 +4,7 @@
 
 #include "../draw/Surface.hpp"
 #include "../draw/Shape.hpp"
-#include "../utility/Waves.hpp"
+#include "../scene/Waves.hpp"
 
 
 /** \class SceneManager

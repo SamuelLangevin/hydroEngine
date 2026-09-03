@@ -2,7 +2,7 @@
 
 #include <ext/quaternion_geometric.hpp>
 
-#include "Shader.hpp"
+#include "../utility/Shader.hpp"
 
 constexpr float PI = 3.14159;
 constexpr float e = 2.71828;

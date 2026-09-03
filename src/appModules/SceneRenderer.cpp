@@ -10,7 +10,7 @@
 
 #include "../draw/Rectangle.hpp"
 #include "../utility/Utility.hpp"
-#include "../utility/Waves.hpp"
+#include "../scene/Waves.hpp"
 #include "../../includes/stb_image.h"
 #include "../repositories/SceneRepository.hpp"
 

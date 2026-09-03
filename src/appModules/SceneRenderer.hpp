@@ -3,7 +3,7 @@
 #include <vec2.hpp>
 
 #include "../draw/Surface.hpp"
-#include "../utility/Camera.hpp"
+#include "../scene/Camera.hpp"
 #include "../utility/Utility.hpp"
 
 /** \class SceneRenderer
