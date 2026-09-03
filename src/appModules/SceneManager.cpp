@@ -4,7 +4,7 @@
 
 #include "../resources/Utility.hpp"
 #include "../repositories/ResourceRepository.hpp"
-#include "../draw/Cube.hpp"
+#include "../scene/draw/Cube.hpp"
 #include "../repositories/SceneRepository.hpp"
 
 void SceneManager::init() {

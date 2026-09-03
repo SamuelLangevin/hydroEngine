@@ -2,7 +2,7 @@
 #define SCENE_REPOSITORY_H
 
 #include "../scene/Waves.hpp"
-#include "../draw/Surface.hpp"
+#include "../scene/draw/Surface.hpp"
 
 
 class SceneRepository {

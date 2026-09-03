@@ -1,7 +1,7 @@
 #ifndef SPHERE_HPP
 #define SPHERE_HPP
 
-#include "../resources/Shader.hpp"
+#include "../../resources/Shader.hpp"
 #include "BasicShape.hpp"
 
 /** \class Sphere

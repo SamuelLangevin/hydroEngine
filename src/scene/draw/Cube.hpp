@@ -1,7 +1,7 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include "../resources/Shader.hpp"
+#include "../../resources/Shader.hpp"
 #include "BasicShape.hpp"
 
 /** \class Cube

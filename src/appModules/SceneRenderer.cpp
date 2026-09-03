@@ -3,12 +3,12 @@
 
 #include <iostream>
 #include <glm/gtc/type_ptr.hpp>
-#include "../draw/Sphere.hpp"
-#include "../draw/Cube.hpp"
+#include "../scene/draw/Sphere.hpp"
+#include "../scene/draw/Cube.hpp"
 #include "../repositories/ResourceRepository.hpp"
 #include <GLFW/glfw3.h>
 
-#include "../draw/Rectangle.hpp"
+#include "../scene/draw/Rectangle.hpp"
 #include "../resources/Utility.hpp"
 #include "../scene/Waves.hpp"
 #include "../../includes/stb_image.h"

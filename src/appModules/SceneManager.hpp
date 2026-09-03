@@ -2,8 +2,7 @@
 #define SCENE_MANAGER_H
 #include <vector>
 
-#include "../draw/Surface.hpp"
-#include "../draw/Shape.hpp"
+#include "../scene/draw/Shape.hpp"
 #include "../scene/Waves.hpp"
 
 

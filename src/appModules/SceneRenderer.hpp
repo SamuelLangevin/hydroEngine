@@ -2,7 +2,6 @@
 #define SCENE_RENDERER_HPP
 #include <vec2.hpp>
 
-#include "../draw/Surface.hpp"
 #include "../scene/Camera.hpp"
 #include "../resources/Utility.hpp"
 
