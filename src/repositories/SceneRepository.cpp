@@ -3,7 +3,7 @@
 Surface * SceneRepository::water = nullptr; /**< The water surface's mesh.*/
 std::vector<DirectionalWave> SceneRepository::directionalWaves;
 std::vector<PointWave> SceneRepository::pointWaves;
-std::vector<BasicShape*> SceneRepository::entities;
+std::vector<Entity*> SceneRepository::entities;
 
 void SceneRepository::eraseDirWave(int index) {
     directionalWaves.erase(directionalWaves.begin() + index);

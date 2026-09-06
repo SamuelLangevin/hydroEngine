@@ -65,7 +65,7 @@ void Sphere::free() {
 
 void Sphere::draw(const Shader & shader) const {
     load();
-    setUniforms(shader, 0);
+    setUniforms(shader);
     glDrawElements(GL_TRIANGLES, lonResolution * latResolution * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

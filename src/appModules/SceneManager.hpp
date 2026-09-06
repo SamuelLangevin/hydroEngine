@@ -2,7 +2,7 @@
 #define SCENE_MANAGER_H
 #include <vector>
 
-#include "../scene/draw/Shape.hpp"
+#include "../scene/Entity.hpp"
 #include "../scene/Waves.hpp"
 
 

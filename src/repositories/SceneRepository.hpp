@@ -12,7 +12,7 @@ public:
     static Surface * water; /**< The water surface's mesh.*/
     static std::vector<DirectionalWave> directionalWaves;
     static std::vector<PointWave> pointWaves;
-    static std::vector<BasicShape*> entities; /**< The scene's objects. */
+    static std::vector<Entity*> entities; /**< The scene's objects. */
 
     /**
      * Erases the directional wave at the index's position.

@@ -222,13 +222,13 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
         SR::directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
     }
 
-    SR::water->setUniforms(waterSurfaceShader, 0);
+    SR::water->setUniforms(waterSurfaceShader);
     SR::water->draw(waterSurfaceShader);
 
     objectShader.use();
     objectShader.setVec3("viewPos", camera.getPosition());
     for (auto entity: SR::entities) {
-        entity->setUniforms(objectShader, 0);
+        entity->setUniforms(objectShader);
         entity->draw(objectShader);
     }
 
