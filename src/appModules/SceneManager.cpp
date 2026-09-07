@@ -1,6 +1,5 @@
 #include "SceneManager.hpp"
 
-#include <iostream>
 #include <memory>
 
 #include "../resources/Utility.hpp"

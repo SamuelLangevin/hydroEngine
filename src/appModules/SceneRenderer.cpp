@@ -33,24 +33,21 @@ void SceneRenderer::init(glm::ivec2 windowSize) {
 void SceneRenderer::loadTextures() {
     using RM =  ResourceRepository;
 
-    RM::addTexture("lakeSkybox", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake/"),
-        Texture::lastCreatedImageSize, GL_TEXTURE_CUBE_MAP);
+    RM::addTexture("lakeSkybox", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake/"));
     stbi_set_flip_vertically_on_load(true);
-    RM::addTexture("lakeIrradianceMap", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake_IrradianceMap/"),
-        Texture::lastCreatedImageSize, GL_TEXTURE_CUBE_MAP);
-    RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"),
-        Texture::lastCreatedImageSize, GL_TEXTURE_2D);
+    RM::addTexture("lakeIrradianceMap", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake_IrradianceMap/"));
+    RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"));
     stbi_set_flip_vertically_on_load(false);
-    ResourceRepository::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)), glm::ivec2(1), GL_TEXTURE_2D);
-    ResourceRepository::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)), glm::ivec2(1), GL_TEXTURE_2D);
-    ResourceRepository::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)), glm::ivec2(1), GL_TEXTURE_2D);
+    ResourceRepository::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
+    ResourceRepository::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
+    ResourceRepository::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
 
     createIBLTextures();
 }
 
 
 void SceneRenderer::loadShaders() {
-    using RM =  ResourceRepository;
+    using RM = ResourceRepository;
     RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
         "pbr.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
@@ -114,13 +111,12 @@ void SceneRenderer::createIBLTextures() {
 
 void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjection, const glm::mat4 * captureView, bool saveAsImage){
     constexpr glm::ivec2 IRRADIANCE_TEX_SIZE(32);
-    uint envIrradianceTexture = Texture::createCubemapTexture(IRRADIANCE_TEX_SIZE);
-    ResourceRepository::addTexture("envIrradianceTexture", envIrradianceTexture,
-                                IRRADIANCE_TEX_SIZE, GL_TEXTURE_CUBE_MAP);
+    Texture envIrradianceTexture = Texture::createCubemapTexture(IRRADIANCE_TEX_SIZE);
+    ResourceRepository::addTexture("envIrradianceTexture", envIrradianceTexture);
 
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
 
-    Shader cubemapConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/cubemapConvolution.frag"));
+    Shader cubemapConvolutionShader = Shader::createShader("pbr/position.vert", "pbr/cubemapConvolution.frag");
     cubemapConvolutionShader.use();
     cubemapConvolutionShader.setInt("environmentMap", 0);
     cubemapConvolutionShader.setMat4("projection", captureProjection);
@@ -130,25 +126,25 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
     for (uint i = 0; i < 6; i++) {
         cubemapConvolutionShader.setMat4("view", captureView[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envIrradianceTexture, 0);
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envIrradianceTexture.getID(), 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         Cube::draw();
         if (saveAsImage) Texture::saveTextureToFile(std::to_string(i) + "_irradianceCubemap.tga", IRRADIANCE_TEX_SIZE);
     }
-    cubemapConvolutionShader.free();
+    glDeleteProgram(cubemapConvolutionShader.getID());
 }
 
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
     constexpr glm::ivec2 MIPMAPS_SIZE(128);
-    uint prefilterMap = Texture::createCubemapTexture(MIPMAPS_SIZE);
-    ResourceRepository::addTexture("prefilterMap", prefilterMap, MIPMAPS_SIZE,  GL_TEXTURE_CUBE_MAP);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+    Texture prefilterMap = Texture::createCubemapTexture(MIPMAPS_SIZE);
+    ResourceRepository::addTexture("prefilterMap", prefilterMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap.getID());
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    Shader prefilterConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag"));
+    Shader prefilterConvolutionShader = Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag");
     prefilterConvolutionShader.use();
     prefilterConvolutionShader.setMat4("projection", captureProjection);
     ResourceRepository::getTexture("lakeSkybox").bind(prefilterConvolutionShader, "environmentMap", 0);
@@ -163,28 +159,30 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
         for (uint i = 0; i < 6; i++) {
             prefilterConvolutionShader.setMat4("view", captureView[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mipLevel);
+                GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap.getID(), mipLevel);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             Cube::draw();
         }
     }
-    prefilterConvolutionShader.free();
+    glDeleteProgram(prefilterConvolutionShader.getID());
 }
 
 void SceneRenderer::createLUTTexture(bool saveAsImage) {
     constexpr glm::ivec2 LUT_TEX_SIZE(512);
-    uint brdfLUTTexture = Texture::createTexture(LUT_TEX_SIZE, GL_RG16F, GL_RG, GL_FLOAT, nullptr);
-    ResourceRepository::addTexture("lutTexture", brdfLUTTexture, LUT_TEX_SIZE, GL_TEXTURE_2D);
+    Texture brdfLUTTexture = Texture::createTexture(LUT_TEX_SIZE, GL_RG16F, GL_RG, GL_FLOAT, nullptr);
+    ResourceRepository::addTexture("lutTexture", brdfLUTTexture);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture.getID(), 0);
     glViewport(0, 0, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
-    Shader brdfConvolutionShader = Shader(Shader::createShader("pbr/BRDFConvolution.vert", "pbr/BRDFConvolution.frag"));
+    Shader brdfConvolutionShader = Shader::createShader("pbr/BRDFConvolution.vert", "pbr/BRDFConvolution.frag");
+
     brdfConvolutionShader.use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Rectangle::draw2DQuad();
     if (saveAsImage) Texture::saveTextureToFile("LUTTexture", LUT_TEX_SIZE);
-    brdfConvolutionShader.free();
+
+    glDeleteProgram(brdfConvolutionShader.getID());
 
 }
 

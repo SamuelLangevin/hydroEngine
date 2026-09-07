@@ -12,27 +12,23 @@
  */
 class Texture{
 private:
-    uint ID; /**< The OpenGL texture ID. */
-    glm::ivec2 size; /**< The width and height of the image. */
-    GLenum type; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
-
-public:
-
-    static glm::ivec2 lastCreatedImageSize; /**< The size of the last created image by this class functions.*/
+    uint ID{0}; /**< The OpenGL texture ID. */
+    glm::ivec2 size{0}; /**< The width and height of the image. */
+    GLenum type{GL_TEXTURE_2D}; /**< The OpenGL image type; GL_TEXTURE_2D ? GL_TEXTURE_CUBE_MAP ?*/
 
     /**
      * Creates a texture object from an OpenGL texture and its type.
+     * Private constructor prevents creating an invalid texture
      * @param textureID The OpenGL texture ID to associate.
      * @param size The width and height of the image.
      * @param type Defaults to GL_TEXTURE_2D
      */
     explicit Texture(uint textureID, glm::ivec2 size, GLenum type);
 
-    Texture() = delete;
-    ~Texture() = default;
+public:
 
-    /** Deletes the associated OpenGL texture. */
-    void free();
+    Texture() = default;
+    ~Texture() = default;
 
     /**
      * Binds the texture to the specified texture channel.
@@ -41,6 +37,10 @@ public:
      * @param channel to bind the uniform to
      */
     void bind(const Shader & shader, const std::string &name, int channel) const;
+
+    [[nodiscard]] uint getID() const;
+    [[nodiscard]] glm::ivec2 getSize() const;
+    [[nodiscard]] GLenum getType() const;
 
     /**
      * Loads and creates a basic texture from a filename and applies the
@@ -51,7 +51,7 @@ public:
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
      */
-    static uint textureFromFile(const char * filenameChar, const std::string &directory,
+    static Texture textureFromFile(const char * filenameChar, const std::string &directory,
                                 GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
@@ -62,7 +62,7 @@ public:
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
      */
-    static uint hdrTextureFromFile(const char * filenameChar, const std::string &directory,
+    static Texture hdrTextureFromFile(const char * filenameChar, const std::string &directory,
                                     GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
@@ -76,7 +76,7 @@ public:
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
      */
-    static uint createTexture( glm::ivec2 size, GLint internalFormat, GLenum format, GLenum type,
+    static Texture createTexture( glm::ivec2 size, GLint internalFormat, GLenum format, GLenum type,
                 const void * data = nullptr, GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
@@ -86,7 +86,7 @@ public:
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
      */
-    static uint createCubemapTexture(glm::ivec2 size, GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
+    static Texture createCubemapTexture(glm::ivec2 size, GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
      * Loads and creates a cubemap from given directory's images.
@@ -98,14 +98,14 @@ public:
      * @param filter method to apply. Defaults to GL_LINEAR
      * @returns the generated OpenGL texture ID
      */
-    static uint cubemapFromDirectory(const std::string &directory, GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
+    static Texture cubemapFromDirectory(const std::string &directory, GLint wrap = GL_CLAMP_TO_EDGE, GLint filter = GL_LINEAR);
 
     /**
      * Creates a 1 pixel color texture.
      * @param color
      * @return the generated OpenGL texture ID.
      */
-    static uint createColorTexture(glm::vec3 color);
+    static Texture createColorTexture(glm::vec3 color);
 
     /**
      * Applies the given wrap and filter methods to the bound texture.
@@ -136,8 +136,6 @@ public:
     * @param size the size of the image to generate
     */
     static void saveTextureToFile(const std::string& filename, glm::ivec2 size);
-
-private:;
 
 };
 

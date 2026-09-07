@@ -5,7 +5,6 @@
 #include <string>
 
 #include "../resources/Texture.hpp"
-#include "../../includes/glad.h"
 #include "../resources/Shader.hpp"
 
 //todo allow to store framebuffers
@@ -19,11 +18,11 @@ class ResourceRepository{
         ResourceRepository() = delete;
 
         /**
-         * Creates and stores a shader object by name from an existing OpenGL program.
+         * Stores a shader object by name.
          * @param name given to the shader
-         * @param programID
+         * @param shader
          */
-        static void addShader(const std::string & name, uint programID);
+        static void addShader(const std::string & name, Shader shader);
 
         /**
          * @param name of the shader
@@ -33,13 +32,12 @@ class ResourceRepository{
         [[nodiscard]] static Shader getShader(const std::string & name);
 
         /**
-         * Creates and stores a texture object by name from an existing OpenGL texture.
+         * Stores a texture object by name.
          * @param name given to the texture
-         * @param textureID
-         * @param size the image's height and width.
-         * @param type 2D ? Cubemap ?
+         * @param texture
+
          */
-        static void addTexture(const std::string & name, uint textureID, glm::ivec2 size, GLenum type);
+        static void addTexture(const std::string & name, Texture texture);
 
         /**
         * @param name of the texture
