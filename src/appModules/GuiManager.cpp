@@ -70,7 +70,7 @@ void GuiManager::draw() {
 
 void GuiManager::drawDirectionalWaveList() {
     using SR = SceneRepository;
-    WaterSurface * water = SR::getWaterSurface();
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
 
     if (ImGui::CollapsingHeader("Directional waves")) {
         if (ImGui::Button("Add wave")) water->addDirectionalWave(DEFAULT_DIRECTIONAL_WAVE);
@@ -100,7 +100,7 @@ void GuiManager::drawDirectionalWaveList() {
 
 void GuiManager::showADirWaveProperties() {
     using SR = SceneRepository;
-    WaterSurface * water = SR::getWaterSurface();
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
 
     ImGui::SeparatorText("Inspector");
     ImGui::TextUnformatted(("Directional wave " + std::to_string(selectedDirectionalWave + 1)).c_str());

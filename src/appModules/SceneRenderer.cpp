@@ -213,7 +213,7 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
     waterSurfaceShader.setVec3("viewPos", camera.getPosition());
 
-    WaterSurface* water = SR::getWaterSurface();
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
     water->draw(waterSurfaceShader);
 
     objectShader.use();

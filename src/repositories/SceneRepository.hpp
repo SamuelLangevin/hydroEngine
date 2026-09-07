@@ -1,6 +1,8 @@
 #ifndef SCENE_REPOSITORY_H
 #define SCENE_REPOSITORY_H
 
+#include <memory>
+
 #include "../scene/Waves.hpp"
 #include "../scene/WaterSurface.hpp"
 #include "../scene/Entity.hpp"
@@ -11,8 +13,8 @@
  */
 class SceneRepository {
 private:
-    static WaterSurface * water; /**< The water surface's mesh.*/
-    static std::vector<Entity*> entities; /**< The scene's objects. */
+    static std::shared_ptr<WaterSurface> water; /**< The water surface's mesh.*/
+    static std::vector<std::shared_ptr<Entity>> entities; /**< The scene's objects. */
 
 public:
     SceneRepository() = delete;
@@ -21,20 +23,19 @@ public:
     static void initWaterSurface();
 
     /** @returns a pointer to the waterSurface.*/
-    static WaterSurface* getWaterSurface();
+    static std::shared_ptr<WaterSurface> getWaterSurface();
 
     /**
      * Adds the entity to the scene.
-     * fixme WARNING : it assumes it has been allocated on the heap.
      * @param entity
      */
-    static void addEntity(Entity * entity);
+    static void addEntity(const std::shared_ptr<Entity>& entity);
 
     /**
      * @param index
      * @returns the entity at the index's position.
      */
-    static Entity* getEntity(int index);
+    static std::shared_ptr<Entity> getEntity(int index);
 
     /**
      * Draws all the stored entities with the passed shader.

@@ -13,10 +13,10 @@ void SceneManager::init() {
 
     SR::initWaterSurface();
 
-    Cube * cube = new Cube();
-    cube->material.texture_diffuse0 = ResourceRepository::getTexture("red");
-    cube->scale = glm::vec3(3.0f);
-    SR::addEntity(cube);
+    Cube cube;
+    cube.material.texture_diffuse0 = ResourceRepository::getTexture("red");
+    cube.scale = glm::vec3(3.0f);
+    SR::addEntity(std::make_shared<Cube>(cube));
 }
 
 void SceneManager::free() {
@@ -24,7 +24,7 @@ void SceneManager::free() {
 }
 
 void SceneManager::update(float time, glm::vec2 windowSize, const Camera & camera) {
-    WaterSurface * water = SceneRepository::getWaterSurface();
+    std::shared_ptr<WaterSurface> water = SceneRepository::getWaterSurface();
     water->deleteDeadWaves(time);
 
     worldCursorPos = Utility::getClickPositionOnPlane(0.5f * glm::vec2(windowSize), camera,
@@ -46,11 +46,11 @@ void SceneManager::produceWave(const Camera & camera, float currentTime, glm::iv
 
 void SceneManager::displaceObjects(float time) {
     using SR = SceneRepository;
-    WaterSurface * water = SceneRepository::getWaterSurface();
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
 
 
     for (int i = 0; i < SR::getNbOfEntities(); ++i) {
-        Entity * entity = SR::getEntity(i);
+        std::shared_ptr<Entity> entity = SR::getEntity(i);
         glm::vec3 newPosition = water->computeResultingPosition(time, entity->position);
         glm::vec3 newNormal = water->computeResultingNormal(time, entity->position);
 
