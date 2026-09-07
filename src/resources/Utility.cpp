@@ -38,7 +38,7 @@ void Utility::createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool a
     glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
 
     for (int i = 0; i < colorAttachments && i < 4; i++) {
-        FBO.buffers[i] = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE);
+        FBO.buffers[i] = Texture::createTexture(windowSize, GL_RGBA16F, GL_RGBA, GL_UNSIGNED_BYTE).getID();
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, FBO.buffers[i], 0);
     }
 

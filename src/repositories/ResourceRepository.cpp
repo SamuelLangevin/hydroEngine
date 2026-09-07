@@ -15,8 +15,8 @@ Shader ResourceRepository::getShader(const std::string & name) {
     return shaders.at(name);
 }
 
-void ResourceRepository::addTexture(const std::string & name, const uint textureID, const glm::ivec2 size, const GLenum type) {
-    textures.insert({name, Texture(textureID, size, type)});
+void ResourceRepository::addTexture(const std::string & name, Texture texture) {
+    textures.insert({name, texture});
 }
 
 Texture ResourceRepository::getTexture(const std::string & name) {
@@ -31,7 +31,8 @@ void ResourceRepository::clear() {
         glDeleteProgram(shader.getID());
     }
     for (auto &[name, texture]: textures) {
-        texture.free();
+        uint id = texture.getID();
+        glDeleteTextures(1, &id);
     }
     shaders.clear();
     textures.clear();
