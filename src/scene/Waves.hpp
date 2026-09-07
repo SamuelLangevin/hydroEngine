@@ -1,5 +1,6 @@
 #ifndef WAVES_HPP
 #define WAVES_HPP
+#include <iostream>
 #include <vec2.hpp>
 
 #include "../resources/Shader.hpp"

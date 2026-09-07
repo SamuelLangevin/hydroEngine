@@ -105,10 +105,10 @@ void GuiManager::showADirWaveProperties() {
     ImGui::SeparatorText("Inspector");
     ImGui::TextUnformatted(("Directional wave " + std::to_string(selectedDirectionalWave + 1)).c_str());
     ImGui::Separator();
-    DirectionalWave * wave = water->getDirectionalWave(selectedDirectionalWave);
+    std::shared_ptr<DirectionalWave> wave = water->getDirectionalWave(selectedDirectionalWave);
 
     if (ImGui::Button("Reset to default values##1")) *wave = DEFAULT_DIRECTIONAL_WAVE;
-    showAWaveParameters(wave, 1);
+    showAWaveParameters(wave.get(), 1);
 
     static int previousSelected = -1;
     // change the direction cache when selecting another wave

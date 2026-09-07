@@ -27,6 +27,7 @@ public:
 
     /**
      * Adds the entity to the scene.
+     * fixme WARNING : it assumes it has been allocated on the heap.
      * @param entity
      */
     static void addEntity(const std::shared_ptr<Entity>& entity);

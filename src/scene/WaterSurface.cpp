@@ -2,13 +2,13 @@
 #include "../repositories/ResourceRepository.hpp"
 
 WaterSurface::WaterSurface(){
-    directionalWaves.emplace_back(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0);
-    directionalWaves.emplace_back(glm::vec2(0.275f, 0.962f), 2.0f, 0.6f, 4.0);
-    directionalWaves.emplace_back(glm::vec2(0.0f, 1.0f), 0.6f, 0.2f, 1.0);
-    directionalWaves.emplace_back(glm::vec2(-0.275f, 0.962f), 12.0f, 2.0f, 3.0);
-    directionalWaves.emplace_back(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0);
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0));
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.275f, 0.962f), 2.0f, 0.6f, 4.0));
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.0f, 1.0f), 0.6f, 0.2f, 1.0));
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(-0.275f, 0.962f), 12.0f, 2.0f, 3.0));
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.5, 0.5), 8.0f, 1.5f, 3.0));
 
-    surface = new Surface(glm::ivec2(1000));
+    surface = std::make_unique<Surface>(glm::ivec2(1000));
 
     surface->scale = glm::vec3(1.0f);
     surface->position = glm::vec3(0.0f, -0.0f, 0.0f);
@@ -24,28 +24,28 @@ void WaterSurface::eraseDirWave(int index) {
 
 void WaterSurface::deleteDeadWaves(float absoluteTime) {
     for (uint i = 0; i < pointWaves.size(); ++i){
-        const PointWave & wave = pointWaves[i];
-        if (absoluteTime - wave.getDropTime() > wave.getLifetime())
+        std::shared_ptr<PointWave> wave = pointWaves.at(i);
+        if (absoluteTime - wave->getDropTime() > wave->getLifetime())
             pointWaves.erase(pointWaves.begin() + i);
         else break;
     }
 }
 
 void WaterSurface::addPointWave(const PointWave &pointWave) {
-    pointWaves.push_back(pointWave);
+    pointWaves.push_back(std::make_shared<PointWave>(pointWave));
 }
 
 void WaterSurface::addDirectionalWave(const DirectionalWave &directionalWave) {
-    directionalWaves.push_back(directionalWave);
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(directionalWave));
 }
 
-DirectionalWave * WaterSurface::getDirectionalWave(int index) {
-    return &directionalWaves.at(index);
+std::shared_ptr<DirectionalWave> WaterSurface::getDirectionalWave(int index) {
+    return directionalWaves.at(index);
 }
 
-void WaterSurface::clearDirectionalWaves() { directionalWaves.clear();}
+void WaterSurface::clearDirectionalWaves() {directionalWaves.clear();}
 
-void WaterSurface::clearPointWaves() {pointWaves.clear(); }
+void WaterSurface::clearPointWaves() {pointWaves.clear();}
 
 glm::vec3 WaterSurface::getPosition() const {
     return surface->position;
@@ -59,10 +59,10 @@ glm::vec3 WaterSurface::computeResultingPosition(float absoluteTime, glm::vec3 i
     glm::vec3 newPosition = initialPosition;
 
     for (auto & pWave : pointWaves) {
-        newPosition += pWave.computeDisplacement(absoluteTime, initialPosition);
+        newPosition += pWave->computeDisplacement(absoluteTime, initialPosition);
     }
     for (auto & dWave : directionalWaves) {
-        newPosition += dWave.computeDisplacement(absoluteTime, initialPosition);
+        newPosition += dWave->computeDisplacement(absoluteTime, initialPosition);
     }
     return newPosition;
 }
@@ -72,12 +72,12 @@ glm::vec3 WaterSurface::computeResultingNormal(float absoluteTime, glm::vec3 ini
     glm::vec3 tangent = glm::vec3(0.0f, 0.0f, 1.0f);
 
     for (auto & pWave : pointWaves) {
-        auto binormalAndTangent = pWave.computeBinormalAndTangent(absoluteTime, initialPosition);
+        auto binormalAndTangent = pWave->computeBinormalAndTangent(absoluteTime, initialPosition);
         binormal += binormalAndTangent.first;
         tangent += binormalAndTangent.second;
     }
     for (auto & dWave : directionalWaves) {
-        auto binormalAndTangent = dWave.computeBinormalAndTangent(absoluteTime, initialPosition);
+        auto binormalAndTangent = dWave->computeBinormalAndTangent(absoluteTime, initialPosition);
         binormal += binormalAndTangent.first;
         tangent += binormalAndTangent.second;
     }
@@ -87,11 +87,11 @@ glm::vec3 WaterSurface::computeResultingNormal(float absoluteTime, glm::vec3 ini
 void WaterSurface::draw(const Shader & shader) const {
     shader.setInt("nbOfPointWaves", static_cast<int>(pointWaves.size()));
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
-        pointWaves.at(i).setUniforms(shader, "pointWaves[" + std::to_string(i) + "]");
+        pointWaves.at(i)->setUniforms(shader, "pointWaves[" + std::to_string(i) + "]");
     }
     shader.setInt("nbOfDirectionalWaves", static_cast<int>(directionalWaves.size()));
     for (int i = 0; i < std::min(static_cast<int>(directionalWaves.size()), 50); ++i) {
-        directionalWaves.at(i).setUniforms(shader, "directionalWaves[" + std::to_string(i) + "]");
+        directionalWaves.at(i)->setUniforms(shader, "directionalWaves[" + std::to_string(i) + "]");
     }
     surface->draw(shader);
 }

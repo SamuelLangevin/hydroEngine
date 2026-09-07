@@ -1,5 +1,6 @@
 #ifndef WATER_SURFACE_HPP
 #define WATER_SURFACE_HPP
+#include <memory>
 #include <vector>
 
 #include "Entity.hpp"
@@ -11,9 +12,9 @@
  */
 class WaterSurface : Entity {
 private:
-    std::vector<DirectionalWave> directionalWaves; /**< The directional waves present in this water body. */
-    std::vector<PointWave> pointWaves; /**< The point waves present in this water body. */
-    Surface * surface = nullptr; /**< The water mesh. */
+    std::vector<std::shared_ptr<DirectionalWave>> directionalWaves; /**< The directional waves present in this water body. */
+    std::vector<std::shared_ptr<PointWave>> pointWaves; /**< The point waves present in this water body. */
+    std::unique_ptr<Surface> surface; /**< The water mesh. */
 
 public:
     WaterSurface();
@@ -46,7 +47,7 @@ public:
      * @param index
      * @returns the directional wave at the index.
      */
-    DirectionalWave* getDirectionalWave(int index);
+    std::shared_ptr<DirectionalWave> getDirectionalWave(int index);
 
     /** Deletes all directional waves. */
     void clearDirectionalWaves();
