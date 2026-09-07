@@ -42,17 +42,15 @@ private:
     glm::vec3 worldCursorPos{}; /**< The corresponding world position of the cursor. */
 
     /**
-     * Deletes the waves according to the lifetime.
-     * @param time
-     */
-    void deleteDeadWaves(float time);
-
-    /**
      * Displaces the scene's entities according to the waves and the time.
      * @param time absolute time
      */
     void displaceObjects(float time);
 
+    /**
+     * @param direction
+     * @returns a quaternion oriented towards the direction.
+     */
     static glm::quat getLookAtQuat(glm::vec3 direction);
 
 };

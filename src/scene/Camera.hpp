@@ -93,7 +93,7 @@ class Camera {
 
     private:;
 
-        glm::vec3 position = glm::vec3(0.0f, 0.0f, 3.0f); /**< The camera's position in the scene. */
+        glm::vec3 position = glm::vec3(0.0f, 10.0f, 40.0f); /**< The camera's position in the scene. */
         glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f); /**< Opposite direction to where the camera looks at. */
         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); /**< The camera's absolute up direction. */
         float zoom = 45.0f; /**< The camera's vertical field of view angle, AKA fovY.*/

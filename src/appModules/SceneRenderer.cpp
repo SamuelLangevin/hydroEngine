@@ -213,24 +213,12 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     waterSurfaceShader.setFloat("time", static_cast<float>(glfwGetTime()));
     waterSurfaceShader.setVec3("viewPos", camera.getPosition());
 
-    waterSurfaceShader.setInt("nbOfPointWaves", SR::pointWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(SR::pointWaves.size()), 50); ++i) {
-        SR::pointWaves.at(i).setUniforms(&waterSurfaceShader, "pointWaves[" + std::to_string(i) + "]");
-    }
-    waterSurfaceShader.setInt("nbOfDirectionalWaves", SR::directionalWaves.size());
-    for (int i = 0; i < std::min(static_cast<int>(SR::directionalWaves.size()), 50); ++i) {
-        SR::directionalWaves.at(i).setUniforms(&waterSurfaceShader, "directionalWaves[" + std::to_string(i) + "]");
-    }
-
-    SR::water->setUniforms(waterSurfaceShader);
-    SR::water->draw(waterSurfaceShader);
+    WaterSurface* water = SR::getWaterSurface();
+    water->draw(waterSurfaceShader);
 
     objectShader.use();
     objectShader.setVec3("viewPos", camera.getPosition());
-    for (auto entity: SR::entities) {
-        entity->setUniforms(objectShader);
-        entity->draw(objectShader);
-    }
+    SR::drawEntities(objectShader);
 
     Shader skyboxShader = RM::getShader("skyboxShader");
     Cube::drawSkyBox(skyboxShader, RM::getTexture("lakeSkybox"), "skybox");
