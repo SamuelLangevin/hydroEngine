@@ -44,6 +44,7 @@ add_executable(hydroEngine
         src/scene/draw/Rectangle.cpp
         src/scene/draw/Surface.cpp
         src/scene/draw/Cube.cpp
+        src/scene/WaterSurface.cpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/glm)
