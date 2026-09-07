@@ -30,11 +30,11 @@ glm::vec2 DirectionalWave::getDirection() const { return direction; }
 
 void DirectionalWave::setDirection(glm::vec2 direction) { this->direction = normalize(direction); }
 
-void DirectionalWave::setUniforms(Shader * shader, const std::string &name) const {
-    shader->setFloat(name + ".waveLength", waveLength);
-    shader->setFloat(name +".amplitude", amplitude);
-    shader->setFloat(name + ".speed", speed);
-    shader->setVec2(name + ".direction", direction);
+void DirectionalWave::setUniforms(const Shader & shader, const std::string &name) const {
+    shader.setFloat(name + ".waveLength", waveLength);
+    shader.setFloat(name +".amplitude", amplitude);
+    shader.setFloat(name + ".speed", speed);
+    shader.setVec2(name + ".direction", direction);
 }
 
 std::pair<glm::vec3, glm::vec3> DirectionalWave::computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const {
@@ -72,12 +72,12 @@ glm::vec2 PointWave::getOrigin() const { return origin; }
 float PointWave::getLifetime() const { return lifetime; }
 float PointWave::getDropTime() const { return dropTime; }
 
-void PointWave::setUniforms(Shader * shader, const std::string &name) const{
-    shader->setFloat(name+ ".waveLength", waveLength);
-    shader->setFloat(name+ ".amplitude", amplitude);
-    shader->setFloat(name+ ".speed", speed);
-    shader->setVec2(name+ ".origin", origin);
-    shader->setFloat(name+ ".dropTime", dropTime);
+void PointWave::setUniforms(const Shader & shader, const std::string &name) const{
+    shader.setFloat(name+ ".waveLength", waveLength);
+    shader.setFloat(name+ ".amplitude", amplitude);
+    shader.setFloat(name+ ".speed", speed);
+    shader.setVec2(name+ ".origin", origin);
+    shader.setFloat(name+ ".dropTime", dropTime);
 }
 
 std::pair<glm::vec3, glm::vec3> PointWave::computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const {

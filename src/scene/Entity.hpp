@@ -4,13 +4,13 @@
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
-#include "../../resources/Shader.hpp"
-#include "../../scene/Camera.hpp"
+#include "../resources/Shader.hpp"
+#include "Camera.hpp"
 
 /**
  * Entity class to draw something in the scene
  */
-class Shape {
+class Entity {
     public:
 
         /** \struct BoundingSphere
@@ -61,13 +61,13 @@ class Shape {
 
         glm::vec3 waterDis = glm::vec3(0.0f);
 
-        virtual ~Shape() = default;
+        virtual ~Entity() = default;
 
         /**
          * Sets the model matrix of the shape.
          * @param shader to send the matrix to
          */
-        void setMatricesUniforms(const Shader & shader) const {
+        virtual void setUniforms(const Shader & shader) const {
             glm::mat4 model(1.0f);
             model = glm::translate(model, position + waterDis);
             model = glm::rotate(model, orientation.w, glm::vec3(orientation.x, orientation.y, orientation.z));

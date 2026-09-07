@@ -70,20 +70,20 @@ void GuiManager::draw() {
 
 void GuiManager::drawDirectionalWaveList() {
     using SR = SceneRepository;
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
 
-    ImGuiTreeNodeFlags treeFlag = ImGuiTreeNodeFlags_DefaultOpen, ImGuiTreeNodeFlags_Leaf, ImGuiTreeNodeFlags_OpenOnArrow;
     if (ImGui::CollapsingHeader("Directional waves")) {
-        if (ImGui::Button("Add wave")) SR::directionalWaves.push_back(DEFAULT_DIRECTIONAL_WAVE);
+        if (ImGui::Button("Add wave")) water->addDirectionalWave(DEFAULT_DIRECTIONAL_WAVE);
         ImGui::SameLine();
         if (ImGui::Button("Clear waves##1")) {
-            SR::directionalWaves.clear();
+            water->clearDirectionalWaves();
             selectedDirectionalWave = -1;
         }
 
         ImGui::BeginChild("ChildList", ImVec2(ImGui::GetContentRegionAvail().x, 100), ImGuiChildFlags_None);
-        if (ImGui::TreeNodeEx("Waves", treeFlag)) {
+        if (ImGui::TreeNodeEx("Waves")) {
 
-            for (int i = 0; i < SR::directionalWaves.size(); i++) {
+            for (int i = 0; i < water->getNbOfDirWaves(); i++) {
                 bool isClicked = ImGui::Selectable(("DWave " + std::to_string(i + 1)).c_str(), i == selectedDirectionalWave);
                 if (isClicked) selectedDirectionalWave = (i == selectedDirectionalWave ? -1 : i);
             }
@@ -92,7 +92,7 @@ void GuiManager::drawDirectionalWaveList() {
         ImGui::EndChild();
 
         ImGui::BeginGroup();
-        if (0 <= selectedDirectionalWave && selectedDirectionalWave < SR::directionalWaves.size()) showADirWaveProperties();
+        if (0 <= selectedDirectionalWave && selectedDirectionalWave < water->getNbOfDirWaves()) showADirWaveProperties();
         ImGui::EndGroup();
         SpacingTimes(3);
     }
@@ -100,25 +100,27 @@ void GuiManager::drawDirectionalWaveList() {
 
 void GuiManager::showADirWaveProperties() {
     using SR = SceneRepository;
+    std::shared_ptr<WaterSurface> water = SR::getWaterSurface();
 
     ImGui::SeparatorText("Inspector");
     ImGui::TextUnformatted(("Directional wave " + std::to_string(selectedDirectionalWave + 1)).c_str());
     ImGui::Separator();
-    DirectionalWave & wave = SR::directionalWaves.at(selectedDirectionalWave);
+    std::shared_ptr<DirectionalWave> wave = water->getDirectionalWave(selectedDirectionalWave);
 
-    if (ImGui::Button("Reset to default values##1")) wave = DEFAULT_DIRECTIONAL_WAVE;
-    showAWaveParameters(&wave, 1);
+    if (ImGui::Button("Reset to default values##1")) *wave = DEFAULT_DIRECTIONAL_WAVE;
+    showAWaveParameters(wave.get(), 1);
 
     static int previousSelected = -1;
-    if (previousSelected != selectedDirectionalWave) directionData = wave.getDirection();
+    // change the direction cache when selecting another wave
+    if (previousSelected != selectedDirectionalWave) directionData = wave->getDirection();
     previousSelected = selectedDirectionalWave;
     auto [enteredDirection, directionValue] = InputVec2(directionData, "Set direction", "##dirct1");
-    if (enteredDirection) wave.setDirection(directionValue);
+    if (enteredDirection) wave->setDirection(directionValue);
 
     SpacingTimes(2);
 
     if (ImGui::Button("Delete wave")) {
-        SR::eraseDirWave(selectedDirectionalWave);
+        water->eraseDirWave(selectedDirectionalWave);
         selectedDirectionalWave = -1;
     }
     ImGui::SeparatorText("");
@@ -128,7 +130,7 @@ void GuiManager::drawPointWaveParameters() {
     if (ImGui::CollapsingHeader("Point waves")) {
         if (ImGui::Button("Reset to default values##2")) pointWaveParameters = DEFAULT_POINT_WAVE;
         ImGui::SameLine();
-        if (ImGui::Button("Clear waves##2")) SceneRepository::pointWaves.clear();
+        if (ImGui::Button("Clear waves##2")) SceneRepository::getWaterSurface()->clearPointWaves();
         showAWaveParameters(&pointWaveParameters, 2);
         SpacingTimes(3);
     }

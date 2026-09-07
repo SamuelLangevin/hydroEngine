@@ -66,7 +66,7 @@ void Surface::load() const {
 
 void Surface::draw(const Shader & shader) const {
     load();
-    setMatricesUniforms(shader);
+    setUniforms(shader);
     glDrawArrays(GL_PATCHES, 0, 4*resolution*resolution);
 }
 

@@ -1,5 +1,6 @@
 #ifndef WAVES_HPP
 #define WAVES_HPP
+#include <iostream>
 #include <vec2.hpp>
 
 #include "../resources/Shader.hpp"
@@ -46,7 +47,7 @@ public:
     void setSpeed(float speed);
 
 
-    virtual void setUniforms(Shader * shader, const std::string &name) const = 0;
+    virtual void setUniforms(const Shader & shader, const std::string &name) const = 0;
     [[nodiscard]] virtual std::pair<glm::vec3, glm::vec3> computeBinormalAndTangent(float absoluteTime, glm::vec3 position) const = 0;
     [[nodiscard]] virtual glm::vec3 computeDisplacement(float absoluteTime, glm::vec3 position) const = 0;
 };
@@ -81,7 +82,7 @@ public:
      * @param shader to send the data for computing
      * @param name of the wave struct instance
      */
-    void setUniforms(Shader * shader, const std::string &name) const override;
+    void setUniforms(const Shader & shader, const std::string &name) const override;
 
     /**
      * @param absoluteTime current time in seconds
@@ -133,7 +134,7 @@ public:
      * @param shader to send the data for computing
      * @param name of the wave struct instance
      */
-    void setUniforms(Shader * shader, const std::string &name) const override;
+    void setUniforms(const Shader & shader, const std::string &name) const override;
 
     /**
      * @param absoluteTime current time in seconds

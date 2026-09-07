@@ -1,13 +1,13 @@
 #ifndef BASIC_SHAPE_HPP
 #define BASIC_SHAPE_HPP
-#include "Shape.hpp"
+#include "../Entity.hpp"
 #include "../../resources/Texture.hpp"
 #include "../../../includes/glad.h"
 
 /** \class BasicShape
  * Base of a shape class with a material
  */
-class BasicShape : public Shape {
+class BasicShape : public Entity {
 public:
 
     /** PBR material for light computation. */
@@ -23,15 +23,14 @@ public:
     /**
      * Sets the model matrix uniform and the material uniforms.
      * @param shader
-     * @param channel
      */
-    void setUniforms(const Shader & shader, int channel) const {
-        setMatricesUniforms(shader);
+    void setUniforms(const Shader & shader) const override {
+        Entity::setUniforms(shader);
 
         shader.setFloat("material.metallic", material.metallic);
         shader.setFloat("material.roughness", material.roughness);
         shader.setFloat("material.ao", material.ao);
-        material.texture_diffuse0.bind(shader, "material.texture_diffuse0", channel);
+        material.texture_diffuse0.bind(shader, "material.texture_diffuse0", 0);
 
     }
 };
