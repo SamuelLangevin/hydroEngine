@@ -13,15 +13,16 @@ class Shader{
     private:
         uint ID; /**< The OpenGL program ID. */
 
+        /**
+         * Creates a shader object from an OpenGL program.
+         * Private prevents from creating a shader with an invalid ID.
+         * @param programID
+         */
+        Shader(uint programID);
+
     public :
         /** Shaders directory path. */
         static constexpr const char * directory = "../resources/shaders/";
-
-        /**
-         * Creates a shader object from an OpenGL program.
-         * @param programID
-         */
-        explicit Shader(uint programID);
 
         Shader() = delete;
         ~Shader() = default;
@@ -33,20 +34,19 @@ class Shader{
          * @param geometryName (optional) geometry shader file name
          * @param tesselControlName (optional) Tessellation control shader file name
          * @param tesselEvalName (optional) Tessellation evaluation shader file name
-         * @returns the associated programID
+         * @returns the created shader.
          */
-        static uint createShader(const char* vertexName, const char* fragmentName, const char* geometryName = nullptr,
+        static Shader createShader(const char* vertexName, const char* fragmentName, const char* geometryName = nullptr,
                const char* tesselControlName = nullptr, const char* tesselEvalName = nullptr);
 
         /**
          * Creates an OpenGL compute shader (program).
          * @param computeName compute shader file name
-         * @return the associated programID
+         * @return the created compute shader.
          */
-        static uint createComputeShader(const char* computeName);
+        static Shader createComputeShader(const char* computeName);
 
-        /** Deletes the associated OpenGL program. */
-        void free();
+        [[nodiscard]] uint getID() const;
 
         /** Binds the associated OpenGL program. */
         void use() const;

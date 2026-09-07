@@ -8,7 +8,7 @@
 
 Shader::Shader(const uint programID) : ID(programID){}
 
-uint Shader::createShader(const char* vertexName, const char* fragmentName, const char* geometryName,
+Shader Shader::createShader(const char* vertexName, const char* fragmentName, const char* geometryName,
     const char* tesselControlName, const char* tesselEvalName) {
 
     uint vertexShader = prepareShader(vertexName, GL_VERTEX_SHADER);
@@ -16,22 +16,21 @@ uint Shader::createShader(const char* vertexName, const char* fragmentName, cons
     uint geometryShader = prepareShader(geometryName, GL_GEOMETRY_SHADER);
     uint tesselControlShader = prepareShader(tesselControlName, GL_TESS_CONTROL_SHADER);
     uint tesselEvalShader = prepareShader(tesselEvalName, GL_TESS_EVALUATION_SHADER);
-    return prepareProgram(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
+    uint ID = prepareProgram(vertexShader, fragmentShader, geometryShader, tesselControlShader, tesselEvalShader);
+    return {ID};
 }
 
-uint Shader::createComputeShader(const char* computeName) {
+Shader Shader::createComputeShader(const char* computeName) {
     const uint computeShader = prepareShader(computeName, GL_COMPUTE_SHADER);
     const uint ID = glCreateProgram();
     glAttachShader(ID, computeShader);
     glLinkProgram(ID);
     printLinkStatus(ID);
     glDeleteShader(computeShader);
-    return ID;
+    return {ID};
 }
 
-void Shader::free() {
-    glDeleteProgram(ID);
-}
+uint Shader::getID() const { return ID;}
 
 uint Shader::prepareShader(const char* fileName, const uint shaderType){
     uint shader = 0;

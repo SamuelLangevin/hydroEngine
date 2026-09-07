@@ -21,9 +21,9 @@ class ResourceRepository{
         /**
          * Creates and stores a shader object by name from an existing OpenGL program.
          * @param name given to the shader
-         * @param programID
+         * @param shader
          */
-        static void addShader(const std::string & name, uint programID);
+        static void addShader(const std::string & name, Shader shader);
 
         /**
          * @param name of the shader

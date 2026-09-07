@@ -120,7 +120,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
 
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
 
-    Shader cubemapConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/cubemapConvolution.frag"));
+    Shader cubemapConvolutionShader = Shader::createShader("pbr/position.vert", "pbr/cubemapConvolution.frag");
     cubemapConvolutionShader.use();
     cubemapConvolutionShader.setInt("environmentMap", 0);
     cubemapConvolutionShader.setMat4("projection", captureProjection);
@@ -136,7 +136,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
         Cube::draw();
         if (saveAsImage) Texture::saveTextureToFile(std::to_string(i) + "_irradianceCubemap.tga", IRRADIANCE_TEX_SIZE);
     }
-    cubemapConvolutionShader.free();
+    glDeleteProgram(cubemapConvolutionShader.getID());
 }
 
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
@@ -148,7 +148,7 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-    Shader prefilterConvolutionShader = Shader(Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag"));
+    Shader prefilterConvolutionShader = Shader::createShader("pbr/position.vert", "pbr/prefilterConvolution.frag");
     prefilterConvolutionShader.use();
     prefilterConvolutionShader.setMat4("projection", captureProjection);
     ResourceRepository::getTexture("lakeSkybox").bind(prefilterConvolutionShader, "environmentMap", 0);
@@ -169,7 +169,7 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
             Cube::draw();
         }
     }
-    prefilterConvolutionShader.free();
+    glDeleteProgram(prefilterConvolutionShader.getID());
 }
 
 void SceneRenderer::createLUTTexture(bool saveAsImage) {
@@ -179,12 +179,14 @@ void SceneRenderer::createLUTTexture(bool saveAsImage) {
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
     glViewport(0, 0, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
-    Shader brdfConvolutionShader = Shader(Shader::createShader("pbr/BRDFConvolution.vert", "pbr/BRDFConvolution.frag"));
+    Shader brdfConvolutionShader = Shader::createShader("pbr/BRDFConvolution.vert", "pbr/BRDFConvolution.frag");
+
     brdfConvolutionShader.use();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     Rectangle::draw2DQuad();
     if (saveAsImage) Texture::saveTextureToFile("LUTTexture", LUT_TEX_SIZE);
-    brdfConvolutionShader.free();
+
+    glDeleteProgram(brdfConvolutionShader.getID());
 
 }
 

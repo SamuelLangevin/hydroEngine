@@ -5,8 +5,8 @@ std::map<std::string, Shader> ResourceRepository::shaders;
 std::map<std::string, Texture> ResourceRepository::textures;
 
 
-void ResourceRepository::addShader(const std::string &name, const uint programID) {
-    shaders.insert({name, Shader(programID)});
+void ResourceRepository::addShader(const std::string &name, const Shader shader) {
+    shaders.insert({name, shader});
 }
 
 Shader ResourceRepository::getShader(const std::string & name) {
@@ -28,7 +28,7 @@ Texture ResourceRepository::getTexture(const std::string & name) {
 
 void ResourceRepository::clear() {
     for (auto &[name, shader]: shaders) {
-        shader.free();
+        glDeleteProgram(shader.getID());
     }
     for (auto &[name, texture]: textures) {
         texture.free();
