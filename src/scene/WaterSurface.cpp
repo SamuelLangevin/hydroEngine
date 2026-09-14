@@ -19,7 +19,7 @@ WaterSurface::WaterSurface(){
     surface->material.texture_diffuse0 = ResourceRepository::getTexture("deepBlue");
 }
 
-void WaterSurface::eraseDirWave(int index) {
+void WaterSurface::eraseDirectionalWaveAt(int index) {
     directionalWaves.erase(directionalWaves.begin() + index);
 }
 
@@ -40,7 +40,15 @@ void WaterSurface::addDirectionalWave(const DirectionalWave &directionalWave) {
     directionalWaves.push_back(std::make_shared<DirectionalWave>(directionalWave));
 }
 
-std::shared_ptr<DirectionalWave> WaterSurface::getDirectionalWave(int index) {
+void WaterSurface::setWaterDepth(float depth) {
+    this->depth = glm::clamp(depth, 0.0f, 1.0f);
+}
+
+float WaterSurface::getWatertDepth() const {
+    return depth;
+}
+
+std::shared_ptr<DirectionalWave> WaterSurface::getDirectionalWaveAt(int index) {
     return directionalWaves.at(index);
 }
 

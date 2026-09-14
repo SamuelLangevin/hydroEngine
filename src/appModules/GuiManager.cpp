@@ -45,12 +45,6 @@ void GuiManager::setCaptureInput(bool capture) {
     io.SetAppAcceptingEvents(capture);
 }
 
-void GuiManager::drawEnvironmentParameters() {
-    if (ImGui::CollapsingHeader("Water properties and environment")) {
-        //ImGui::SliderFloat("##DepthSlider")
-    }
-}
-
 void GuiManager::draw() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -73,6 +67,17 @@ void GuiManager::draw() {
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void GuiManager::drawEnvironmentParameters() {
+    if (ImGui::CollapsingHeader("Water properties and environment")) {
+        //ImGui::SliderFloat("##DepthSlider")
+        float value = SceneRepository::getWaterSurface()->getWatertDepth();
+        ImGui::TextUnformatted("Depth");
+        ImGui::SameLine();
+        if (ImGui::SliderFloat("##Depth", &value, 0.0f, 1.0f))
+            SceneRepository::getWaterSurface()->setWaterDepth(value);
+    }
 }
 
 void GuiManager::drawDirectionalWaveList() {
@@ -112,7 +117,7 @@ void GuiManager::showADirWaveProperties() {
     ImGui::SeparatorText("Inspector");
     ImGui::TextUnformatted(("Directional wave " + std::to_string(selectedDirectionalWave + 1)).c_str());
     ImGui::Separator();
-    std::shared_ptr<DirectionalWave> wave = water->getDirectionalWave(selectedDirectionalWave);
+    std::shared_ptr<DirectionalWave> wave = water->getDirectionalWaveAt(selectedDirectionalWave);
 
     if (ImGui::Button("Reset to default values##1")) *wave = DEFAULT_DIRECTIONAL_WAVE;
     showAWaveParameters(wave.get(), 1);
@@ -127,7 +132,7 @@ void GuiManager::showADirWaveProperties() {
     SpacingTimes(2);
 
     if (ImGui::Button("Delete wave")) {
-        water->eraseDirWave(selectedDirectionalWave);
+        water->eraseDirectionalWaveAt(selectedDirectionalWave);
         selectedDirectionalWave = -1;
     }
     ImGui::SeparatorText("");

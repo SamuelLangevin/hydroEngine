@@ -20,15 +20,17 @@ out vec4 FragColor;
  * @param base reflectivity factor
  * @returns the environment's contribution to the surface's color
  */
-vec3 waterColor(vec3 albedo, vec3 N, vec3 V, vec3 F_0) {
+vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
     vec3 F = fresnelSchlickRoughness(max(dot(N, V), 0.0), F_0, material.roughness);
     vec3 kS = F; //Ratio of the light reflected
     vec3 kD = (1.0 - kS) * (1.0 - material.metallic); //Ratio of the light absorbed
 
     vec3 refracted = normalize(refract(-V, N, 1.0/1.33));
     vec3 oceanBedColor = texture(oceanBedTexture, refracted.xz).rgb;
-    vec3 deepColor = mix(vec3(0.0), oceanBedColor, depth);
-    vec3 diffuse = mix(albedo, deepColor, max(dot(V, N), 0));
+    vec3 deepColor = vec3(0.0, 0.0, 0.1);
+    vec3 shallowColor = vec3(0.0, 0.3, 0.3);
+    vec3 depthColor = mix(deepColor, shallowColor + 0.2*oceanBedColor, depth);
+    vec3 diffuse = max( dot(V, N),0 ) * depthColor * texture(environment.irradianceMap, N).xyz;
 
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 reflected = reflect(-V, N);
@@ -44,13 +46,9 @@ void main(){
     vec3 N = normalize(Normal);
     vec3 V = normalize(viewPos - FragPos);
 
-    vec3 deepColor = vec3(0.0, 0.0, 0.2);
-    vec3 shallowColor = vec3(0.0, 0.1, 0.3);
-    float depth = 0.5;
-    vec3 avgColor = mix(deepColor, shallowColor, depth);
     vec3 F_0 = mix(vec3(0.04), vec3(1.0), material.metallic);
 
-    vec3 ambient = waterColor(deepColor, N, V, F_0);
+    vec3 ambient = waterColor(N, V, F_0);
 
     vec3 color = ambient;
     color = color / (color + vec3(1.0));
