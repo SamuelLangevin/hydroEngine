@@ -38,9 +38,10 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("lakeIrradianceMap", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake_IrradianceMap/"));
     RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"));
     stbi_set_flip_vertically_on_load(false);
-    ResourceRepository::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
-    ResourceRepository::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
-    ResourceRepository::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
+    RM::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
+    RM::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
+    RM::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
+    RM::addTexture("oceanBed", Texture::textureFromFile("oceanBed.png", "../resources/textures/", GL_REPEAT));
 
     createIBLTextures();
 }
@@ -48,9 +49,8 @@ void SceneRenderer::loadTextures() {
 
 void SceneRenderer::loadShaders() {
     using RM = ResourceRepository;
-    RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
-        "pbr.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
+        "waterSurface.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
     RM::addShader("monoColorShader", Shader::createShader("object.vert", "monoColor.frag"));
     RM::addShader("skyboxShader", Shader::createShader("cubemap.vert", "cubemap.frag"));
     RM::addShader("object", Shader::createShader("object.vert", "pbr.frag"));
@@ -76,6 +76,9 @@ void SceneRenderer::initializeScene() {
     ResourceRepository::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
     ResourceRepository::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
     ResourceRepository::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
+    ResourceRepository::getTexture("oceanBed").bind(waterSurfaceShader, "oceanBedTexture",4);
+
+
 
     Shader objectShader = ResourceRepository::getShader("object");
     objectShader.use();

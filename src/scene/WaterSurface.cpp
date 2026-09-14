@@ -2,6 +2,7 @@
 #include "../repositories/ResourceRepository.hpp"
 
 WaterSurface::WaterSurface(){
+    directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.275f, 0.962f), 0.2f, 0.03f, 3.0));
     directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.721f, 0.693f), 1.0f, 0.2f, 3.0));
     directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.275f, 0.962f), 2.0f, 0.6f, 4.0));
     directionalWaves.push_back(std::make_shared<DirectionalWave>(glm::vec2(0.0f, 1.0f), 0.6f, 0.2f, 1.0));
@@ -12,7 +13,7 @@ WaterSurface::WaterSurface(){
 
     surface->scale = glm::vec3(1.0f);
     surface->position = glm::vec3(0.0f, -0.0f, 0.0f);
-    surface->material.metallic = 1.0;
+    surface->material.metallic = 0.0;
     surface->material.roughness = 0.0f;
     surface->material.ao = 1.0f;
     surface->material.texture_diffuse0 = ResourceRepository::getTexture("deepBlue");
