@@ -39,6 +39,8 @@ class GuiManager {
         /** Tells whether ImGui should capture the user's input. */
         static void setCaptureInput(bool capture);
 
+        static void drawEnvironmentParameters();
+
         /** Draws ImGui's windows. */
         static void draw();
 

@@ -139,7 +139,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
 }
 
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
-    constexpr glm::ivec2 MIPMAPS_SIZE(128);
+    constexpr glm::ivec2 MIPMAPS_SIZE(512);
     Texture prefilterMap = Texture::createCubemapTexture(MIPMAPS_SIZE);
     ResourceRepository::addTexture("prefilterMap", prefilterMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap.getID());

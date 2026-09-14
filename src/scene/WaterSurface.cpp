@@ -87,6 +87,7 @@ glm::vec3 WaterSurface::computeResultingNormal(float absoluteTime, glm::vec3 ini
 
 void WaterSurface::draw(const Shader & shader) const {
     shader.setInt("nbOfPointWaves", static_cast<int>(pointWaves.size()));
+    shader.setFloat("depth", depth);
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
         pointWaves.at(i)->setUniforms(shader, "pointWaves[" + std::to_string(i) + "]");
     }

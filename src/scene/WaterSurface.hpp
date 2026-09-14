@@ -15,6 +15,7 @@ private:
     std::vector<std::shared_ptr<DirectionalWave>> directionalWaves; /**< The directional waves present in this water body. */
     std::vector<std::shared_ptr<PointWave>> pointWaves; /**< The point waves present in this water body. */
     std::unique_ptr<Surface> surface; /**< The water mesh. */
+    float depth;
 
 public:
     WaterSurface();

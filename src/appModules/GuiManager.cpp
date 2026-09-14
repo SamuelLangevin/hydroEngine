@@ -45,6 +45,12 @@ void GuiManager::setCaptureInput(bool capture) {
     io.SetAppAcceptingEvents(capture);
 }
 
+void GuiManager::drawEnvironmentParameters() {
+    if (ImGui::CollapsingHeader("Water properties and environment")) {
+        //ImGui::SliderFloat("##DepthSlider")
+    }
+}
+
 void GuiManager::draw() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -60,6 +66,7 @@ void GuiManager::draw() {
     ImGui::EndMainMenuBar();
 
     ImGui::Begin("Simulation - Press escape to interact");
+    drawEnvironmentParameters();
     drawDirectionalWaveList();
     drawPointWaveParameters();
     ImGui::End();
