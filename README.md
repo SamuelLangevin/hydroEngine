@@ -37,6 +37,9 @@ notably the implementation of [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-
 
 ## Used assets
 - Lake skybox : https://github.com/JoeyDeVries/LearnOpenGL/tree/master/resources/textures/skybox
+- Noise pattern generated with https://tools.puida.com/creative/gamedesign/pattern-generator/app/
+and modified with gimp.
+- Ocean bed made with gimp.
 
 ## Contributing
 This is a personal project. You may suggest modifications, report bugs through issues but pull requests will not be merged.

@@ -71,8 +71,7 @@ void GuiManager::draw() {
 
 void GuiManager::drawEnvironmentParameters() {
     if (ImGui::CollapsingHeader("Water properties and environment")) {
-        //ImGui::SliderFloat("##DepthSlider")
-        float value = SceneRepository::getWaterSurface()->getWatertDepth();
+        float value = SceneRepository::getWaterSurface()->getWaterDepth();
         ImGui::TextUnformatted("Depth");
         ImGui::SameLine();
         if (ImGui::SliderFloat("##Depth", &value, 0.0f, 1.0f))
