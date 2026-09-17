@@ -10,7 +10,6 @@
 
 #include "../scene/draw/Rectangle.hpp"
 #include "../resources/Utility.hpp"
-#include "../scene/Waves.hpp"
 #include "../../includes/stb_image.h"
 #include "../repositories/SceneRepository.hpp"
 
@@ -36,11 +35,13 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("lakeSkybox", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake/"));
     stbi_set_flip_vertically_on_load(true);
     RM::addTexture("lakeIrradianceMap", Texture::cubemapFromDirectory("../resources/textures/cubemaps/lake_IrradianceMap/"));
-    RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures/"));
+    RM::addTexture("lutTexture", Texture::textureFromFile("LUTTexture.png", "../resources/textures"));
     stbi_set_flip_vertically_on_load(false);
-    ResourceRepository::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
-    ResourceRepository::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
-    ResourceRepository::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
+    RM::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
+    RM::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
+    RM::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
+    RM::addTexture("oceanBed", Texture::textureFromFile("oceanBed.png", "../resources/textures", GL_REPEAT));
+    RM::addTexture("noiseNormalMap", Texture::textureFromFile("noiseNormals5.png", "../resources/textures", GL_REPEAT));
 
     createIBLTextures();
 }
@@ -48,9 +49,8 @@ void SceneRenderer::loadTextures() {
 
 void SceneRenderer::loadShaders() {
     using RM = ResourceRepository;
-    RM::addShader("screenWaterShader", Shader::createShader("screen.vert", "screenWater.frag"));
     RM::addShader("waterSurfaceShader", Shader::createShader("waterSurface.vert",
-        "pbr.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
+        "waterSurface.frag", nullptr, "waterSurface.tesc", "waterSurface.tese"));
     RM::addShader("monoColorShader", Shader::createShader("object.vert", "monoColor.frag"));
     RM::addShader("skyboxShader", Shader::createShader("cubemap.vert", "cubemap.frag"));
     RM::addShader("object", Shader::createShader("object.vert", "pbr.frag"));
@@ -71,17 +71,23 @@ void SceneRenderer::setUniformBlocks() {
 }
 
 void SceneRenderer::initializeScene() {
-    Shader waterSurfaceShader = ResourceRepository::getShader("waterSurfaceShader");
-    waterSurfaceShader.use();
-    ResourceRepository::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
-    ResourceRepository::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
-    ResourceRepository::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
+    using RM = ResourceRepository;
 
-    Shader objectShader = ResourceRepository::getShader("object");
+    Shader waterSurfaceShader = RM::getShader("waterSurfaceShader");
+    waterSurfaceShader.use();
+    RM::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
+    RM::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
+    RM::getTexture("lutTexture").bind(waterSurfaceShader, "environment.brdfLUT",3);
+    RM::getTexture("oceanBed").bind(waterSurfaceShader, "oceanBedTexture",4);
+    RM::getTexture("noiseNormalMap").bind(waterSurfaceShader, "noiseNormalMap",5);
+
+
+
+    Shader objectShader = RM::getShader("object");
     objectShader.use();
-    ResourceRepository::getTexture("lakeIrradianceMap").bind(objectShader, "environment.irradianceMap",1);
-    ResourceRepository::getTexture("prefilterMap").bind(objectShader, "environment.prefilterMap",2);
-    ResourceRepository::getTexture("lutTexture").bind(objectShader, "environment.brdfLUT",3);
+    RM::getTexture("lakeIrradianceMap").bind(objectShader, "environment.irradianceMap",1);
+    RM::getTexture("prefilterMap").bind(objectShader, "environment.prefilterMap",2);
+    RM::getTexture("lutTexture").bind(objectShader, "environment.brdfLUT",3);
 }
 
 void SceneRenderer::createIBLTextures() {
@@ -136,7 +142,7 @@ void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjecti
 }
 
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
-    constexpr glm::ivec2 MIPMAPS_SIZE(128);
+    constexpr glm::ivec2 MIPMAPS_SIZE(512);
     Texture prefilterMap = Texture::createCubemapTexture(MIPMAPS_SIZE);
     ResourceRepository::addTexture("prefilterMap", prefilterMap);
     glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap.getID());

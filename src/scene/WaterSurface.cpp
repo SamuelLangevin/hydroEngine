@@ -12,13 +12,13 @@ WaterSurface::WaterSurface(){
 
     surface->scale = glm::vec3(1.0f);
     surface->position = glm::vec3(0.0f, -0.0f, 0.0f);
-    surface->material.metallic = 1.0;
+    surface->material.metallic = 0.0;
     surface->material.roughness = 0.0f;
     surface->material.ao = 1.0f;
     surface->material.texture_diffuse0 = ResourceRepository::getTexture("deepBlue");
 }
 
-void WaterSurface::eraseDirWave(int index) {
+void WaterSurface::eraseDirectionalWaveAt(int index) {
     directionalWaves.erase(directionalWaves.begin() + index);
 }
 
@@ -39,7 +39,24 @@ void WaterSurface::addDirectionalWave(const DirectionalWave &directionalWave) {
     directionalWaves.push_back(std::make_shared<DirectionalWave>(directionalWave));
 }
 
-std::shared_ptr<DirectionalWave> WaterSurface::getDirectionalWave(int index) {
+void WaterSurface::setWaterDepth(float depth) {
+    this->depth = glm::clamp(depth, 0.0f, 1.0f);
+}
+
+float WaterSurface::getWaterDepth() const {
+    return depth;
+}
+
+void WaterSurface::setWindVelocity(glm::vec2 velocity) {
+    constexpr float MAGNITUDE_UNDERSCALING = 100.0f;
+    windVelocity = (1.0f/MAGNITUDE_UNDERSCALING) * velocity;
+}
+
+glm::vec2 WaterSurface::getWindVelocity() const {
+    return windVelocity;
+}
+
+std::shared_ptr<DirectionalWave> WaterSurface::getDirectionalWaveAt(int index) {
     return directionalWaves.at(index);
 }
 
@@ -86,6 +103,9 @@ glm::vec3 WaterSurface::computeResultingNormal(float absoluteTime, glm::vec3 ini
 
 void WaterSurface::draw(const Shader & shader) const {
     shader.setInt("nbOfPointWaves", static_cast<int>(pointWaves.size()));
+    shader.setFloat("depth", depth);
+    shader.setVec2("windVelocity", windVelocity);
+
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {
         pointWaves.at(i)->setUniforms(shader, "pointWaves[" + std::to_string(i) + "]");
     }
