@@ -17,6 +17,7 @@ class GuiManager {
         static GLFWwindow * window; /**< A pointer on the application's window. */
         static int selectedDirectionalWave; /**< The index corresponding to the selected directional wave. =-1 if none is selected. */
         static glm::vec2 directionData; /**< Displayed direction value to not normalize directly the user's input. */
+        static glm::vec2 windVelocityData; /**< Displayed wind velocity value in km/h. */
         static PointWave pointWaveParameters; /**< The selected parameters to generate point waves.*/
 
     public:
@@ -58,16 +59,6 @@ class GuiManager {
          * @param imGuiID
          */
         static void showAWaveParameters(Wave * wave, int imGuiID);
-
-        /**
-         * Displays a text and a text input on the same line.
-         * @param text to use and modify
-         * @param label The name of the text to modify and its Imgui ID.
-         * @param textFlags
-         *
-         * fixme the app crashes if the string is too long.
-         */
-        static void InputText(std::string & text, const std::string &label, ImGuiInputTextFlags textFlags);
 
         /**
          * Displays a text and a float input on the same line.

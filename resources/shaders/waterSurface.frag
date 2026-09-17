@@ -14,6 +14,7 @@ uniform Environment environment;
 uniform sampler2D oceanBedTexture;
 uniform sampler2D noiseNormalMap;
 uniform float depth;
+uniform vec2 windVelocity;
 
 out vec4 FragColor;
 
@@ -46,15 +47,13 @@ vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
 }
 
 void main(){
-    //todo displacement mapping or parallax mapping ?
     //todo sub-surface scattering
-    float NORMAL_SMOOTHING = 0.2;//0.2
-    vec2 velocity = vec2(0.2);
+    vec2 waterMovt = windVelocity * time;
 
-    vec3 sample1 = normalize(texture(noiseNormalMap, TexCoords + velocity * time).rgb* 2.0 - 1.0);
-    vec3 sample2 = normalize(texture(noiseNormalMap, TexCoords + velocity * time + vec2(0.1)).rgb* 2.0 - 1.0);
+    vec3 sample1 = normalize(texture(noiseNormalMap, TexCoords + waterMovt).rgb* 2.0 - 1.0);
+    vec3 sample2 = normalize(texture(noiseNormalMap, TexCoords + waterMovt + vec2(0.1)).rgb* 2.0 - 1.0);
     vec3 normal = mix(sample1, sample2, 0.5*sin(4*time) + 0.5);
-    normal = mix(vec3(0.0, 0.0, 1.0), normal, NORMAL_SMOOTHING); //mixing two normal samples to not have static ripples
+    normal = mix(vec3(0.0, 0.0, 1.0), normal, length(windVelocity)); //mixing two normal samples to not have static ripples
 
     vec3 N = TBN * normalize(normal);
     vec3 V = normalize(viewPos - FragPos);

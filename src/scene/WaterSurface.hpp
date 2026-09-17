@@ -12,10 +12,13 @@
  */
 class WaterSurface : Entity {
 private:
+    static constexpr float MAGNITUDE_UNDERSCALING = 100.0f;
+
     std::vector<std::shared_ptr<DirectionalWave>> directionalWaves; /**< The directional waves present in this water body. */
     std::vector<std::shared_ptr<PointWave>> pointWaves; /**< The point waves present in this water body. */
     std::unique_ptr<Surface> surface; /**< The water mesh. */
     float depth = 0; /**< depth of the water body : [0,1] */
+    glm::vec2 windVelocity = glm::vec2(-0.2); /**< in km/h, divided by MAGNITUDE_UNDERSCALING for calculations */
 
 public:
     WaterSurface();
@@ -35,6 +38,9 @@ public:
     /** Sets the body of water clamped to [0,1]. */
     void setWaterDepth(float depth);
     [[nodiscard]] float getWaterDepth() const;
+
+    void setWindVelocity(glm::vec2 velocity);
+    [[nodiscard]] glm::vec2 getWindVelocity() const;
 
     /** @returns the directional wave at the index's position.*/
     std::shared_ptr<DirectionalWave> getDirectionalWaveAt(int index);

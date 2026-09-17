@@ -4,9 +4,9 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <cmath>
-#include <iostream>
 #include <string>
 #include <gtc/type_ptr.hpp>
+#include "SceneManager.hpp"
 #include "../repositories/SceneRepository.hpp"
 
 const DirectionalWave GuiManager::DEFAULT_DIRECTIONAL_WAVE{glm::vec2(0.2f, 0.7f), 4.0f, 1.5f, 3.0};
@@ -16,6 +16,7 @@ GLFWwindow * GuiManager::window = nullptr;
 int GuiManager::selectedDirectionalWave = -1;
 
 glm::vec2 GuiManager::directionData{};
+glm::vec2 GuiManager::windVelocityData{-20.0f};
 PointWave GuiManager::pointWaveParameters = DEFAULT_POINT_WAVE;
 
 void GuiManager::init(GLFWwindow * _window) {
@@ -76,6 +77,10 @@ void GuiManager::drawEnvironmentParameters() {
         ImGui::SameLine();
         if (ImGui::SliderFloat("##Depth", &value, 0.0f, 1.0f))
             SceneRepository::getWaterSurface()->setWaterDepth(value);
+
+        auto [hasBeenModified, velocity] = GuiManager::InputVec2(windVelocityData, "Set wind velocity", "##windVelocity");
+        if (hasBeenModified) SceneRepository::getWaterSurface()->setWindVelocity(velocity);
+        SpacingTimes(3);
     }
 }
 
@@ -154,15 +159,6 @@ void GuiManager::showAWaveParameters(Wave * wave, int imGuiID) {
     if (enteredAmpl) wave->setAmplitude(amplValue);
     auto [enteredSpeed, speedValue] = InputFloat(wave->getSpeed(), "Speed", ("##spd" + std::to_string(imGuiID)).c_str());
     if (enteredSpeed) wave->setSpeed(speedValue);
-}
-
-void GuiManager::InputText(std::string & text, const std::string & label, ImGuiInputTextFlags textFlags) {
-    char * buf = text.data();
-    ImGui::TextUnformatted(label.c_str());
-    ImGui::SameLine();
-    bool input = ImGui::InputText(("##" + label).c_str(), buf, 20, textFlags);
-    std::string str(buf);
-    if (input) text = std::string(buf);
 }
 
 std::pair<bool, float> GuiManager::InputFloat(float value, const char * label, const char * id) {
