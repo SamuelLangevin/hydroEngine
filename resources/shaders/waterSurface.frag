@@ -48,14 +48,16 @@ vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
 void main(){
     //todo displacement mapping or parallax mapping ?
     //todo sub-surface scattering
-    float normalSmoothing = 0.2;//0.2
-    float windSpeed = 0.1;
-    vec3 normal = normalize(texture(noiseNormalMap, TexCoords + windSpeed * time).rgb* 2.0 - 1.0);
+    float NORMAL_SMOOTHING = 0.2;//0.2
+    vec2 velocity = vec2(0.2);
 
-    normal = mix(vec3(0.0, 0.0, 1.0), normal, normalSmoothing);
+    vec3 sample1 = normalize(texture(noiseNormalMap, TexCoords + velocity * time).rgb* 2.0 - 1.0);
+    vec3 sample2 = normalize(texture(noiseNormalMap, TexCoords + velocity * time + vec2(0.1)).rgb* 2.0 - 1.0);
+    vec3 normal = mix(sample1, sample2, 0.5*sin(4*time) + 0.5);
+    normal = mix(vec3(0.0, 0.0, 1.0), normal, NORMAL_SMOOTHING); //mixing two normal samples to not have static ripples
+
     vec3 N = TBN * normalize(normal);
     vec3 V = normalize(viewPos - FragPos);
-
     vec3 F_0 = mix(vec3(0.04), vec3(1.0), material.metallic);
 
     vec3 ambient = waterColor(N, V, F_0);
@@ -63,6 +65,5 @@ void main(){
     vec3 color = ambient;
     color = color / (color + vec3(1.0));
     color = pow(color, vec3(1.0/2.2));
-
     FragColor = vec4(color, 1.0);
 }
