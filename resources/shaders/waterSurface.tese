@@ -84,7 +84,7 @@ void main() {
 
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
-    int TEXTURE_UNDERSCALING = 160;
+    int TEXTURE_UNDERSCALING = 40;
     TexCoords = TEXTURE_UNDERSCALING * ((t1 - t0) * v + t0); //fixme texcoords will not be tied to a position
 
     vec4 p00 = gl_in[0].gl_Position;

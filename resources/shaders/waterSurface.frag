@@ -6,7 +6,9 @@ in vec3 Normal;
 in vec2 TexCoords;
 in mat3 TBN;
 
+uniform float time;
 uniform vec3 viewPos;
+
 uniform Material material;
 uniform Environment environment;
 uniform sampler2D oceanBedTexture;
@@ -27,7 +29,6 @@ vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
     vec3 kS = F; //Ratio of the light reflected
     vec3 kD = (1.0 - kS) * (1.0 - material.metallic); //Ratio of the light absorbed
 
-    //fixme need to muptiply with inverse(TBN) when sampling with vector
     vec3 refracted = refract(-V, N, 1.0/1.33);
     vec3 oceanBedColor = texture(oceanBedTexture, refracted.xz).rgb;
     vec3 deepColor = vec3(0.0, 0.0, 0.1);
@@ -45,9 +46,14 @@ vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
 }
 
 void main(){
+    //todo displacement mapping or parallax mapping ?
+    //todo sub-surface scattering
+    float normalSmoothing = 0.2;//0.2
+    float windSpeed = 0.1;
+    vec3 normal = normalize(texture(noiseNormalMap, TexCoords + windSpeed * time).rgb* 2.0 - 1.0);
 
-    vec3 normal = texture(noiseNormalMap, TexCoords).rgb;
-    vec3 N = TBN * normalize(normal * 2.0 - 1.0);
+    normal = mix(vec3(0.0, 0.0, 1.0), normal, normalSmoothing);
+    vec3 N = TBN * normalize(normal);
     vec3 V = normalize(viewPos - FragPos);
 
     vec3 F_0 = mix(vec3(0.04), vec3(1.0), material.metallic);

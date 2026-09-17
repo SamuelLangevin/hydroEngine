@@ -41,7 +41,7 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
     RM::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
     RM::addTexture("oceanBed", Texture::textureFromFile("oceanBed.png", "../resources/textures", GL_REPEAT));
-    RM::addTexture("noiseNormalMap", Texture::textureFromFile("noise4Normals.png", "../resources/textures", GL_REPEAT));
+    RM::addTexture("noiseNormalMap", Texture::textureFromFile("noiseNormals5.png", "../resources/textures", GL_REPEAT));
 
     createIBLTextures();
 }
