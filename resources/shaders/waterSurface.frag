@@ -2,7 +2,6 @@
 #include "pbr/pbrFunctions.glsl"
 
 in vec3 FragPos;
-in vec3 Normal;
 in vec2 TexCoords;
 in mat3 TBN;
 
@@ -30,14 +29,25 @@ vec3 waterColor(vec3 N, vec3 V, vec3 F_0) {
     vec3 kS = F; //Ratio of the light reflected
     vec3 kD = (1.0 - kS) * (1.0 - material.metallic); //Ratio of the light absorbed
 
-    vec3 refracted = refract(-V, N, 1.0/1.33);
-    vec3 oceanBedColor = texture(oceanBedTexture, refracted.xz).rgb;
-    vec3 deepColor = vec3(0.0, 0.0, 0.1);
-    vec3 shallowColor = vec3(0.0, 0.3, 0.3);
-    vec3 depthColor = mix(deepColor, shallowColor + 0.2*oceanBedColor, depth);
-    vec3 diffuse = max( dot(V, N),0 ) * depthColor * texture(environment.irradianceMap, N).xyz;
-
     const float MAX_REFLECTION_LOD = 4.0;
+    vec3 refracted = refract(-V, N, 1.0/1.33);
+    vec3 scatterColor = vec3(0.0, 0.5, 1.0);
+    //vec3 scatterColor = textureLod(environment.prefilterMap, refracted, material.roughness * MAX_REFLECTION_LOD).rgb;
+
+
+    float wrap = 0.5;
+    float scatterWidth = 2.0;
+    float NdotL = dot(N, vec3(1.0, -1.0, 1.0));
+    float NdotL_wrap = (NdotL + wrap) / (1 + wrap);
+    float diffuseC = max(NdotL_wrap, 0.0);
+    float scatter = smoothstep(0.0, scatterWidth, NdotL_wrap) *
+    smoothstep(scatterWidth * 2.0, scatterWidth, NdotL_wrap);
+
+    vec3 values = scatter * scatterColor;
+
+    vec3 deepColor = vec3(0.0, 0.0, 0.1);
+    vec3 diffuse =  max(dot(N,V), 0.0) * values * texture(environment.irradianceMap, N).xyz + vec3(0.0, 0.0, 0.03);
+
     vec3 reflected = reflect(-V, N);
     vec3 prefilteredColor = textureLod(environment.prefilterMap, reflected, material.roughness * MAX_REFLECTION_LOD).rgb;
     vec2 envBRDF = texture(environment.brdfLUT, vec2(max(dot(N, V), 0.0), material.roughness)).rg;
