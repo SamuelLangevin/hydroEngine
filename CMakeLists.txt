@@ -40,7 +40,7 @@ add_executable(hydroEngine
         src/resources/Texture.cpp
         src/scene/Waves.cpp
         src/scene/draw/Sphere.cpp
-        src/scene/draw/Mesh.cpp
+        src/resources/Mesh.cpp
         src/scene/draw/Rectangle.cpp
         src/scene/draw/Surface.cpp
         src/scene/draw/Cube.cpp

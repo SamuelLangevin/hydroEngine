@@ -6,11 +6,11 @@
 
 #include "../resources/Texture.hpp"
 #include "../resources/Shader.hpp"
+#include "../resources/Mesh.hpp"
 
 //todo allow to store framebuffers
-//todo allow to store meshes{VAO, VBO, EBO} ?
 /** \class ResourceRepository
- * Singleton managing the shaders and textures creation, usage and destruction.
+ * Singleton managing the shaders, textures and meshes creation, usage and destruction.
  */
 class ResourceRepository{
     public:
@@ -51,10 +51,25 @@ class ResourceRepository{
          */
         static void clear();
 
+        /**
+         * Stores a mesh object by name.
+         * @param name given to the mesh
+         * @param mesh
+         */
+        static void addMesh(const std::string & name, Mesh mesh);
+
+        /**
+        * @param name of the mesh
+        * @returns a copy the named mesh
+        * @throws std::invalid_argument if there is no mesh linked to the given name
+        */
+        [[nodiscard]] static Mesh getMesh(const std::string & name);
+
     private:
 
         static std::map<std::string, Shader> shaders; /**< Shaders stored by name*/
         static std::map<std::string, Texture> textures; /**< Textures stored by name*/
+        static std::map<std::string, Mesh> meshes; /**< meshes stored by name*/
 
 };
 

@@ -1,6 +1,6 @@
 #include "Sphere.hpp"
 
-#include "Mesh.hpp"
+#include "../../resources/Mesh.hpp"
 
 #define PI 3.14159265359
 
@@ -48,8 +48,7 @@ void Sphere::load(){
                 indices.push_back(d);
             }
         }
-        std::vector<Mesh::Texture> textures;
-        Mesh mesh(vertices, indices, textures);
+        Mesh mesh(vertices, indices);
         VAO = mesh.VAO;
         VBO = mesh.VBO;
         EBO = mesh.EBO;

@@ -1,5 +1,5 @@
-#ifndef SHAPE_HPP
-#define SHAPE_HPP
+#ifndef ENTITY_HPP
+#define ENTITY_HPP
 
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL

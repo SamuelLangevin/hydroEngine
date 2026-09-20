@@ -3,6 +3,7 @@
 
 std::map<std::string, Shader> ResourceRepository::shaders;
 std::map<std::string, Texture> ResourceRepository::textures;
+std::map<std::string, Mesh> ResourceRepository::meshes;
 
 
 void ResourceRepository::addShader(const std::string &name, const Shader shader) {
@@ -25,6 +26,15 @@ Texture ResourceRepository::getTexture(const std::string & name) {
     return textures.at(name);
 }
 
+void ResourceRepository::addMesh(const std::string &name, Mesh mesh) {
+    meshes.insert({name, mesh});
+}
+
+Mesh ResourceRepository::getMesh(const std::string &name) {
+    if (meshes.find(name) == meshes.end())
+        throw std::invalid_argument("Mesh " + name + " does not exists");
+    return meshes.at(name);
+}
 
 void ResourceRepository::clear() {
     for (auto &[name, shader]: shaders) {
@@ -34,6 +44,11 @@ void ResourceRepository::clear() {
         uint id = texture.getID();
         glDeleteTextures(1, &id);
     }
+    for (auto &[name, mesh]: meshes) {
+        mesh.free();
+    }
+
     shaders.clear();
     textures.clear();
+    meshes.clear();
 }
