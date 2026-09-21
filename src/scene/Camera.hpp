@@ -9,45 +9,6 @@
  */
 class Camera {
     public:
-        /** \struct Plane
-        * Describes a plane of the camera's frustum.
-        */
-        struct Plane {
-
-            glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f); /**< A vector perpendicular to the plane. */
-            float distance = 0.0f; /**< Distance from the origin to the nearest point on the plane*/
-
-            Plane() = default;
-
-            /**
-             * Calculates its distance from the origin from the given parameters.
-             * @param p1 A point on the plane
-             * @param normal
-             */
-            Plane(const glm::vec3 & p1, const glm::vec3 & normal)
-                : normal(glm::normalize(normal)), distance(glm::dot(normal, p1)){}
-
-            /**
-             * @param point
-             * @returns the point's distance from the plane
-             */
-            [[nodiscard]] float getSignedDistanceToPlane(const glm::vec3& point) const
-            {
-                return glm::dot(normal, point) - distance;
-            }
-        };
-
-        /** \struct Frustum
-         * Used to describe the camera's frustum.
-         */
-        struct Frustum {
-            Plane topFace; /**< The frustum's top delimitation. */
-            Plane bottomFace; /**< The frustum's bottom delimitation. */
-            Plane rightFace; /**< The frustum's right delimitation. */
-            Plane leftFace; /**< The frustum's left delimitation. */
-            Plane farFace; /**< The frustum's back delimitation. */
-            Plane nearFace; /**< The frustum's front delimitation. */
-        };
 
         Camera() = default;
 
@@ -61,12 +22,6 @@ class Camera {
          * @returns a matrix transforming to the screen's space.
          */
         [[nodiscard]] glm::mat4 getProjectionMatrix(glm::ivec2 windowSize) const;
-
-        /**
-         * @param windowSize AKA viewport
-         * @returns the camera's frustum
-         */
-        [[nodiscard]] Frustum createFrustumFromCamera(glm::ivec2 windowSize) const;
 
         /**
          * @param clickPos on the screen

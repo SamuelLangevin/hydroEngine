@@ -16,13 +16,10 @@
 
 void SceneRenderer::free() {
     glDeleteBuffers(1, &matricesUBO);
-    Sphere::free();
     ResourceRepository::clear();
-    Rectangle::free();
-    Cube::free();
 }
 
-void SceneRenderer::init(glm::ivec2 windowSize) {
+void SceneRenderer::init() {
     loadShaders();
     setUniformBlocks();
     loadTextures();
@@ -105,40 +102,12 @@ void SceneRenderer::createIBLTextures() {
     };
 
     glBindFramebuffer(GL_FRAMEBUFFER, envCubemapFBO.ID);
-        glBindRenderbuffer(GL_RENDERBUFFER, envCubemapFBO.renderBuffer);
-        //createEnvIrradianceCubemap(captureProjection, &captureView[0], false); // has been pre-generated
-        createPrefilteredMipMaps(captureProjection, &captureView[0]);
-        //createLUTTexture(false); // has been pre-generated
+    glBindRenderbuffer(GL_RENDERBUFFER, envCubemapFBO.renderBuffer);
+    createPrefilteredMipMaps(captureProjection, &captureView[0]);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDeleteFramebuffers(1, &envCubemapFBO.ID);
     glDeleteRenderbuffers(1, &envCubemapFBO.renderBuffer);
-}
-
-void SceneRenderer::createEnvIrradianceCubemap(const glm::mat4 & captureProjection, const glm::mat4 * captureView, bool saveAsImage){
-    constexpr glm::ivec2 IRRADIANCE_TEX_SIZE(32);
-    Texture envIrradianceTexture = Texture::createCubemapTexture(IRRADIANCE_TEX_SIZE);
-    ResourceRepository::addTexture("envIrradianceTexture", envIrradianceTexture);
-
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
-
-    Shader cubemapConvolutionShader = Shader::createShader("pbr/position.vert", "pbr/cubemapConvolution.frag");
-    cubemapConvolutionShader.use();
-    cubemapConvolutionShader.setInt("environmentMap", 0);
-    cubemapConvolutionShader.setMat4("projection", captureProjection);
-    ResourceRepository::getTexture("lakeSkybox").bind(cubemapConvolutionShader, "environmentMap", 0);
-
-    glViewport(0, 0, IRRADIANCE_TEX_SIZE.x, IRRADIANCE_TEX_SIZE.y);
-    for (uint i = 0; i < 6; i++) {
-        cubemapConvolutionShader.setMat4("view", captureView[i]);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envIrradianceTexture.getID(), 0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        Cube::draw();
-        if (saveAsImage) Texture::saveTextureToFile(std::to_string(i) + "_irradianceCubemap.tga", IRRADIANCE_TEX_SIZE);
-    }
-    glDeleteProgram(cubemapConvolutionShader.getID());
 }
 
 void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection, const glm::mat4 * captureView) {
@@ -174,24 +143,6 @@ void SceneRenderer::createPrefilteredMipMaps(const glm::mat4 & captureProjection
     glDeleteProgram(prefilterConvolutionShader.getID());
 }
 
-void SceneRenderer::createLUTTexture(bool saveAsImage) {
-    constexpr glm::ivec2 LUT_TEX_SIZE(512);
-    Texture brdfLUTTexture = Texture::createTexture(LUT_TEX_SIZE, GL_RG16F, GL_RG, GL_FLOAT, nullptr);
-    ResourceRepository::addTexture("lutTexture", brdfLUTTexture);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture.getID(), 0);
-    glViewport(0, 0, LUT_TEX_SIZE.x, LUT_TEX_SIZE.y);
-    Shader brdfConvolutionShader = Shader::createShader("pbr/BRDFConvolution.vert", "pbr/BRDFConvolution.frag");
-
-    brdfConvolutionShader.use();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    Rectangle::draw2DQuad();
-    if (saveAsImage) Texture::saveTextureToFile("LUTTexture", LUT_TEX_SIZE);
-
-    glDeleteProgram(brdfConvolutionShader.getID());
-
-}
-
 void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) const {
     using RM = ResourceRepository;
     using SR = SceneRepository;
@@ -208,7 +159,6 @@ void SceneRenderer::draw(const Camera & camera, const glm::ivec2 windowSize) con
     glPatchParameteri(GL_PATCH_VERTICES, 4);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);
-    //glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 
     Shader waterSurfaceShader = RM::getShader("waterSurfaceShader");
     Shader objectShader = RM::getShader("object");
