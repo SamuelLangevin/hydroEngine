@@ -88,7 +88,7 @@ class SceneRenderer {
          * Based on https://learnopengl.com/PBR/IBL/Specular-IBL
          * @param saveAsImage option to save this texture as an image.
          */
-        static void createLUTTexture(bool saveAsImage);
+        static void createbrdfLUT(bool saveAsImage);
 };
 
 #endif

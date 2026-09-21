@@ -87,19 +87,16 @@ void Application::mouse_button_callback(GLFWwindow* window, int button, int acti
 void Application::processInput(){
 
     switch (appState) {
-
         case ACTIVE: {
             processCameraMovement();
 
             if (mouseButtons[GLFW_MOUSE_BUTTON_LEFT] && !mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT]) {
                 sceneManager.produceWave(camera, glfwGetTime(), windowSize, GuiManager::getPointWaveParameters());
-
                 mouseButtonsProcessed[GLFW_MOUSE_BUTTON_LEFT] = true;
             }
 
             if(keys[GLFW_KEY_ESCAPE] && !keysProcessed[GLFW_KEY_ESCAPE]) {
                 setState(MENU);
-
                 keysProcessed[GLFW_KEY_ESCAPE] = true;
             }
 

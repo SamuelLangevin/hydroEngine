@@ -36,7 +36,8 @@ void SceneManager::update(float time, glm::vec2 windowSize, const Camera & camer
 void SceneManager::produceWave(const Camera & camera, float currentTime, glm::ivec2 windowSize, const PointWave & pointWaveParameters) {
     const glm::vec2 screenCenter = 0.5f * glm::vec2(windowSize);
     glm::vec3 nearClipClick = camera.screenClickToNearClip(screenCenter, windowSize);
-    if (glm::dot(camera.getPosition() - nearClipClick, camera.getPosition() - worldCursorPos) > 0.0f) {
+    bool waveOriginIsVisible = glm::dot(camera.getPosition() - nearClipClick, camera.getPosition() - worldCursorPos) > 0.0f;
+    if (waveOriginIsVisible) {
         PointWave wave(glm::vec2(worldCursorPos.x, worldCursorPos.z), currentTime,
             pointWaveParameters.getWaveLength(), pointWaveParameters.getAmplitude(), pointWaveParameters.getSpeed());
         SceneRepository::getWaterSurface()->addPointWave(wave);

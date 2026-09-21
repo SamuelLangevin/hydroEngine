@@ -34,6 +34,7 @@ notably the implementation of [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-
 - The tessellation shader used for the water was based from [Dr. Jeffrey Paone's guest article on tessellation](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
 - The frustum culling (not yet implemented) calculations come from [Six Jonathan's article](https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling).
 - The [ImGui library](https://github.com/ocornut/imgui) was used for the graphical user interface.
+- [NVIDIA's article on sub-surface scattering approximation](https://developer.nvidia.com/gpugems/gpugems/part-iii-materials/chapter-16-real-time-approximations-subsurface-scattering)
 
 ## Used assets
 - Lake skybox : https://github.com/JoeyDeVries/LearnOpenGL/tree/master/resources/textures/skybox
