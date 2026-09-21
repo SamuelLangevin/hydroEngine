@@ -40,7 +40,6 @@ void SceneRenderer::loadTextures() {
     RM::addTexture("deepBlue", Texture::createColorTexture(glm::vec3(0.0f, 0.05f, 0.1f)));
     RM::addTexture("white", Texture::createColorTexture(glm::vec3(1.0f)));
     RM::addTexture("red", Texture::createColorTexture(glm::vec3(1.0f, 0.0f, 0.0f)));
-    RM::addTexture("oceanBed", Texture::textureFromFile("oceanBed.png", "../resources/textures", GL_REPEAT));
     RM::addTexture("noiseNormalMap", Texture::textureFromFile("noiseNormals5.png", "../resources/textures", GL_REPEAT));
 
     createIBLTextures();
@@ -78,8 +77,7 @@ void SceneRenderer::initializeScene() {
     RM::getTexture("lakeIrradianceMap").bind(waterSurfaceShader, "environment.irradianceMap",1);
     RM::getTexture("prefilterMap").bind(waterSurfaceShader, "environment.prefilterMap",2);
     RM::getTexture("brdfLUT").bind(waterSurfaceShader, "environment.brdfLUT",3);
-    RM::getTexture("oceanBed").bind(waterSurfaceShader, "oceanBedTexture",4);
-    RM::getTexture("noiseNormalMap").bind(waterSurfaceShader, "noiseNormalMap",5);
+    RM::getTexture("noiseNormalMap").bind(waterSurfaceShader, "noiseNormalMap",4);
 
     Shader objectShader = RM::getShader("object");
     objectShader.use();

@@ -17,7 +17,6 @@ private:
     std::vector<std::shared_ptr<DirectionalWave>> directionalWaves; /**< The directional waves present in this water body. */
     std::vector<std::shared_ptr<PointWave>> pointWaves; /**< The point waves present in this water body. */
     std::unique_ptr<Surface> surface; /**< The water mesh. */
-    float depth = 0; /**< depth of the water body : [0,1] */
     glm::vec2 windVelocity = glm::vec2(-0.2); /**< in km/h, divided by MAGNITUDE_UNDERSCALING for calculations */
 
 public:
@@ -34,10 +33,6 @@ public:
 
     /** Adds the point wave to the water */
     void addDirectionalWave(const DirectionalWave & directionalWave);
-
-    /** Sets the body of water clamped to [0,1]. */
-    void setWaterDepth(float depth);
-    [[nodiscard]] float getWaterDepth() const;
 
     void setWindVelocity(glm::vec2 velocity);
     [[nodiscard]] glm::vec2 getWindVelocity() const;

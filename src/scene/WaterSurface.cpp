@@ -39,14 +39,6 @@ void WaterSurface::addDirectionalWave(const DirectionalWave &directionalWave) {
     directionalWaves.push_back(std::make_shared<DirectionalWave>(directionalWave));
 }
 
-void WaterSurface::setWaterDepth(float depth) {
-    this->depth = glm::clamp(depth, 0.0f, 1.0f);
-}
-
-float WaterSurface::getWaterDepth() const {
-    return depth;
-}
-
 void WaterSurface::setWindVelocity(glm::vec2 velocity) {
     constexpr float MAGNITUDE_UNDERSCALING = 100.0f;
     windVelocity = (1.0f/MAGNITUDE_UNDERSCALING) * velocity;
@@ -103,7 +95,6 @@ glm::vec3 WaterSurface::computeResultingNormal(float absoluteTime, glm::vec3 ini
 
 void WaterSurface::draw(const Shader & shader) const {
     shader.setInt("nbOfPointWaves", static_cast<int>(pointWaves.size()));
-    shader.setFloat("depth", depth);
     shader.setVec2("windVelocity", windVelocity);
 
     for (int i = 0; i < std::min(static_cast<int>(pointWaves.size()), 50); ++i) {

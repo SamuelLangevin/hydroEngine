@@ -72,12 +72,6 @@ void GuiManager::draw() {
 
 void GuiManager::drawEnvironmentParameters() {
     if (ImGui::CollapsingHeader("Water properties and environment")) {
-        float value = SceneRepository::getWaterSurface()->getWaterDepth();
-        ImGui::TextUnformatted("Depth");
-        ImGui::SameLine();
-        if (ImGui::SliderFloat("##Depth", &value, 0.0f, 1.0f))
-            SceneRepository::getWaterSurface()->setWaterDepth(value);
-
         auto [hasBeenModified, velocity] = GuiManager::InputVec2(windVelocityData, "Set wind velocity", "##windVelocity");
         if (hasBeenModified) SceneRepository::getWaterSurface()->setWindVelocity(velocity);
         SpacingTimes(3);

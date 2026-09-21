@@ -10,20 +10,19 @@ uniform vec3 viewPos;
 
 uniform Material material;
 uniform Environment environment;
-uniform sampler2D oceanBedTexture;
 uniform sampler2D noiseNormalMap;
-uniform float depth;
 uniform vec2 windVelocity;
 
 out vec4 FragColor;
 
-float computeScatteringFactor(vec3 refracted, vec3 minusV){
+// https://developer.nvidia.com/gpugems/gpugems/part-iii-materials/chapter-16-real-time-approximations-subsurface-scattering
+float computeScatteringFactor(vec3 N, vec3 L){
     float wrap = 0.5;
     float scatterWidth = 2.0;
-    float dotP = dot(refracted, minusV);
-    float dotP_wrap = (dotP + wrap) / (1 + wrap);
-    float scatteringFactor = smoothstep(0.0, scatterWidth, dotP_wrap) *
-        smoothstep(scatterWidth * 2.0, scatterWidth, dotP_wrap);
+    float NdotL = dot(N, L);
+    float NdotL_wrap = (NdotL + wrap) / (1 + wrap);
+    float scatteringFactor = smoothstep(0.0, scatterWidth, NdotL_wrap) *
+        smoothstep(scatterWidth * 2.0, scatterWidth, NdotL_wrap);
     return scatteringFactor;
 }
 
@@ -38,11 +37,10 @@ vec3 waterColor(vec3 N, vec3 V) {
     vec3 kS = F; //Ratio of the light reflected
     vec3 kD = (1.0 - kS) * (1.0 - material.metallic); //Ratio of the light absorbed
 
-    //todo but light direction should be approximated from irradiance map
-    vec3 doubleRefracted = reflect(-N,vec3(0.0, 1.0, 0.0)); //extremely rough approximation of a double refracted ray towards the sky
-    float scatteringFactor = computeScatteringFactor(doubleRefracted, -V);
+    vec3 L = vec3(1.0, -1.0, 1.0);
+    float scatteringFactor = computeScatteringFactor(N ,L);
     vec3 albedo = texture(material.texture_diffuse0, TexCoords).rgb;
-    vec3 scatterColor = 20 * albedo *texture(environment.irradianceMap, doubleRefracted).rgb;
+    vec3 scatterColor = 20 * albedo *texture(environment.irradianceMap, -L).rgb;
     vec3 scatteredRefraction = albedo + scatteringFactor * scatterColor;
     vec3 diffuse = max(dot(N,V), 0.0) * scatteredRefraction * texture(environment.irradianceMap, N).xyz;
 
