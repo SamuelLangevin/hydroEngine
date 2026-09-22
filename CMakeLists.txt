@@ -39,12 +39,14 @@ add_executable(hydroEngine
         src/repositories/ResourceRepository.cpp
         src/resources/Texture.cpp
         src/scene/Waves.cpp
-        src/scene/draw/Sphere.cpp
         src/resources/Mesh.cpp
-        src/scene/draw/Rectangle.cpp
-        src/scene/draw/Surface.cpp
-        src/scene/draw/Cube.cpp
         src/scene/WaterSurface.cpp
+        src/scene/draw/Shape.cpp
+        src/resources/ResourceRefs.hpp
+        src/submodules/ShapeFactory.cpp
+        src/submodules/ShapeFactory.hpp
+        src/submodules/MeshBuilder.cpp
+        src/submodules/MeshBuilder.hpp
 )
 
 target_include_directories(hydroEngine PRIVATE /usr/local/include/glm)

@@ -30,10 +30,11 @@ void ResourceRepository::addMesh(const std::string &name, Mesh mesh) {
     meshes.insert({name, mesh});
 }
 
-Mesh ResourceRepository::getMesh(const std::string &name) {
+MeshRef ResourceRepository::getMesh(const std::string &name) {
     if (meshes.find(name) == meshes.end())
         throw std::invalid_argument("Mesh " + name + " does not exists");
-    return meshes.at(name);
+    Mesh mesh = meshes.at(name);
+    return MeshRef{mesh.getVaoID(), mesh.vertexDrawCount};
 }
 
 void ResourceRepository::clear() {

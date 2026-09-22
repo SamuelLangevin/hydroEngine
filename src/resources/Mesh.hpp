@@ -26,6 +26,8 @@ public:
     /** Deletes the VAO, VBO and EBO */
     void free();
 
+    [[nodiscard]] uint getVaoID() const { return VAO; }
+
     /**
      * Generates the VAO, VBO and EBO
      * @param vertices

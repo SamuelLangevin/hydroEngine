@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include "../resources/ResourceRefs.hpp"
 
 #include "../resources/Texture.hpp"
 #include "../resources/Shader.hpp"
@@ -63,7 +64,7 @@ class ResourceRepository{
         * @returns a copy the named mesh
         * @throws std::invalid_argument if there is no mesh linked to the given name
         */
-        [[nodiscard]] static Mesh getMesh(const std::string & name);
+        [[nodiscard]] static MeshRef getMesh(const std::string & name);
 
     private:
 
