@@ -41,12 +41,12 @@ vec3 waterColor(vec3 N, vec3 V) {
     float scatteringFactor = computeScatteringFactor(N ,L);
     vec3 albedo = texture(material.texture_diffuse0, TexCoords).rgb;
     vec3 scatterColor = 20 * albedo *texture(environment.irradianceMap, -L).rgb;
-    vec3 scatteredRefraction = albedo + scatteringFactor * scatterColor;
-    vec3 diffuse = max(dot(N,V), 0.0) * scatteredRefraction * texture(environment.irradianceMap, N).xyz;
+    vec3 diffuseColor = albedo + scatteringFactor * scatterColor;
+    vec3 diffuse = diffuseColor * texture(environment.irradianceMap, N).xyz;
 
-    const float MAX_REFLECTION_LOD = 4.0;
+    const float MAX_REFLECTION_LOD = 0.0;
     vec3 reflected = reflect(-V, N);
-    vec3 prefilteredColor = textureLod(environment.prefilterMap, reflected, material.roughness * MAX_REFLECTION_LOD).rgb;
+    vec3 prefilteredColor = textureLod(environment.prefilterMap, reflected, MAX_REFLECTION_LOD).rgb;
     vec2 envBRDF = texture(environment.brdfLUT, vec2(max(dot(N, V), 0.0), material.roughness)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
 
