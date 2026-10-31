@@ -4,6 +4,7 @@
 
 #include "../scene/Entity.hpp"
 #include "../scene/Waves.hpp"
+#include "../scene/Camera.hpp"
 
 
 /** \class SceneManager
