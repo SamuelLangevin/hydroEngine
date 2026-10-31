@@ -2,36 +2,6 @@
 #include <iostream>
 #include "Texture.hpp"
 
-//todo refactor duplicated code : texture and renderbuffer creation
-
-void Utility::createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize) {
-    glGenFramebuffers(1, &FBO.ID);
-    glBindFramebuffer(GL_FRAMEBUFFER, FBO.ID);
-
-    auto generateTextureBuffer = [&](uint & textureBufferId, const GLuint number) {
-        glGenTextures(1, &textureBufferId);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, textureBufferId);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA16F, windowSize.x, windowSize.y, GL_TRUE);
-        Texture::setParameters(GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_LINEAR);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, number, GL_TEXTURE_2D_MULTISAMPLE, textureBufferId, 0);
-    };
-    generateTextureBuffer(FBO.buffers[0], GL_COLOR_ATTACHMENT0);
-    generateTextureBuffer(FBO.buffers[1], GL_COLOR_ATTACHMENT1);
-
-    glGenRenderbuffers(1, &FBO.renderBuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, FBO.renderBuffer);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, windowSize.x, windowSize.y);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FBO.renderBuffer);
-
-    uint attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    glDrawBuffers(2, attachments);
-
-    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Multisample framebuffer is not complete!\n";
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
 
 void Utility::createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool attachRenderBuffer, int colorAttachments) {
     glGenFramebuffers(1, &FBO.ID);

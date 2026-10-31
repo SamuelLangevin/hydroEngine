@@ -11,7 +11,7 @@ uint Application::keysProcessed[1024];
 
 Application::Application() {
     initializeWindow();
-    sceneRenderer.init(windowSize);
+    sceneRenderer.init();
     sceneManager.init();
     GuiManager::init(window);
     setState(MENU);

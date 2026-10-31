@@ -32,7 +32,6 @@ This application uses ImGui as its graphical user interface, but does not requir
 - Some classes and functions of this application have been built from the book of [Joey de Vries](https://twitter.com/JoeyDeVriez), [LearnOpenGL](https://learnopengl.com/Introduction),
 notably the implementation of [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-irradiance) and [specular](https://learnopengl.com/PBR/IBL/Specular-IBL) IBL.
 - The tessellation shader used for the water was based from [Dr. Jeffrey Paone's guest article on tessellation](https://learnopengl.com/Guest-Articles/2021/Tessellation/Tessellation)
-- The frustum culling (not yet implemented) calculations come from [Six Jonathan's article](https://learnopengl.com/Guest-Articles/2021/Scene/Frustum-Culling).
 - The [ImGui library](https://github.com/ocornut/imgui) was used for the graphical user interface.
 - [NVIDIA's article on sub-surface scattering approximation](https://developer.nvidia.com/gpugems/gpugems/part-iii-materials/chapter-16-real-time-approximations-subsurface-scattering)
 
@@ -40,7 +39,6 @@ notably the implementation of [diffuse](https://learnopengl.com/PBR/IBL/Diffuse-
 - Lake skybox : https://github.com/JoeyDeVries/LearnOpenGL/tree/master/resources/textures/skybox
 - Noise pattern generated with https://tools.puida.com/creative/gamedesign/pattern-generator/app/
 and modified with gimp.
-- Ocean bed made with gimp.
 
 ## Contributing
 This is a personal project. You may suggest modifications, report bugs through issues but pull requests will not be merged.

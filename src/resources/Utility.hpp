@@ -32,13 +32,6 @@ class Utility{
         static void createFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize, bool attachRenderBuffer, int colorAttachments);
 
         /**
-         * Generates a multisample framebuffer for anti-aliasing
-         * @param FBO object to store the IDs in
-         * @param windowSize the size of the framebuffer
-         */
-        static void createMultiSampleFrameBuffer(FrameBuffer & FBO, glm::ivec2 windowSize);
-
-        /**
          * Prints the latest OpenGL error. Does not specify the error's location.
          * @param file the error was noticed in
          * @param line the line where the error was noticed.
